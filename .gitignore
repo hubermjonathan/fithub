@@ -1,0 +1,9 @@
+# general files to exclude
+*.DS_Store
+.DS_Store
+
+# backend files to exclude
+server_src/node_modules
+
+# frontend files to exclude
+
