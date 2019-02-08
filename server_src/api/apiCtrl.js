@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-import schemaCtrl from '../models/schema';
-import url from './config';
+const mongoose = require('mongoose');
+const schemaCtrl = require('../models/schema');
+const url = "URL";
 
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
@@ -20,4 +20,4 @@ function connectToDb() {
 let apiCtrl = {
 };
 
-export default apiCtrl;
+module.exports = apiCtrl;

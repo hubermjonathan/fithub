@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 // schemas
@@ -7,4 +7,4 @@ let Schema = mongoose.Schema;
 let schemaCtrl = {
 };
 
-export default schemaCtrl;
+module.exports = schemaCtrl;

@@ -1,6 +1,6 @@
-import express form 'express';
+const express = require('express');
 const app = express();
-import router from './routes';
+const router = require('./routes');
 
 app.use('/', router);
 
