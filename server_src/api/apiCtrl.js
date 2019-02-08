@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
-const url = "URL";
+const url = "mongodb://admin:<PASSWORD>@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
