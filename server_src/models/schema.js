@@ -14,32 +14,29 @@ let ProfileSchema = new Schema({
 
 let LogSchema = new Schema({
     exercise: { type: String, required: true },
-    data: [{sets: Number, reps: Number, weight: Number, warmup: Number}],
+    data:{ type: [], required: true }, //sets: Number, reps: Number, weight: Number, isWarmup: number
     dates: { type: Date, required: true },
 });
 
 let ExerciseSchema = new Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
-    id: { type: Number, required: true },
 });
 
 let WorkoutSchema = new Schema({
     name: { type: String, required: true },
+    dates: { type: Date, required: true },
     description: { type: String, required: true },
-    id: { type: Number, required: true },
 });
 
 let CustomExerciseSchema = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
-    id: { type: String, required: true },
 });
 
 let CustomWorkoutSchema = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
-    id: { type: String, required: true },
     exercises: [{ type: Schema.Types.ObjectId, ref: "CustomExerciseSchema"}],
     owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
 });
