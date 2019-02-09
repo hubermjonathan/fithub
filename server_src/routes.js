@@ -7,7 +7,13 @@ router.use(bodyParser.json());
 
 const apiCtrl = require('./api/apiCtrl');
 
-// api
-// ROUTES HERE
+//api
+router.post('/register',apiCtrl.register);
+router.post('/login',apiCtrl.login);
+router.post('/newWorkout',apiCtrl.newWorkout);
+router.post('/newExercise',apiCtrl.newExercise);
+router.post('/logWorkout',apiCtrl.logWorkout);
+router.get('/workouts/:uid',apiCtrl.workouts);
+router.get('/workoutDetails',apiCtrl.workoutDetails);
 
 module.exports = router;

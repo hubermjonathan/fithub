@@ -9,15 +9,48 @@ function connectToDb() {
   return db;
 }
 
-// FORMAT
-// let NAME = function NAME(req, res) {
-//   let db = connectToDb();
-//   db.once('open', () => {
-//     DO STUFF HERE
-//   });
-// }
+let register = function register(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
 
-let apiCtrl = {
-};
+  });
+}
+let login = function login(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+
+  });
+}
+let newWorkout = function newWorkout(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+
+  });
+}
+
+let newExercise = function newExercise(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+
+  });
+}
+let logWorkout = function logWorkout(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+
+  });
+}
+let workouts = function workouts(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+
+  });
+}
+let workoutDetails = function workoutDetails(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+
+  });
+}
 
 module.exports = apiCtrl;
