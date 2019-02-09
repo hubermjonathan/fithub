@@ -8,12 +8,12 @@ router.use(bodyParser.json());
 const apiCtrl = require('./api/apiCtrl');
 
 //api
-router.post('/register',apiCtrl.register);
 router.post('/login',apiCtrl.login);
-router.post('/newWorkout',apiCtrl.newWorkout);
-router.post('/newExercise',apiCtrl.newExercise);
-router.post('/logWorkout',apiCtrl.logWorkout);
-router.get('/workouts/:uid',apiCtrl.workouts);
-router.get('/workoutDetails',apiCtrl.workoutDetails);
+router.post('/users/register',apiCtrl.register);
+router.get('/users/:uid/workouts',apiCtrl.workouts);
+router.get('/users/:uid/exercises',apiCtrl.exercises);
+router.post('/workouts/new',apiCtrl.newWorkout);
+router.post('/workouts/log',apiCtrl.logWorkout);
+router.post('/exercise/new',apiCtrl.newExercise);
 
 module.exports = router;

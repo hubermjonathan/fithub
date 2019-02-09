@@ -9,48 +9,84 @@ function connectToDb() {
   return db;
 }
 
+//Register a user
 let register = function register(req, res) {
   let db = connectToDb();
   db.once('open', () => {
 
   });
 }
+
+//Log a user in
 let login = function login(req, res) {
   let db = connectToDb();
   db.once('open', () => {
 
   });
 }
+
+//Add a new workout into a users profile
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    let newWorkout = new schemaCtrl.WorkoutSchema({
+      name: req.body.name,
+      description: req.body.description,
+    });
 
+    newWorkout.save(function (err, newWorkout) {
+      if (err) return res.status(500).send({ message: 'Workout unsuccessfully added' });
+      else res.status(200).send({ message: 'Workout successfully added' });
+    });
   });
 }
 
+//Add a new exercise to a user's profile
 let newExercise = function newExercise(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    let newExercise = new schemaCtrl.ExerciseSchema({
+      name: req.body.name,
+      description: req.body.description,
+    });
 
+    newExercise.save(function (err, newExercise) {
+      if (err) return res.status(500).send({ message: 'Exercise unsuccessfully added' });
+      else res.status(200).send({ message: 'Exercise successfully added' });
+    });
   });
 }
+
+//Log a user's workout into the DB
 let logWorkout = function logWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    let newLog = new schemaCtrl.LogSchema({
+      exercise: req.body.exercise,
+      data: req.body.data,
+      dates = req.body.date
+    });
 
+    newLog.save(function (err, newLog) {
+      if (err) return res.status(500).send({ message: 'Log unsuccessfully added' });
+      else res.status(200).send({ message: 'Log successfully added' });
+    });
   });
 }
+
+//Get a users workouts from DB
 let workouts = function workouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-
   });
 }
-let workoutDetails = function workoutDetails(req, res) {
+
+//Get a users exercises from DB
+let exercises = function exercises(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-
   });
 }
+
 
 module.exports = apiCtrl;
