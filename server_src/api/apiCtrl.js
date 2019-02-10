@@ -75,9 +75,18 @@ let logWorkout = function logWorkout(req, res) {
 }
 
 //Get a users workouts from DB
+let workouts = [];
 let workouts = function workouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    schemaCtrl.workouts.find({name: req.body.name}, function(err, workouts){
+      if(err){
+        res.status(500).send({message: "Error getting workouts"});
+      }
+      else{
+        res.send(workouts);
+      }
+    })
   });
 }
 
