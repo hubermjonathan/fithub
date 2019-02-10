@@ -98,4 +98,5 @@ let exercises = function exercises(req, res) {
 }
 
 
+
 module.exports = apiCtrl;

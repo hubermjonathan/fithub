@@ -12,50 +12,61 @@ import { Agenda } from 'react-native-calendars';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       workouts: {},
     }
   }
 
   render() {
-    if(Platform.OS === 'ios') {
+    if (Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.container}>
-          <StatusBar backgroundColor="white"/>
+          <StatusBar backgroundColor="white" />
           <Agenda
             items={this.state.workouts}
             selected={'2019-02-09'}
             loadItemsForMonth={this.loadItems.bind(this)}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
-            rowHasChanged={(r1, r2) => {return r1.text !== r2.text}}
+            rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
           />
         </SafeAreaView>
       );
     } else {
       return (
         <View style={styles.container}>
-          <StatusBar backgroundColor="white"/>
+          <StatusBar backgroundColor="white" />
           <Agenda
             items={this.state.workouts}
             selected={'2019-02-09'}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
-            rowHasChanged={(r1, r2) => {return r1.text !== r2.text}}
+            rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
           />
         </View>
       );
     }
   }
 
+  //fetches users from server given uid
+  getWorkouts(uid) {
+    fetch(`/users/${uid}/workouts`, {
+      method: 'GET'
+    }).then(res => res.json())
+      .then((res) => console.log(res + ""))
+      .catch(function (e) {
+        console.log("User not found");
+      });
+  }
+
   loadItems(month) {
     setTimeout(() => {
       loadedWorkouts = {}
 
-      for(let i = 0; i < 31; i++) {
-        let date = new Date(month.timestamp + (i*24*60*60*1000));
-        date = date.toJSON().slice(0,10);
+      for (let i = 0; i < 31; i++) {
+        let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
+        date = date.toJSON().slice(0, 10);
         loadedWorkouts[date] = [];
       }
 
@@ -79,7 +90,7 @@ export default class App extends React.Component {
   }
 
   renderEmptyDate() {
-    return(
+    return (
       <View style={styles.empty}>
         <Text>You missed the gym this day!</Text>
       </View>
