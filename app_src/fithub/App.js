@@ -49,12 +49,12 @@ export default class App extends React.Component {
     }
   }
 
-  //fetches users from server given uid
+  //fetches user's workouts from server given a uid
   getWorkouts(uid) {
     fetch(`/users/${uid}/workouts`, {
       method: 'GET'
     }).then(res => res.json())
-      .then((res) => console.log(res + ""))
+      .then((res) => console.log(res))
       .catch(function (e) {
         console.log("User not found");
       });

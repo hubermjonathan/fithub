@@ -4,7 +4,7 @@ import { Icon } from 'react-native-elements';
 
 export default class SignIn extends Component {
 
-    render() {
+    render() {     
         <ScrollView style={styles.scroll}>
             {/*HEADER: FitHub logo*/}
             <View style={styles.header}>
@@ -76,12 +76,12 @@ export default class SignIn extends Component {
             </Container>       
         </ScrollView>
     }
-
+    
 }
 
 const styles = StyleSheet.create({
     scroll: {
-        backgroundColor: 'E1D7D8',
+        backgroundColor: '#E1D7D8',
         padding: 30,
         flexDirection: 'column'
     },
