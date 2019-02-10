@@ -1,6 +1,34 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
-const url = "mongodb://admin:@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+
+var passport = require('passport');
+var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
+var configAuth = require('../config/auth')
+
+//Used for login persistence
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+
+passport.use(new GoogleStrategy({
+        clientID             : configAuth.googleAuth.clientID,
+        clientSecret          : configAuth.googleAuth.clientSecret,
+        callbackURL             : configAuth.googleAuth.callbackURL,
+        passReqToCallback       : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+  },
+  function(request, accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      return done(null, profile);
+    });
+  }
+));
+
 
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
@@ -18,6 +46,7 @@ let register = function register(req, res) {
 }
 
 let callback = function callback(req,res) { 
+  console.log('callback');  
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     res.redirect('/');
