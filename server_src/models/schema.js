@@ -6,10 +6,13 @@ let Schema = mongoose.Schema;
 
 let ProfileSchema = new Schema({
     name: { type: String, required: true },
-    uid: { type: Number, required: true },
     pseudonym: { type: String, required: true },
     avatar: { type: String, required: true },
-    logs: [{ type: Schema.Types.ObjectId, ref: "LogSchema"}]
+    logs: [{ type: Schema.Types.ObjectId, ref: "LogSchema"}],
+    //For authentication
+    uid: { type: String, required: true },
+    token : { type: String, required: true},
+    email : { type: String, required: true}
 });
 
 let LogSchema = new Schema({
