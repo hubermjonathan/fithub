@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
-const url = "mongodb://admin:<PASSWORD>@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+const url = "mongodb://admin:@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
@@ -13,8 +13,15 @@ function connectToDb() {
 let register = function register(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-
+    passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] });
   });
+}
+
+let callback = function callback(req,res) { 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  };
 }
 
 //Log a user in
@@ -64,7 +71,7 @@ let logWorkout = function logWorkout(req, res) {
     let newLog = new schemaCtrl.LogSchema({
       exercise: req.body.exercise,
       data: req.body.data,
-      dates = req.body.date
+      dates: req.body.date
     });
 
     newLog.save(function (err, newLog) {
@@ -75,7 +82,6 @@ let logWorkout = function logWorkout(req, res) {
 }
 
 //Get a users workouts from DB
-let workouts = [];
 let workouts = function workouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
@@ -98,5 +104,15 @@ let exercises = function exercises(req, res) {
 }
 
 
+let apiCtrl = {
+  login: login,
+  callback: callback,
+  register: register,
+  newExercise: newExercise,
+  newWorkout: newWorkout,
+  logWorkout: logWorkout,
+  workouts: workouts,
+  exercises: exercises
+}
 
 module.exports = apiCtrl;
