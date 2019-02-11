@@ -8,11 +8,11 @@ import {
     Platform
 } from 'react-native';
 
-export default class Profile extends React.Component {
+export default class Home extends React.Component {
 
     render() {
         return (
-            <Text>Profile Screen</Text>
+            <Text>Home Screen</Text>
         )
     }
 }
