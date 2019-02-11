@@ -1,93 +1,100 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, Text, View, TextInput, SrollView } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { AppRegistry, StyleSheet, Text, View, TextInput, ScrollView, Image, Label, Button, Flexbox, Container, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class SignIn extends Component {
 
-    render() {     
-        <ScrollView style={styles.scroll}>
-            {/*HEADER: FitHub logo*/}
-            <View style={styles.header}>
-                <Container>
-                    <Image 
-                        source={require('asset:/FitHub-transparent.png')} 
-                        style={styles.image}
-                    />
-                </Container>
-            </View>
-            {/*HEADING: Login*/}
-            <Container>
-                <Label 
-                    text="Login"
-                    style={styles.heading}
-                />
-            </Container>  
-            {/*ROW: Login-Logo | Username-Dialog-Box*/}
-            <View style={styles.row}>
-                <Container>
-                    <Icon 
-                        name='account_circle' 
-                        style={styles.icon}
-                    />
-                </Container>
-                <Container>
-                    <TextInput
-                        placeholder='Username'
-                        secureTextEntry={false}
-                        style={styles.textInput}
-                    />
-                </Container>
-            </View>
-            {/*ROW: Password-Logo | Password-Dialog-Box*/}
-            <View style={styles.row}>
-                <Container>
-                    <Icon 
-                        name='lock' 
-                        style={styles.icon}
-                    />
-                </Container>
-                <Container>
-                    <TextInput
-                        placeholder='Password'
-                        secureTextEntry={true}
-                        style={styles.textInput}
-                    />
-                </Container>
-            </View>
-            {/*BUTTON: Login Button*/}
-            <View styles={{width: 100, padding: 10}}>
-                <Button
-                    label="Login"
-                    styles={styles.button}
-                    onPress={this.press.bind(this)}
-                />
-            </View>
-            {/*CREATE ACCOUNT: Text prompt with link to create an account*/}
-            <Container>
-                <Text style={{fontSize: 20}}>
-                    New to FitHub? No problem!
-                </Text>
-                <Text 
-                    style={{fontSize: 20, fontWeight: 'bold', color: 'blue'}}
-                    onPress={this.press.bind(this)}
-                > 
-                    Register for an account
-                </Text>
-            </Container>       
-        </ScrollView>
+    press() {
+        Console.log('Button Pressed');
+    }
+
+    render() {
+        return(
+                <View style={{flex: 3, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center'}}>
+                    {/*HEADER: FitHub logo*/}
+                    <View style={styles.header}>
+                            <Image 
+                                source={require('../../assets/FitHub-transparent.png')}
+                                style={styles.image}
+                            />
+                    </View>
+                    {/*HEADING: Login*/}
+                    <View>
+                        <Text style={styles.heading}>
+                            Login
+                        </Text> 
+                    </View>  
+                    {/*ROW: Login-Logo | Username-Dialog-Box*/}
+                    <View style={styles.row}>
+
+                            <View style={{padding: 5}}>
+                            </View>
+
+                            <Icon 
+                                name='user-circle' 
+                                type='font-awesome'
+                                size={30}
+                            />
+
+                            <View style={{padding: 5}}>
+                            </View>
+                            
+                            <TextInput
+                                placeholder='Username'
+                                placeholderTextColor= 'gray'
+                                secureTextEntry={false}
+                                style={styles.textInput}
+                            />
+                    </View>
+                    {/*ROW: Password-Logo | Password-Dialog-Box*/}
+                    <View style={styles.row}>
+                            <View style={{padding: 5}}>
+                            </View>
+                            <Icon 
+                                name='lock' 
+                                type='font-awesome'
+                                size={30}
+                            />
+                            <View style={{padding: 5}}>
+                            </View>
+                            <TextInput
+                                placeholder='Password'
+                                placeholderTextColor= 'gray'
+                                secureTextEntry={true}
+                                style={styles.textInput}
+                            />
+                    </View>
+                    {/*BUTTON: Login Button*/}
+                    <View>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={this.press.bind(this)}
+                        >
+                            <Text style={{fontSize: 30, fontWeight: 'bold', color: 'white'}}>Login</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {/*CREATE ACCOUNT: Text prompt with link to create an account*/}
+                    <View>
+                        <Text style={{fontSize: 20}}>
+                            New to FitHub? No problem!
+                        </Text>
+                        <Text 
+                            style={{fontSize: 20, fontWeight: 'bold', color: 'blue'}}
+                            onPress={this.press.bind(this)}
+                        > 
+                            Register for an account
+                        </Text>
+                    </View>    
+                </View>   
+        );
     }
     
 }
 
 const styles = StyleSheet.create({
-    scroll: {
-        backgroundColor: '#E1D7D8',
-        padding: 30,
-        flexDirection: 'column'
-    },
-    label: {
-        color: '#0d8898',
-        fontSize: 20
+    heading: {
+        fontSize: 40,
+        padding: 20,
     },
 
     alignRight: {
@@ -95,22 +102,35 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        color: '#05a5d1',
+        alignItems: 'center',
+        backgroundColor: '#05a5d1',
+        width: 150,
+        height: 40,
     },
     textInput: {
-        height: 80,
-        fontSize: 30,
+        height: 30,
+        flex: 2,
+        fontSize: 16,
         borderColor: 'gray',
         borderWidth: 1,
         backgroundColor: '#FFF',
-        placeholderTextColor: 'gray'
+    },
+
+    header: {
+        height: 200,
+        width: 300,
+        padding: 30
+        
     },
     image: {
-        width: 40,
-        height: 40
+        flex: 1,
+        width: undefined,
+        height: undefined,
+        resizeMode: 'contain'
     },
     row: {
         flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        alignItems: 'center'
     }
 });
