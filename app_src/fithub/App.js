@@ -49,17 +49,6 @@ export default class App extends React.Component {
     }
   }
 
-  //fetches users from server given uid
-  getWorkouts(uid) {
-    fetch(`/users/${uid}/workouts`, {
-      method: 'GET'
-    }).then(res => res.json())
-      .then((res) => console.log(res + ""))
-      .catch(function (e) {
-        console.log("User not found");
-      });
-  }
-
   loadItems(month) {
     setTimeout(() => {
       loadedWorkouts = {}
