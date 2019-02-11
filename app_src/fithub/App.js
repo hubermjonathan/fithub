@@ -8,6 +8,8 @@ import {
   Platform
 } from 'react-native';
 import { Agenda } from 'react-native-calendars';
+import { Icon } from 'react-native-elements';
+//import { BottomBar } from './app/Components/BottomBar.js';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -31,6 +33,37 @@ export default class App extends React.Component {
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
           />
+          <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                alignItems: 'flex-end',
+            }}>
+            <Icon
+                name="book"
+                type="material-community"
+                size={50}
+            />
+            <Icon
+              name="plus"
+              type="entypo"
+              size={50}
+            />
+            <Icon
+              name="home"
+              type="material-community"
+              size={50}
+            />
+            <Icon
+              name="globe"
+              type="entypo"
+              size={50}
+            />
+            <Icon
+                name="account"
+                type="material-community"
+                size={50}
+            />
+            </View>
         </SafeAreaView>
       );
     } else {
