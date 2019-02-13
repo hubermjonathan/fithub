@@ -1,24 +1,7 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
-var passport = require('passport');
-var GooglePlusTokenStrategy = require('passport-google-plus-token');
-var configAuth = require('../config/auth')
-
-//Google Strategy for logging in
-passport.use("googleToken", new GooglePlusTokenStrategy({
-        clientID             : configAuth.googleAuth.clientID,
-        clientSecret          : configAuth.googleAuth.clientSecret,
-  },
-  async(accessToken, refreshToken, profile, done) => {
-    try {
-
-      console.log('profile', profile);
-  
-    } catch(error) {
-      done(error, false, error.message);
-    }
-  }));
+const passport = require('../config/passport');
 
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
@@ -39,8 +22,6 @@ let login = function login(req, res) {
 let register = function register(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    passport.authenticate('googleToken', { session : false });
-    res.status(200).send();
   });
 }
 
@@ -122,7 +103,8 @@ let apiCtrl = {
   newWorkout: newWorkout,
   logWorkout: logWorkout,
   workouts: workouts,
-  exercises: exercises
+  exercises: exercises,
+  passport: passport
 }
 
 module.exports = apiCtrl;

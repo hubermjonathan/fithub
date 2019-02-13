@@ -1,17 +1,21 @@
-var passport = require('passport');
-var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
+const passport = require('passport');
+const GooglePlusTokenStrategy = require('passport-google-plus-token');
+const configAuth = require('./auth')
 
-var configAuth = require('./auth')
-
-passport.use(new GoogleStrategy({
-        consumerKey             : configAuth.googleAuth.clientID,
-        consumerSecret          : configAuth.googleAuth.clientSecret,
-        callbackURL             : configAuth.googleAuth.callbackURL,
-        passReqToCallback       : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+//Google Strategy for logging in
+passport.use("googleToken", new GooglePlusTokenStrategy({
+    clientID             : configAuth.googleAuth.clientID,
+    clientSecret          : configAuth.googleAuth.clientSecret,
   },
-  function(token, tokenSecret, profile, done) {
-      User.findOrCreate({ googleId: profile.id }, function (err, user) {
-        return done(err, user);
-      });
+  async(accessToken, refreshToken, profile, done) => {
+    try {
+
+      console.log('profile', profile);
+  
+    } catch(error) {
+      done(error, false, error.message);
+    }
   }
 ));
+
+module.exports = passport;
