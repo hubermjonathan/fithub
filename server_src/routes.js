@@ -1,6 +1,25 @@
 const express = require('express');
 const router = express.Router();
 
+var passport = require('passport');
+var GooglePlusTokenStrategy = require('passport-google-plus-token');
+var configAuth = require('./config/auth')
+
+//Google Strategy for logging in
+passport.use("googleToken", new GooglePlusTokenStrategy({
+        clientID             : configAuth.googleAuth.clientID,
+        clientSecret          : configAuth.googleAuth.clientSecret,
+  },
+  async(accessToken, refreshToken, profile, done) => {
+    try {
+
+      console.log('profile', profile);
+  
+    } catch(error) {
+      done(error, false, error.message);
+    }
+  }));
+
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
@@ -8,9 +27,8 @@ router.use(bodyParser.json());
 const apiCtrl = require('./api/apiCtrl');
 
 //api
-router.get('/auth/google', apiCtrl.register);
-router.get('/auth/google/callback', apiCtrl.callback);
-router.post('/login',apiCtrl.login);
+router.route('/oauth/google').post(passport.authenticate('googleToken', { session: false }));
+router.post('/users/login',apiCtrl.login);
 router.post('/users/register',apiCtrl.register);
 router.get('/users/:uid/workouts',apiCtrl.workouts);
 router.get('/users/:uid/exercises',apiCtrl.exercises);
