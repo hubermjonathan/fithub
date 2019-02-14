@@ -25,7 +25,7 @@ export default class App extends React.Component {
           <StatusBar backgroundColor="white" />
           <Agenda
             items={this.state.workouts}
-            selected={'2019-02-09'}
+            selected={'2019-02-13'}
             loadItemsForMonth={this.loadItems.bind(this)}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
@@ -53,14 +53,34 @@ export default class App extends React.Component {
     setTimeout(() => {
       loadedWorkouts = {}
 
-      for (let i = 0; i < 31; i++) {
-        let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
-        date = date.toJSON().slice(0, 10);
-        loadedWorkouts[date] = [];
-      }
+      fetch("https://swapi.co/api/people")
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data);
+        
+        for(let i = 0; i < 31; i++) {
+          let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
+          date = date.toJSON().slice(0, 10);
+          loadedWorkouts[date] = [];
+        }
 
-      this.setState({
-        workouts: loadedWorkouts
+        for(let i = 0; i < data.results.length; i++) {
+          let date = new Date(data.results[i].created);
+          date = date.toJSON().slice(0, 10);
+          if(loadedWorkouts[date] == undefined) {
+            loadedWorkouts[date] = [];
+          }
+          loadedWorkouts[date].push({ text: data.results[i].name });
+        }
+
+        this.setState({
+          workouts: loadedWorkouts
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
     }, 1000);
   }
