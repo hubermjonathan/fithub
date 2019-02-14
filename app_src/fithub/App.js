@@ -2,14 +2,17 @@ import React from 'react';
 import {
   StyleSheet,
   Text,
-  SafeAreaView,
   View,
-  StatusBar,
+  SafeAreaView,
   Platform
 } from 'react-native';
 import { Agenda } from 'react-native-calendars';
+import {
+  createStackNavigator,
+  createAppContainer
+} from 'react-navigation';
 
-export default class App extends React.Component {
+class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -22,7 +25,6 @@ export default class App extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.container}>
-          <StatusBar backgroundColor="white" />
           <Agenda
             items={this.state.workouts}
             selected={'2019-02-13'}
@@ -36,7 +38,6 @@ export default class App extends React.Component {
     } else {
       return (
         <View style={styles.container}>
-          <StatusBar backgroundColor="white" />
           <Agenda
             items={this.state.workouts}
             selected={'2019-02-09'}
@@ -58,8 +59,6 @@ export default class App extends React.Component {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
-        
         for(let i = 0; i < 31; i++) {
           let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
           date = date.toJSON().slice(0, 10);
@@ -127,3 +126,13 @@ const styles = StyleSheet.create({
     paddingTop: 30
   },
 });
+
+const AppNavigator = createStackNavigator({
+  Home: {
+    screen: HomeScreen
+  }
+}, {
+  headerMode: 'none'
+});
+
+export default createAppContainer(AppNavigator);
