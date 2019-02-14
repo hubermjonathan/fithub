@@ -3,6 +3,17 @@ const GooglePlusTokenStrategy = require('passport-google-plus-token');
 const configAuth = require('./auth')
 const schemaCtrl = require('../models/schema')
 
+const mongoose = require('mongoose');
+const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+
+
+function connectToDb() {
+  mongoose.connect(url, { useNewUrlParser: true });
+  let db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error'));
+  return db;
+}
+
 //Google Strategy for logging in
 passport.use("googleToken", new GooglePlusTokenStrategy({
     clientID             : configAuth.googleAuth.clientID,
@@ -10,23 +21,28 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
   },
   async(accessToken, refreshToken, profile, done) => {
     try {
-      console.log('profile.id', profile.id);
       let user;
-      let user = await schema.ProfileSchema.findOne({ "google.id" : profile.id});
-      if (user){
-        return done(null, user);
-      }
-      user = new schemaCtrl.ProfileSchema ({
-        name: profile.displayName,
-        pseudonym: { type: String, required: true },
-        avatar: profile._json.image,
-        logs: [{ type: Schema.Types.ObjectId, ref: "LogSchema"}],
+      //user = await schemaCtrl.ProfileSchema.findOne({ "google.id" : profile.id});
+      //if (user){
+      //  return done(null, user);
+      //}
+      user = new schemaCtrl.ProfileSchema({
+        name: profile.name.givenName + " " + profile.name.familyName,
+        pseudonym: profile.displayName,
+        avatar: profile._json.image.url,
+        logs: null,
         //For authentication
         uid: profile.id,
-        token : { type: String, required: true},
-        email : { type: String, required: true}
-      })
-      console.log(user);
+        token : "abcd",
+        email : profile.emails[0].value
+      })        
+      let db = connectToDb();
+      db.once('open', () => {
+        user.save(function (err, newLog) {
+          //if (err) return res.status(500).send({ message: 'User unsuccessfully added' });
+          //else res.status(200).send({ message: 'User successfully added' });
+        });
+      });
     } catch(error) {
       done(error, false, error.message);
     }
