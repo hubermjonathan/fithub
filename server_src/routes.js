@@ -8,7 +8,7 @@ router.use(bodyParser.json());
 const apiCtrl = require('./api/apiCtrl');
 
 //api
-router.post('/oauth/google',apiCtrl.passport.authenticate('googleToken', {session: false}));
+router.post('/oauth/google', apiCtrl.reg);
 router.post('/users/login',apiCtrl.login);
 router.post('/users/register',apiCtrl.register);
 router.get('/users/:uid/workouts',apiCtrl.workouts);

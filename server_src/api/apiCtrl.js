@@ -10,6 +10,8 @@ function connectToDb() {
   return db;
 }
 
+let reg = passport.authenticate('googleToken', {session: false});
+
 //Log a user in
 let login = function login(req, res) {
   let db = connectToDb();
@@ -20,9 +22,12 @@ let login = function login(req, res) {
 
 //Register a user
 let register = function register(req, res) {
-  let db = connectToDb();
-  db.once('open', () => {
-  });
+  //let db = connectToDb();
+  //db.once('open', () => {
+  //});
+  console.log("auth");
+  passport.authenticate('googleToken', {session: false});
+
 }
 
 //Add a new workout into a users profile
@@ -104,7 +109,8 @@ let apiCtrl = {
   logWorkout: logWorkout,
   workouts: workouts,
   exercises: exercises,
-  passport: passport
+  passport: passport,
+  reg: reg
 }
 
 module.exports = apiCtrl;
