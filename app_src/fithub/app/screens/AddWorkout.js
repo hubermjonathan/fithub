@@ -16,6 +16,7 @@ export default class AddWorkout extends React.Component {
         )
     }
 
+    /*posts workout data to server*/
     postStandardWorkout(workout) {
         fetch('/workouts/new', {
             method: 'POST',
@@ -27,7 +28,15 @@ export default class AddWorkout extends React.Component {
             });
     }
 
+    /*could delete this later since it's identical to first one*/
     postCustomWorkout(workout){
-        //TODO
+        fetch('/workouts/new', {
+            method: 'POST',
+            body: JSON.stringify(workout)
+        }).then(res => res.json())
+            .then((res) => console.log('Success',JSON.stringify(res)))
+            .catch(function (e) {
+                console.log('Error');
+            });
     }
 }
