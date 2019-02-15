@@ -13,23 +13,25 @@ let ProfileSchema = new Schema({
     //workouts that the user created
     workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutSchema"}],
     //logging data for the user
-    log: { type: Schema.Types.ObjectId, ref: "LogSchema"},
+    log: { type: Schema.Types.ObjectId, ref: "LogSchema" },
     //For authentication
     uid: { type: String, required: true },
-    token : { type: String, required: true},
-    email : { type: String, required: true}
+    token : { type: String, required: true },
+    email : { type: String, required: true }
 });
 
 //Sub-schema of ProfileSchema for a user's log information, contains an array of days
 let LogSchema = new Schema({
     days: [{ type: Schema.Types.ObjectId, ref: "LogDaySchema"}],
+    //owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
+    owner : { type: String, required: true } //username or uid
 });
 
 //Sub-schema of LogSchema representing data for exercises performed on a specific day
 let LogDaySchema = new Schema({
     exercises: [{ type: Schema.Types.ObjectId, ref: "LogExerciseSchema"}],
     date: { type: Date, required: true },
-    owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
+    owner : { type: String, required: true } //username or uid
 });
 
 //Sub-schema of LogSchema representing data 
@@ -45,7 +47,7 @@ let LogExerciseSchema = new Schema({
 let ExerciseSchema = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
-    owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
+    owner : { type: String, required: true } //username or uid
 });
 
 //Schema for creating a new workout
@@ -53,7 +55,7 @@ let WorkoutSchema = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
     exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseSchema"}],
-    owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
+    owner : { type: String, required: true } //username or uid
 });
 
 //map the schemas to mongo collections
