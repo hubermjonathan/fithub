@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import { Icon } from 'react-native-elements';
-//import { BottomBar } from './app/Components/BottomBar.js';
+import { BottomBar } from './app/Components/BottomBar';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -33,7 +33,7 @@ export default class App extends React.Component {
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
           />
-          <View style={{
+          {/*<View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 alignItems: 'flex-end',
@@ -63,7 +63,9 @@ export default class App extends React.Component {
                 type="material-community"
                 size={50}
             />
-            </View>
+            </View>*/}
+            <View><BottomBar /> </View>
+            
         </SafeAreaView>
       );
     } else {
