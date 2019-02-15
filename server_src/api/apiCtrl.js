@@ -98,6 +98,22 @@ let workouts = function workouts(req, res) {
 let exercises = function exercises(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    //query Log collection
+    schemaCtrl.LogSchema.findOne({owner : req.body.uid}, function(err, exercises))
+
+	  /* Populate will fill JSON response with appropriate data
+	   * Nested populate can be reduced to a single call
+	  */
+
+    .populate({ path: 'exercises', populate: { path: 'owner', model: 'ProfileSchema' }})
+    .exec(function(err, exercises){
+      if(err){
+        res.status(500).send({message: "Error getting exercises"});
+      }
+      else{
+        res.send(exercises);
+      }
+    });
   });
 }
 
