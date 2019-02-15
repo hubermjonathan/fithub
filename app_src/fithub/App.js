@@ -27,7 +27,7 @@ class HomeScreen extends React.Component {
         <SafeAreaView style={styles.container}>
           <Agenda
             items={this.state.workouts}
-            selected={'2019-02-13'}
+            selected={this.getCurrentDate()}
             loadItemsForMonth={this.loadItems.bind(this)}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
@@ -48,6 +48,11 @@ class HomeScreen extends React.Component {
         </View>
       );
     }
+  }
+
+  getCurrentDate() {
+    let date = new Date();
+    return date.toJSON().slice(0, 10);
   }
 
   loadItems(month) {
