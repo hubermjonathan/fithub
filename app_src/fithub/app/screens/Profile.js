@@ -1,4 +1,5 @@
 import React,{ Component } from 'react';
+import React from 'react';
 import {
     StyleSheet,
     Text,
@@ -7,12 +8,16 @@ import {
     StatusBar,
     Platform
 } from 'react-native';
+import BottomBar from '../Components/BottomBar';
 
 export default class Profile extends React.Component {
 
     render() {
         return (
-            <Text>Profile Screen</Text>
+            <View>
+                <Text>Profile Screen</Text>
+                <BottomBar />
+            </View>
         )
     }
 }
