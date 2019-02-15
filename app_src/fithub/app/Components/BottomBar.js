@@ -7,7 +7,7 @@ export default class BottomBar extends React.Component{
   constructor(props){
     super(props);
   }
-    render() {
+    render(){
         return (
             <View style={{
                 flexDirection: 'row',
@@ -49,7 +49,7 @@ export default class BottomBar extends React.Component{
     }
 }
 
-module.export = BottomBar;
+//module.exports = BottomBar;
 
 /* const RootStack = createStackNavigator(
     {

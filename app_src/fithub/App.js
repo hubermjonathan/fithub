@@ -15,6 +15,9 @@ import {
   createAppContainer
 } from 'react-navigation';
 import Detail from './app/screens/Detail';
+import Profile from './app/screens/Profile';
+import Feed from './app/screens/Feed';
+import AddWorkout from './app/screens/AddWorkout';
 
 
 class HomeScreen extends React.Component {
@@ -38,7 +41,7 @@ class HomeScreen extends React.Component {
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
           />
-          {/*<View style={{
+          <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 alignItems: 'flex-end',
@@ -52,25 +55,27 @@ class HomeScreen extends React.Component {
               name="plus"
               type="entypo"
               size={50}
+              onPress={() => this.props.navigation.navigate('Add')}
             />
             <Icon
               name="home"
               type="material-community"
               size={50}
+              onPress={() => this.props.navigation.navigate('Home')}
             />
             <Icon
               name="globe"
               type="entypo"
               size={50}
+              onPress={() => this.props.navigation.navigate('Feed')}
             />
             <Icon
                 name="account"
                 type="material-community"
                 size={50}
+                onPress={() => this.props.navigation.navigate('Profile')}
             />
-            </View>*/}
-            <View><BottomBar /> </View>
-            
+            </View>
         </SafeAreaView>
       );
     } else {
@@ -181,10 +186,19 @@ const styles = StyleSheet.create({
 
 const AppNavigator = createStackNavigator({
   Home: HomeScreen,
-  Detail: Detail
+  Detail: Detail,
+  Profile: Profile,
+  Feed: Feed,
+  Add: AddWorkout
 }, {
   initialRouteName: 'Home',
   headerMode: 'none'
 });
 
-export default createAppContainer(AppNavigator);
+const AppContainer = createAppContainer(AppNavigator);
+
+export default class App extends React.Component {
+  render() {
+    return <AppContainer />;
+  }
+}
