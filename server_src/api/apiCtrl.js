@@ -1,34 +1,7 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
-
-var passport = require('passport');
-var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
-var configAuth = require('../config/auth')
-
-//Used for login persistence
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
-
-
-passport.use(new GoogleStrategy({
-        clientID             : configAuth.googleAuth.clientID,
-        clientSecret          : configAuth.googleAuth.clientSecret,
-        callbackURL             : configAuth.googleAuth.callbackURL,
-        passReqToCallback       : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
-  },
-  function(request, accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
-      return done(null, profile);
-    });
-  }
-));
-
+const passport = require('../config/passport');
 
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
@@ -37,21 +10,7 @@ function connectToDb() {
   return db;
 }
 
-//Register a user
-let register = function register(req, res) {
-  let db = connectToDb();
-  db.once('open', () => {
-    passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] });
-  });
-}
-
-let callback = function callback(req,res) { 
-  console.log('callback');  
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
-    res.redirect('/');
-  };
-}
+let reg = passport.authenticate('googleToken', {session: false});
 
 //Log a user in
 let login = function login(req, res) {
@@ -61,12 +20,22 @@ let login = function login(req, res) {
   });
 }
 
+//Register a user
+let register = function register(req, res) {
+  //let db = connectToDb();
+  //db.once('open', () => {
+  //});
+  console.log("auth");
+  passport.authenticate('googleToken', {session: false});
+
+}
+
 //Add a new workout into a users profile
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     let newWorkout = new schemaCtrl.WorkoutSchema({
-      name: req.body.name,
+      uid: req.body.uid,
       description: req.body.description,
     });
 
@@ -82,7 +51,7 @@ let newExercise = function newExercise(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     let newExercise = new schemaCtrl.ExerciseSchema({
-      name: req.body.name,
+      uid: req.body.uid,
       description: req.body.description,
     });
 
@@ -97,12 +66,12 @@ let newExercise = function newExercise(req, res) {
 let logWorkout = function logWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    let uid = req.body.uid;
     let newLog = new schemaCtrl.LogSchema({
       exercise: req.body.exercise,
       data: req.body.data,
       dates: req.body.date
     });
-
     newLog.save(function (err, newLog) {
       if (err) return res.status(500).send({ message: 'Log unsuccessfully added' });
       else res.status(200).send({ message: 'Log successfully added' });
@@ -114,7 +83,7 @@ let logWorkout = function logWorkout(req, res) {
 let workouts = function workouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    schemaCtrl.workouts.find({name: req.body.name}, function(err, workouts){
+    schemaCtrl.workouts.findOne({uid : req.body.uid}, function(err, workouts){
       if(err){
         res.status(500).send({message: "Error getting workouts"});
       }
@@ -125,23 +94,52 @@ let workouts = function workouts(req, res) {
   });
 }
 
-//Get a users exercises from DB
-let exercises = function exercises(req, res) {
+//Get a user's workouts from DB
+let workouts = function workouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    //query profile collection
+    schemaCtrl.ProfileSchema.findOne({uid : req.body.uid}, function(err, workouts))
+    .populate('workouts')
+    .exec(function(err, workouts){
+      if(err){
+        res.status(500).send({message: "Error getting workouts"});
+      }
+      else{
+        res.send(workouts);
+      }
+    });
   });
 }
 
+//Get a user's exercises from DB
+let exercises = function exercises(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+    //query profile collection
+    schemaCtrl.ProfileSchema.findOne({uid : req.body.uid}, function(err, exercises))
+    .populate('exercises')
+    .exec(function(err, exercises){
+      if(err){
+        res.status(500).send({message: "Error getting exercises"});
+      }
+      else{
+        res.send(exercises);
+      }
+    });
+  });
+}
 
 let apiCtrl = {
   login: login,
-  callback: callback,
   register: register,
   newExercise: newExercise,
   newWorkout: newWorkout,
   logWorkout: logWorkout,
   workouts: workouts,
-  exercises: exercises
+  exercises: exercises,
+  passport: passport,
+  reg: reg
 }
 
 module.exports = apiCtrl;

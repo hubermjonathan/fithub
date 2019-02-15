@@ -11,6 +11,7 @@ import {
 export default class Workouts extends React.Component {
 
     render() {
+       let workouts = this.getWorkouts(/*put id here, idk how to get it for now */);
         return (
             <Text>workouts Screen</Text>
         )
@@ -22,7 +23,7 @@ export default class Workouts extends React.Component {
     fetch(`/users/${uid}/workouts`, {
       method: 'GET'
     }).then(res => res.json())
-      .then((res) => console.log(res))
+      .then(res => console.log(res))
       .catch(function (e) {
         console.log("User not found");
       });
