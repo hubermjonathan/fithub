@@ -8,7 +8,9 @@ let ProfileSchema = new Schema({
     name: { type: String, required: true },
     pseudonym: { type: String, required: true },
     avatar: { type: String, required: true },
+    exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseSchema"}],
     logs: [{ type: Schema.Types.ObjectId, ref: "LogSchema"}],
+    workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutSchema"}],
     //For authentication
     uid: { type: String, required: true },
     token : { type: String, required: true},
