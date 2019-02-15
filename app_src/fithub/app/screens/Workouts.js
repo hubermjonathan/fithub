@@ -8,7 +8,7 @@ import {
     Platform
 } from 'react-native';
 
-export default class Workouts extends React.Component {
+export default class WorkoutsScreen extends React.Component {
 
     render() {
        let workouts = this.getWorkouts(/*put id here, idk how to get it for now */);
