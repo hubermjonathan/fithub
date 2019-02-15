@@ -34,12 +34,25 @@ let register = function register(req, res) {
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    let exerciseIDs = [];
     //parse body for exercises and retrieve ObjectIDs of each from the exercise collection
+    for (exercise in req.body.exercises){
+      let newExercise = new schemaCtrl.ExerciseSchema({
+        name: exercise.name
+        description: exercise.description,
+        ownerUID: req.body.uid,
+      });
+
+      newExercise.save(function (err, newExercise) {
+        if (err) return res.status(500).send({ message: 'Error when parsing JSON exercises' });
+        else exerciseIDs.push(mongoose.Types.ObjectID(newExercise.id)));
+      });
+    }
 
     //build the workout by adding requested exercise ObjectIDs into an array
     let newWorkout = new schemaCtrl.WorkoutSchema({
       name: req.body.name,
-      exercises: [],
+      exercises: exerciseIDs,
       description: req.body.description,
       ownerUID: req.body.uid,
     });
@@ -52,7 +65,7 @@ let newWorkout = function newWorkout(req, res) {
   });
 }
 
-//Add a new exercise for the  master exercise library
+//Create a new exercise for the master exercise library
 let newExercise = function newExercise(req, res) {
   let db = connectToDb();
   db.once('open', () => {
@@ -71,20 +84,44 @@ let newExercise = function newExercise(req, res) {
   });
 }
 
+//Add exercise to user profile
+let newExercise = function newExercise(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+    //fetch the exercise
+
+    //
+    newExercise.save(function (err, newExercise) {
+      if (err) return res.status(500).send({ message: 'Exercise unsuccessfully added' });
+      else res.status(200).send({ message: 'Exercise successfully added' });
+    });
+  });
+}
+
 //Log a user's workout into the DB
 let logWorkout = function logWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     let uid = req.body.uid;
-    let newLog = new schemaCtrl.LogSchema({
-      exercise: req.body.exercise,
-      data: req.body.data,
-      dates: req.body.date
+
+    //loop over the exercises performed that day and create a new LogExercise for each
+    let exerciseObjectIDs = []
+
+
+    //create LogDay containing array of the LogExercises
+    let LogDay = new schemaCtrl.LogDaySchema({
+      exercise: exerciseObjectIDs,
+      date: req.body.data,
+      ownerUID: req.body.date
     });
-    newLog.save(function (err, newLog) {
+
+    //save day
+    LogDay.save(function (err, newLog) {
       if (err) return res.status(500).send({ message: 'Log unsuccessfully added' });
       else res.status(200).send({ message: 'Log successfully added' });
     });
+
+    //update LogSchema
   });
 }
 
