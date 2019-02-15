@@ -55,7 +55,6 @@ export default class BottomBar extends React.Component{
             </View>
         );
     }
-}}
 
 module.export = BottomBar;
 
