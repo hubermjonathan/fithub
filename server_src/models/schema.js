@@ -9,7 +9,7 @@ let ProfileSchema = new Schema({
     pseudonym: { type: String, required: true },
     avatar: { type: String, required: true },
     exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseSchema"}],
-    logs: [{ type: Schema.Types.ObjectId, ref: "LogSchema"}],
+    log: { type: Schema.Types.ObjectId, ref: "LogSchema"},
     workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutSchema"}],
     //For authentication
     uid: { type: String, required: true },
@@ -18,30 +18,43 @@ let ProfileSchema = new Schema({
 });
 
 let LogSchema = new Schema({
-    exercise: { type: String, required: true },
-    data:{ type: [], required: true }, //sets: Number, reps: Number, weight: Number, isWarmup: number
-    dates: { type: Date, required: true },
+    days: [{ type: Schema.Types.ObjectId, ref: "LogDaySchema"}],
+});
+
+let LogDaySchema = new Schema({
+    exercises: [{ type: Schema.Types.ObjectId, ref: "LogExerciseSchema"}],
+    owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
+});
+
+let LogExerciseSchema = new Schema({
+    name: { type: String, required: true },
+    sets: { type: Number, required: true },
+    sets: { type: Number, required: true },
+    weight: { type: Number, required: true },
+    isWarmup: { type: Boolean, required: true },
+    date: { type: Date, required: true },
 });
 
 let ExerciseSchema = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
+    owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
 });
 
 let WorkoutSchema = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
-    exercises: [{ type: Schema.Types.ObjectId, ref: "CustomExerciseSchema"}],
+    exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseSchema"}],
     owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
 });
 
 let schemaCtrl = {
     ProfileSchema: mongoose.model("ProfileSchema", ProfileSchema),
     LogSchema: mongoose.model("LogSchema", LogSchema),
+    LogExerciseSchema: mongoose.model("LogExerciseSchema", LogExerciseSchema),
+    LogWorkoutSchema: mongoose.model("LogWorkoutSchema", LogWorkoutSchema),
     ExerciseSchema: mongoose.model("ExerciseSchema", ExerciseSchema),
     WorkoutSchema: mongoose.model("WorkoutSchema", WorkoutSchema),
-    CustomExerciseSchema: mongoose.model("CustomExerciseSchema", CustomExerciseSchema),
-    CustomWorkoutSchema: mongoose.model("CustomWorkoutSchema", CustomWorkoutSchema)
 }
 
 module.exports = schemaCtrl;
