@@ -14,6 +14,7 @@ import {
 } from 'react-navigation';
 import Detail from './app/screens/Detail';
 
+
 class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -35,6 +36,37 @@ class HomeScreen extends React.Component {
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
           />
+          <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                alignItems: 'flex-end',
+            }}>
+            <Icon
+                name="book"
+                type="material-community"
+                size={50}
+            />
+            <Icon
+              name="plus"
+              type="entypo"
+              size={50}
+            />
+            <Icon
+              name="home"
+              type="material-community"
+              size={50}
+            />
+            <Icon
+              name="globe"
+              type="entypo"
+              size={50}
+            />
+            <Icon
+                name="account"
+                type="material-community"
+                size={50}
+            />
+            </View>
         </SafeAreaView>
       );
     } else {
@@ -119,6 +151,8 @@ class HomeScreen extends React.Component {
     );
   }
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
