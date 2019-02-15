@@ -94,18 +94,31 @@ let workouts = function workouts(req, res) {
   });
 }
 
-//Get a users exercises from DB
+//Get a user's workouts from DB
+let workouts = function workouts(req, res) {
+  let db = connectToDb();
+  db.once('open', () => {
+    //query profile collection
+    schemaCtrl.ProfileSchema.findOne({uid : req.body.uid}, function(err, workouts))
+    .populate('workouts')
+    .exec(function(err, workouts){
+      if(err){
+        res.status(500).send({message: "Error getting workouts"});
+      }
+      else{
+        res.send(workouts);
+      }
+    });
+  });
+}
+
+//Get a user's exercises from DB
 let exercises = function exercises(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    //query Log collection
-    schemaCtrl.LogSchema.findOne({owner : req.body.uid}, function(err, exercises))
-
-	  /* Populate will fill JSON response with appropriate data
-	   * Nested populate can be reduced to a single call
-	  */
-
-    .populate({ path: 'exercises', populate: { path: 'owner', model: 'ProfileSchema' }})
+    //query profile collection
+    schemaCtrl.ProfileSchema.findOne({uid : req.body.uid}, function(err, exercises))
+    .populate('exercises')
     .exec(function(err, exercises){
       if(err){
         res.status(500).send({message: "Error getting exercises"});
