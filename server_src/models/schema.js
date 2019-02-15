@@ -25,21 +25,10 @@ let LogSchema = new Schema({
 
 let ExerciseSchema = new Schema({
     name: { type: String, required: true },
-    description: { type: String, required: true },
-});
-
-let WorkoutSchema = new Schema({
-    name: { type: String, required: true },
-    dates: { type: Date, required: true },
-    description: { type: String, required: true },
-});
-
-let CustomExerciseSchema = new Schema({
-    name: { type: String, required: true },
     description: { type: Number, required: true },
 });
 
-let CustomWorkoutSchema = new Schema({
+let WorkoutSchema = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
     exercises: [{ type: Schema.Types.ObjectId, ref: "CustomExerciseSchema"}],
