@@ -8,7 +8,7 @@ import {
   Button
 } from 'react-native';
 
-export default class Detail extends React.Component {
+export default class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     console.log(navigation.getParam('name', 'Workout'));
     return {
