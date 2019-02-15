@@ -2,14 +2,20 @@ import React from 'react';
 import {
   StyleSheet,
   Text,
-  SafeAreaView,
   View,
-  StatusBar,
-  Platform
+  SafeAreaView,
+  Platform,
+  TouchableHighlight
 } from 'react-native';
 import { Agenda } from 'react-native-calendars';
+import {
+  createStackNavigator,
+  createAppContainer
+} from 'react-navigation';
+import Detail from './app/screens/Detail';
 
-export default class App extends React.Component {
+
+class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -22,21 +28,50 @@ export default class App extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.container}>
-          <StatusBar backgroundColor="white" />
           <Agenda
             items={this.state.workouts}
-            selected={'2019-02-09'}
+            selected={this.getCurrentDate()}
             loadItemsForMonth={this.loadItems.bind(this)}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
           />
+          <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                alignItems: 'flex-end',
+            }}>
+            <Icon
+                name="book"
+                type="material-community"
+                size={50}
+            />
+            <Icon
+              name="plus"
+              type="entypo"
+              size={50}
+            />
+            <Icon
+              name="home"
+              type="material-community"
+              size={50}
+            />
+            <Icon
+              name="globe"
+              type="entypo"
+              size={50}
+            />
+            <Icon
+                name="account"
+                type="material-community"
+                size={50}
+            />
+            </View>
         </SafeAreaView>
       );
     } else {
       return (
         <View style={styles.container}>
-          <StatusBar backgroundColor="white" />
           <Agenda
             items={this.state.workouts}
             selected={'2019-02-09'}
@@ -49,18 +84,41 @@ export default class App extends React.Component {
     }
   }
 
+  getCurrentDate() {
+    let date = new Date();
+    return date.toJSON().slice(0, 10);
+  }
+
   loadItems(month) {
     setTimeout(() => {
       loadedWorkouts = {}
 
-      for (let i = 0; i < 31; i++) {
-        let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
-        date = date.toJSON().slice(0, 10);
-        loadedWorkouts[date] = [];
-      }
+      fetch("https://swapi.co/api/people")
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        for(let i = 0; i < 31; i++) {
+          let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
+          date = date.toJSON().slice(0, 10);
+          loadedWorkouts[date] = [];
+        }
 
-      this.setState({
-        workouts: loadedWorkouts
+        for(let i = 0; i < data.results.length; i++) {
+          let date = new Date(data.results[i].created);
+          date = date.toJSON().slice(0, 10);
+          if(loadedWorkouts[date] == undefined) {
+            loadedWorkouts[date] = [];
+          }
+          loadedWorkouts[date].push({ text: data.results[i].name });
+        }
+
+        this.setState({
+          workouts: loadedWorkouts
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
     }, 1000);
   }
@@ -72,10 +130,17 @@ export default class App extends React.Component {
 
   renderItem(item) {
     return (
-      <View style={styles.item}>
-        <Text>{item.name}</Text>
-      </View>
+      <TouchableHighlight onPress={this.linkToDetail.bind(this, item)} style={styles.item}>
+        <Text>{item.text}</Text>
+      </TouchableHighlight>
     );
+  }
+
+  linkToDetail(item) {
+    console.log(item);
+    this.props.navigation.push('Detail', {
+      name: item.text,
+    });
   }
 
   renderEmptyDate() {
@@ -109,3 +174,13 @@ const styles = StyleSheet.create({
     paddingTop: 30
   },
 });
+
+const AppNavigator = createStackNavigator({
+  Home: HomeScreen,
+  Detail: Detail
+}, {
+  initialRouteName: 'Home',
+  headerMode: 'none'
+});
+
+export default createAppContainer(AppNavigator);

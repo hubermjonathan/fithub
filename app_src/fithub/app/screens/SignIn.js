@@ -10,7 +10,7 @@ export default class SignIn extends Component {
 
     render() {
         return(
-                <View style={{flex: 3, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={styles.page}>
                     {/*HEADER: FitHub logo*/}
                     <View style={styles.header}>
                             <Image 
@@ -18,22 +18,23 @@ export default class SignIn extends Component {
                                 style={styles.image}
                             />
                     </View>
-                    {/*HEADING: Login*/}
-                    <View>
-                        <Text style={styles.heading}>
-                            Login
-                        </Text> 
-                    </View>  
-                    {/*ROW: Login-Logo | Username-Dialog-Box*/}
-                    <View style={styles.row}>
-
+                    {/*CONTENT:  Login details*/}
+                    <View style={styles.content}>
+                        {/*HEADING: Login*/}
+                        <View style={styles.heading}>
+                            <Text style={styles.headingText}>
+                                Login
+                            </Text> 
+                        </View>  
+                        {/*ROW: Login-Logo | Username-Dialog-Box*/}
+                        <View style={styles.row}>
                             <View style={{padding: 5}}>
                             </View>
 
                             <Icon 
                                 name='user-circle' 
                                 type='font-awesome'
-                                size={30}
+                                size={20}
                             />
 
                             <View style={{padding: 5}}>
@@ -45,36 +46,50 @@ export default class SignIn extends Component {
                                 secureTextEntry={false}
                                 style={styles.textInput}
                             />
-                    </View>
-                    {/*ROW: Password-Logo | Password-Dialog-Box*/}
-                    <View style={styles.row}>
+
                             <View style={{padding: 5}}>
                             </View>
+                        </View>
+
+                        <View style={{padding: 3}}>
+                        </View>
+
+                        {/*ROW: Password-Logo | Password-Dialog-Box*/}
+                        <View style={styles.row}>
+                            <View style={{padding: 5}}>
+                            </View>
+
                             <Icon 
                                 name='lock' 
                                 type='font-awesome'
                                 size={30}
                             />
+
                             <View style={{padding: 5}}>
                             </View>
+
                             <TextInput
                                 placeholder='Password'
                                 placeholderTextColor= 'gray'
                                 secureTextEntry={true}
                                 style={styles.textInput}
                             />
+
+                            <View style={{padding: 5}}>
+                            </View>
+                        </View>
+                        {/*BUTTON: Login Button*/}
+                        <View style={styles.login}>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={this.press.bind(this)}
+                            >
+                                <Text style={{fontSize: 30, fontWeight: 'bold', color: 'white'}}>Login</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    {/*BUTTON: Login Button*/}
-                    <View>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={this.press.bind(this)}
-                        >
-                            <Text style={{fontSize: 30, fontWeight: 'bold', color: 'white'}}>Login</Text>
-                        </TouchableOpacity>
-                    </View>
-                    {/*CREATE ACCOUNT: Text prompt with link to create an account*/}
-                    <View>
+                    {/*FOOTER: Create Account Dialog*/}
+                    <View style={styles.footer}>
                         <Text style={{fontSize: 20}}>
                             New to FitHub? No problem!
                         </Text>
@@ -92,13 +107,41 @@ export default class SignIn extends Component {
 }
 
 const styles = StyleSheet.create({
+
+    page: {
+        flex: 1, 
+        flexDirection: 'column', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+
+    },
+
+    header: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+
+    content: {
+        flex: 2,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
+    footer: {
+        flex: 1,
+        justifyContent: 'center'
+    },
+
     heading: {
+    },
+
+    headingText: {
         fontSize: 40,
         padding: 20,
     },
 
-    alignRight: {
-        alignSelf: 'flex-end'
+    login: {
+        padding: 20,
     },
 
     button: {
@@ -107,6 +150,7 @@ const styles = StyleSheet.create({
         width: 150,
         height: 40,
     },
+
     textInput: {
         height: 30,
         flex: 2,
@@ -116,21 +160,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
     },
 
-    header: {
-        height: 200,
-        width: 300,
-        padding: 30
-        
-    },
     image: {
-        flex: 1,
-        width: undefined,
-        height: undefined,
+        width: 200,
+        height: 100,
         resizeMode: 'contain'
     },
+
     row: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center'
-    }
+    },
+
+    footerText: {
+
+    },
+
 });

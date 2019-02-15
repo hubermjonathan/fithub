@@ -8,9 +8,8 @@ router.use(bodyParser.json());
 const apiCtrl = require('./api/apiCtrl');
 
 //api
-router.get('/auth/google', apiCtrl.register);
-router.get('/auth/google/callback', apiCtrl.callback);
-router.post('/login',apiCtrl.login);
+router.post('/oauth/google', apiCtrl.reg);
+router.post('/users/login',apiCtrl.login);
 router.post('/users/register',apiCtrl.register);
 router.get('/users/:uid/workouts',apiCtrl.workouts);
 router.get('/users/:uid/exercises',apiCtrl.exercises);
