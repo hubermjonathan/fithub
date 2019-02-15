@@ -35,7 +35,7 @@ let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     let newWorkout = new schemaCtrl.WorkoutSchema({
-      name: req.body.name,
+      uid: req.body.uid,
       description: req.body.description,
     });
 
@@ -51,7 +51,7 @@ let newExercise = function newExercise(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     let newExercise = new schemaCtrl.ExerciseSchema({
-      name: req.body.name,
+      uid: req.body.uid,
       description: req.body.description,
     });
 
@@ -66,12 +66,12 @@ let newExercise = function newExercise(req, res) {
 let logWorkout = function logWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    let uid = req.body.uid;
     let newLog = new schemaCtrl.LogSchema({
       exercise: req.body.exercise,
       data: req.body.data,
       dates: req.body.date
     });
-
     newLog.save(function (err, newLog) {
       if (err) return res.status(500).send({ message: 'Log unsuccessfully added' });
       else res.status(200).send({ message: 'Log successfully added' });
@@ -83,7 +83,7 @@ let logWorkout = function logWorkout(req, res) {
 let workouts = function workouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    schemaCtrl.workouts.find({name: req.body.name}, function(err, workouts){
+    schemaCtrl.workouts.findOne({uid : req.body.uid}, function(err, workouts){
       if(err){
         res.status(500).send({message: "Error getting workouts"});
       }
