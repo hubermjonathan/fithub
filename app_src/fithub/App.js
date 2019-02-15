@@ -4,13 +4,15 @@ import {
   Text,
   View,
   SafeAreaView,
-  Platform
+  Platform,
+  TouchableHighlight
 } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import {
   createStackNavigator,
   createAppContainer
 } from 'react-navigation';
+import Detail from './app/screens/Detail';
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -96,10 +98,17 @@ class HomeScreen extends React.Component {
 
   renderItem(item) {
     return (
-      <View style={styles.item}>
-        <Text>{item.name}</Text>
-      </View>
+      <TouchableHighlight onPress={this.linkToDetail.bind(this, item)} style={styles.item}>
+        <Text>{item.text}</Text>
+      </TouchableHighlight>
     );
+  }
+
+  linkToDetail(item) {
+    console.log(item);
+    this.props.navigation.push('Detail', {
+      name: item.text,
+    });
   }
 
   renderEmptyDate() {
@@ -133,10 +142,10 @@ const styles = StyleSheet.create({
 });
 
 const AppNavigator = createStackNavigator({
-  Home: {
-    screen: HomeScreen
-  }
+  Home: HomeScreen,
+  Detail: Detail
 }, {
+  initialRouteName: 'Home',
   headerMode: 'none'
 });
 
