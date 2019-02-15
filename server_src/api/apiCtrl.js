@@ -79,27 +79,13 @@ let logWorkout = function logWorkout(req, res) {
   });
 }
 
-//Get a users workouts from DB
-let workouts = function workouts(req, res) {
-  let db = connectToDb();
-  db.once('open', () => {
-    schemaCtrl.workouts.findOne({uid : req.body.uid}, function(err, workouts){
-      if(err){
-        res.status(500).send({message: "Error getting workouts"});
-      }
-      else{
-        res.send(workouts);
-      }
-    })
-  });
-}
-
-//Get a user's workouts from DB
+//Get a user's workouts from DB, queries using req body UID of the caller
 let workouts = function workouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
-    schemaCtrl.ProfileSchema.findOne({uid : req.body.uid}, function(err, workouts))
+    schemaCtrl.ProfileSchema
+    .findOne({uid : req.body.uid}, function(err, workouts))
     .populate('workouts')
     .exec(function(err, workouts){
       if(err){
@@ -112,12 +98,13 @@ let workouts = function workouts(req, res) {
   });
 }
 
-//Get a user's exercises from DB
+//Get a user's exercises from DB, queries using req body UID of the caller
 let exercises = function exercises(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
-    schemaCtrl.ProfileSchema.findOne({uid : req.body.uid}, function(err, exercises))
+    schemaCtrl.ProfileSchema
+    .findOne({uid : req.body.uid}, function(err, exercises))
     .populate('exercises')
     .exec(function(err, exercises){
       if(err){
