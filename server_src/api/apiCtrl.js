@@ -30,15 +30,21 @@ let register = function register(req, res) {
 
 }
 
-//Add a new workout into a users profile
+//Create a new workout for the master workout library
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    //parse body for exercises and retrieve ObjectIDs of each from the exercise collection
+
+    //build the workout by adding requested exercise ObjectIDs into an array
     let newWorkout = new schemaCtrl.WorkoutSchema({
-      uid: req.body.uid,
+      name: req.body.name,
+      exercises: [],
       description: req.body.description,
+      ownerUID: req.body.uid,
     });
 
+    //save the workout to the master workout collection
     newWorkout.save(function (err, newWorkout) {
       if (err) return res.status(500).send({ message: 'Workout unsuccessfully added' });
       else res.status(200).send({ message: 'Workout successfully added' });
@@ -46,15 +52,18 @@ let newWorkout = function newWorkout(req, res) {
   });
 }
 
-//Add a new exercise to a user's profile
+//Add a new exercise for the  master exercise library
 let newExercise = function newExercise(req, res) {
   let db = connectToDb();
   db.once('open', () => {
+    //create the exercise
     let newExercise = new schemaCtrl.ExerciseSchema({
-      uid: req.body.uid,
+      name: req.body.name
       description: req.body.description,
+      ownerUID: req.body.uid,
     });
 
+    //save the exercise to the master exercise collection
     newExercise.save(function (err, newExercise) {
       if (err) return res.status(500).send({ message: 'Exercise unsuccessfully added' });
       else res.status(200).send({ message: 'Exercise successfully added' });
