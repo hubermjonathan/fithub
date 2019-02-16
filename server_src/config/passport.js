@@ -23,26 +23,26 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
     try {
       let db = connectToDb();
       db.once('open', () => {
-        let user;
-        user = schemaCtrl.ProfileSchema.findOne({ "google.id" : profile.id}, { pseudonym : 1 });
-        if (user){
-          console.log(user);
-          return done(null, user);
-        }
-        console.log(profile);
-        user = new schemaCtrl.ProfileSchema({
-          name: profile.name.givenName + " " + profile.name.familyName,
-          pseudonym: profile.displayName,
-          avatar: profile._json.image.url,
-          logs: null,
-          //For authentication
-          uid: profile.id,
-          token : "abcd",
-          email : profile.emails[0].value
-        })        
-        user.save(function (err, newLog) {
-          //if (err) return res.status(500).send({ message: 'User unsuccessfully added' });
-          //else res.status(200).send({ message: 'User successfully added' });
+        schemaCtrl.ProfileSchema.findOne({ "google.id" : profile.uid}, function(err, user) {
+          if (err) return handleError(err);
+          if (user){
+            console.log("----------Found user----------\n" + user + "\n------------------------------");
+            return done(null, user);
+          }
+          user = new schemaCtrl.ProfileSchema({
+            name: profile.name.givenName + " " + profile.name.familyName,
+            pseudonym: profile.displayName,
+            avatar: profile._json.image.url,
+            //For authentication
+            uid: profile.id,
+            token : "abcd",
+            email : profile.emails[0].value
+          })
+          console.log("----------Saving user----------\n" + user + "\n------------------------------");        
+          user.save(function (err, newLog) {
+            //if (err) return res.status(500).send({ message: 'User unsuccessfully added' });
+            //else res.status(200).send({ message: 'User successfully added' });
+          });
         });
       });
     } catch(error) {

@@ -28,7 +28,7 @@ let LogSchema = new Schema({
 });
 
 //Sub-schema of LogSchema representing data for exercises performed on a specific day
-let LogDaySchema = new Schema({
+let LogWorkoutSchema = new Schema({
     exercises: [{ type: Schema.Types.ObjectId, ref: "LogExerciseSchema"}],
     date: { type: Date, required: true },
     ownerUID : { type: String, required: true }
@@ -36,11 +36,11 @@ let LogDaySchema = new Schema({
 
 //Sub-schema of LogSchema representing data 
 let LogExerciseSchema = new Schema({
-    name: { type: String, required: true },
-    sets: { type: Number, required: true },
-    reps: { type: Number, required: true },
-    weight: { type: Number, required: true },
-    isWarmup: { type: Boolean, required: true },
+    name: { type: String, required: true },             //Name for the exercise
+    sets: { type: Number, required: true },             //Number for the amount of sets done
+    reps: { type: Array, required: true },              //Array for the reps done for each set
+    weight: { type: Array, required: true },            //Weight lifted for each set
+    isWarmup: { type: Boolean, required: true },        //Boolean for each warmup
 });
 
 //Schema for creating a new exercise
@@ -53,7 +53,7 @@ let ExerciseSchema = new Schema({
 //Schema for creating a new workout
 let WorkoutSchema = new Schema({
     name: { type: String, required: true },
-    description: { type: Number, required: true },
+    description: { type: String, required: true },
     exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseSchema"}],
     ownerUID : { type: String, required: true }
 });
