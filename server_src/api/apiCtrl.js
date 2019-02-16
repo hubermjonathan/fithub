@@ -25,7 +25,7 @@ let register = passport.authenticate('googleToken', {session: false});
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    schemaCtrl.ProfileSchema.findOne({ "uid" : req.body.uid}, function(err, user) {
+    schemaCtrl.Profile.findOne({ "uid" : req.body.uid}, function(err, user) {
 
       let exerciseIDs = [];
       if (user){
@@ -41,7 +41,7 @@ let newWorkout = function newWorkout(req, res) {
       console.log(exerciseIDs);
 
       //build the workout by adding requested exercise ObjectIDs into an array
-      let newWorkout = new schemaCtrl.WorkoutSchema({
+      let newWorkout = new schemaCtrl.Workout({
         name: req.body.name,
         exercises: exerciseIDs,
         description: req.body.description,
@@ -66,7 +66,7 @@ let newWorkout = function newWorkout(req, res) {
 let newExercise = function newExercise(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    schemaCtrl.ProfileSchema.findOne({ "uid" : profile.uid}, function(err, user) {
+    schemaCtrl.Profile.findOne({ "uid" : profile.uid}, function(err, user) {
       if (user){
         console.log("----------Found user----------\n" + user + "\n------------------------------");
       } else {
@@ -75,7 +75,7 @@ let newExercise = function newExercise(req, res) {
       }
       //parse body for exercises and retrieve ObjectIDs of each from the exercise collection
       for (exercise in req.body.exercises){
-        let newExercise = new schemaCtrl.ExerciseSchema({
+        let newExercise = new schemaCtrl.Exercise({
           name: exercise.name,
           description: exercise.description,
           ownerUID: req.body.uid,
@@ -124,11 +124,11 @@ let logWorkout = function logWorkout(req, res) {
 }
 
 //Get a user's workouts from DB, queries using req body UID of the caller
-let workouts = function workouts(req, res) {
+let workouts = function getUserWorkouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
-    schemaCtrl.ProfileSchema
+    schemaCtrl.Profile
     .findOne({uid : req.body.uid}, function(err, workouts){
       if(err){
         res.status(500).send({message: "Error getting workouts"});
@@ -150,11 +150,11 @@ let workouts = function workouts(req, res) {
 }
 
 //Get a user's exercises from DB, queries using req body UID of the caller
-let exercises = function exercises(req, res) {
+let exercises = function getUserexercises(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
-    schemaCtrl.ProfileSchema
+    schemaCtrl.Profile
     .findOne({uid : req.body.uid}, function(err, exercises){
       if(err){
         res.status(500).send({message: "Error getting exercises"});
