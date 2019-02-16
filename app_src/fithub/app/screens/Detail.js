@@ -10,7 +10,6 @@ import {
 
 export default class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    console.log(navigation.getParam('name', 'Workout'));
     return {
       title: navigation.getParam('name', 'Workout'),
       headerStyle: {

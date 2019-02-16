@@ -24,7 +24,7 @@ class HomeScreen extends React.Component {
       return (
         <SafeAreaView style={styles.containerIOS}>
           <View style={styles.calendar}>
-            <Calendar />
+            <Calendar navigation={this.props.navigation} />
           </View>
           <View style={styles.bottomBar}>
             <BottomBar />
@@ -35,7 +35,7 @@ class HomeScreen extends React.Component {
       return (
         <View style={styles.containerAND}>
           <View style={styles.calendar}>
-            <Calendar />
+            <Calendar navigation={this.props.navigation} />
           </View>
           <View style={styles.bottomBar}>
             <BottomBar />

@@ -62,13 +62,15 @@ export default class Calendar extends React.Component {
         for(let i = 0; i < 31; i++) {
           let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
           date = date.toJSON().slice(0, 10);
-          loadedWorkouts[date] = [];
+          if(loadedWorkouts[date] === undefined) {
+            loadedWorkouts[date] = [];
+          }
         }
 
         for(let i = 0; i < data.results.length; i++) {
           let date = new Date(data.results[i].created);
           date = date.toJSON().slice(0, 10);
-          if(loadedWorkouts[date] == undefined) {
+          if(loadedWorkouts[date] === undefined) {
             loadedWorkouts[date] = [];
           }
           loadedWorkouts[date].push({ text: data.results[i].name });
@@ -96,6 +98,7 @@ export default class Calendar extends React.Component {
           name: item.text,
         })}}
         style={styles.item}
+        underlayColor='#eee'
       >
         <Text>{item.text}</Text>
       </TouchableHighlight>
