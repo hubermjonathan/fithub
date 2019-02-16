@@ -1,0 +1,25 @@
+log: 
+[
+  {
+    name: bench,
+    reps: [5, 5, 5, 5, 5],
+    weight: [115, 115, 115, 115, 100]
+    isWarmup: False
+    date: 
+  },
+
+  {
+    name: pushdowns,
+    reps: [12, 12, 8],
+    weight: [50, 50, 50, 50, 50]
+    isWarmup: False
+    date: 
+  }
+
+
+
+
+
+
+
+]
