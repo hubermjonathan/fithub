@@ -20,6 +20,10 @@ import WorkoutScreen from './app/screens/Workouts';
 
 
 class HomeScreen extends React.Component {
+  static navigationOptions = {
+    header: null,
+  }
+
   render() {
     if(Platform.OS === 'ios') {
       return (
@@ -69,9 +73,8 @@ const AppNavigator = createStackNavigator({
   Home: HomeScreen,
   Detail: DetailScreen,
 }, {
-    initialRouteName: 'Home',
-    headerMode: 'none',
-  });
+  initialRouteName: 'Home',
+});
 
 const AppContainer = createAppContainer(AppNavigator);
 
