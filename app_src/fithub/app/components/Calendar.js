@@ -50,7 +50,23 @@ export default class Calendar extends React.Component {
     setTimeout(() => {
       loadedWorkouts = {
         '2019-02-15': [
-          { text: 'Sample Workout' },
+          {
+            name: 'The Dorito',
+            exercises: [
+              {
+                name: 'Bench',
+                reps: [4,3,4],
+                weight: [5,10,15],
+                isWarmup: true,
+              },
+              {
+                name: 'Squat',
+                reps: [10,3,1],
+                weight: [200,5,300],
+                isWarmup: false,
+              },
+            ],
+          },
         ],
       };
 
@@ -73,7 +89,7 @@ export default class Calendar extends React.Component {
           if(loadedWorkouts[date] === undefined) {
             loadedWorkouts[date] = [];
           }
-          loadedWorkouts[date].push({ text: data.results[i].name });
+          loadedWorkouts[date].push({ name: data.results[i].name });
         }
 
         this.setState({
@@ -94,13 +110,11 @@ export default class Calendar extends React.Component {
   renderItem(item) {
     return (
       <TouchableHighlight
-        onPress={() => { this.props.navigation.push('Detail', {
-          name: item.text,
-        })}}
+        onPress={() => { this.props.navigation.push('Detail', item)}}
         style={styles.item}
         underlayColor='#eee'
       >
-        <Text>{item.text}</Text>
+        <Text>{item.name}</Text>
       </TouchableHighlight>
     );
   }
