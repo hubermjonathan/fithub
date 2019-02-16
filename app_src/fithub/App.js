@@ -14,8 +14,9 @@ import {
 
 import DetailScreen from './app/screens/Detail';
 
-import Calendar from './app/components/Calendar';
-import BottomBar from './app/components/BottomBar';
+import Calendar from './app/Components/Calendar';
+import BottomBar from './app/Components/BottomBar';
+import WorkoutScreen from './app/screens/Workouts';
 
 
 class HomeScreen extends React.Component {
@@ -48,7 +49,7 @@ class HomeScreen extends React.Component {
       );
     }
   }
-}
+  }
 
 const styles = StyleSheet.create({
   containerIOS: {

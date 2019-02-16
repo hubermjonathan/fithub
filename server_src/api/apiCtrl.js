@@ -125,11 +125,18 @@ let logWorkout = function logWorkout(req, res) {
 
 //Get a user's workouts from DB, queries using req body UID of the caller
 let workouts = function workouts(req, res) {
-  /*let db = connectToDb();
+  let db = connectToDb();
   db.once('open', () => {
     //query profile collection
     schemaCtrl.ProfileSchema
-    .findOne({uid : req.body.uid}, function(err, workouts))
+    .findOne({uid : req.body.uid}, function(err, workouts){
+      if(err){
+        res.status(500).send({message: "Error getting workouts"});
+      }
+      else{
+        res.send(workouts);
+      }
+    })
     .populate('workouts')
     .exec(function(err, workouts){
       if(err){
@@ -139,16 +146,23 @@ let workouts = function workouts(req, res) {
         res.send(workouts);
       }
     });
-  });*/
+  });
 }
 
 //Get a user's exercises from DB, queries using req body UID of the caller
 let exercises = function exercises(req, res) {
-  /*let db = connectToDb();
+  let db = connectToDb();
   db.once('open', () => {
     //query profile collection
     schemaCtrl.ProfileSchema
-    .findOne({uid : req.body.uid}, function(err, exercises))
+    .findOne({uid : req.body.uid}, function(err, exercises){
+      if(err){
+        res.status(500).send({message: "Error getting exercises"});
+      }
+      else{
+        res.send(exercises);
+      }
+    })
     .populate('exercises')
     .exec(function(err, exercises){
       if(err){
@@ -158,7 +172,7 @@ let exercises = function exercises(req, res) {
         res.send(exercises);
       }
     });
-  });*/
+  });
 }
 
 let apiCtrl = {
