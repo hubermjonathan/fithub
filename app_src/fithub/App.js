@@ -19,6 +19,10 @@ import BottomBar from './app/components/BottomBar';
 
 
 class HomeScreen extends React.Component {
+  static navigationOptions = {
+    header: null,
+  }
+
   render() {
     if(Platform.OS === 'ios') {
       return (
@@ -69,7 +73,6 @@ const AppNavigator = createStackNavigator({
   Detail: DetailScreen,
 }, {
   initialRouteName: 'Home',
-  headerMode: 'none',
 });
 
 const AppContainer = createAppContainer(AppNavigator);
