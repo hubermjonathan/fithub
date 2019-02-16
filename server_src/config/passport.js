@@ -14,6 +14,7 @@ function connectToDb() {
   return db;
 }
 
+
 //Google Strategy for logging in
 passport.use("googleToken", new GooglePlusTokenStrategy({
     clientID             : configAuth.googleAuth.clientID,
@@ -23,13 +24,13 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
     try {
       let db = connectToDb();
       db.once('open', () => {
-        schemaCtrl.ProfileSchema.findOne({ "google.id" : profile.uid}, function(err, user) {
+        schemaCtrl.Profile.findOne({ "google.id" : profile.uid}, function(err, user) {
           if (err) return handleError(err);
           if (user){
             console.log("----------Found user----------\n" + user + "\n------------------------------");
-            return done(null, user);
+            return done(null, user, false);
           }
-          user = new schemaCtrl.ProfileSchema({
+          user = new schemaCtrl.Profile({
             name: profile.name.givenName + " " + profile.name.familyName,
             pseudonym: profile.displayName,
             avatar: profile._json.image.url,
@@ -40,13 +41,13 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
           })
           console.log("----------Saving user----------\n" + user + "\n------------------------------");        
           user.save(function (err, newLog) {
-            //if (err) return res.status(500).send({ message: 'User unsuccessfully added' });
-            //else res.status(200).send({ message: 'User successfully added' });
+            if (err) return done(error, null, error.message);
+            else return done(null, user, true);
           });
         });
       });
     } catch(error) {
-      done(error, false, error.message);
+      done(error, null, error.message);
     }
   }
 ));
