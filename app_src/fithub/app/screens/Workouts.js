@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Dash from 'react-native-dash';
 import { Icon } from 'react-native-elements';
-import BottomBar from '../Components/BottomBar.js';
+import BottomBar from '../components/BottomBar.js';
 import StickyHeaderFooterScrollView from 'react-native-sticky-header-footer-scroll-view';
 
 export default class WorkoutScreen extends React.Component {
