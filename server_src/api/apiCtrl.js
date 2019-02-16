@@ -92,66 +92,35 @@ let newExercise = function newExercise(req, res) {
 
 //Log a user's workout into the DB
 let logWorkout = function logWorkout(req, res) {
+  
   let db = connectToDb();
   db.once('open', () => {
-    
-
-    let exerciseIDs = [];
-    //parse body for exercises and retrieve ObjectIDs of each from the exercise collection
+      
+    let exercises = [];    
+    //Construct the JSON exercise objects and push them to exercises
     req.body.exercises.forEach(exercise => {
-
-      let newExercise = new schemaCtrl.LogExerciseSchema({
+      let newExercise = {
         name: exercise.name,
-        sets: exercise.sets,
         reps: exercise.reps,
         weight: exercise.weight,
         isWarmup: exercise.isWarmup
-      });
-
-      newExercise.save(function (err, newExercise) {
-        if (err) return res.status(500).send({ message: 'Error when parsing JSON exercises' });
-        else exerciseIDs.push(mongoose.Types.ObjectID(newExercise.id));
-      });
+      };
+      exercises.push(newExercise);
     });
 
-    //build the workout by adding requested exercise ObjectIDs into an array
-    let newWorkout = new schemaCtrl.WorkoutSchema({
+    //Construct the workout JSON object
+    let newWorkout = {
       name: req.body.name,
-      exercises: exerciseIDs,
-      description: req.body.description,
-      ownerUID: req.body.uid,
-    });
+      date: req.body.date,
+      exercises: exercises,
+    };
 
-    //save the workout to the master workout collection
-    newWorkout.save(function (err, newWorkout) {
-      if (err) return res.status(500).send({ message: 'Workout unsuccessfully added' });
-      else res.status(200).send({ message: 'Workout successfully added' });
-    });
-    
-    
-    
-    
-    
-    let uid = req.body.uid;
-
-    //loop over the exercises performed that day and create a new LogExercise for each
-    let exerciseObjectIDs = []
-
-    //create LogDay containing array of the LogExercises
-    let LogDay = new schemaCtrl.LogDaySchema({
-      exercise: exerciseObjectIDs,
-      date: req.body.data,
-      ownerUID: req.body.date
-    });
-
-    //save day
-    LogDay.save(function (err, newLog) {
-      if (err) return res.status(500).send({ message: 'Log unsuccessfully added' });
-      else res.status(200).send({ message: 'Log successfully added' });
-    });
-
-    //update LogSchema
-  });
+    //Push the newWorkout log to the user profile
+    schemaCtrl.ProfileSchema.update(
+      { uid: req.body.uid }, 
+      { $push: { logs : newWorkout } },
+    );
+  });    
 }
 
 //Get a user's workouts from DB, queries using req body UID of the caller
