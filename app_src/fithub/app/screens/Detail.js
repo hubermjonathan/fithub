@@ -30,14 +30,8 @@ export default class DetailScreen extends React.Component {
       return (
         <SafeAreaView style={styles.containerIOS}>
           <View style={styles.cardsContainer}>
-            <View style={styles.card}>
-              <View style={styles.cardTitle}>
-                <Text style={styles.exerciseLabel}>Set</Text>
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>Warmup</Text>
-                </View>
-              </View>
-            </View>
+            <Cards exercises={this.state.exercises} />
+            
           </View>
         </SafeAreaView>
       );
@@ -47,6 +41,57 @@ export default class DetailScreen extends React.Component {
         </View>
       );
     }
+  }
+}
+
+class Cards extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    let cards = [];
+
+    for(let i = 0; i < this.props.exercises.length; i++) {
+      cards.push(
+        <View style={styles.card} key={"card-"+i}>
+          <View style={styles.cardTitle}>
+            <Text style={styles.exerciseLabel}>{this.props.exercises[i].name}</Text>
+            {this.props.exercises[i].isWarmup &&
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>Warmup</Text>
+              </View>
+            }
+          </View>
+
+          <View style={styles.cardRow}>
+            <Text style={styles.exerciseText}>Set 1</Text>
+            <Text style={styles.exerciseText}>4 reps</Text>
+            <Text style={styles.exerciseText}>5 lbs</Text>
+          </View>
+          
+          <View style={styles.cardRow}>
+            <Text style={styles.exerciseText}>Set 2</Text>
+            <Text style={styles.exerciseText}>3 reps</Text>
+            <Text style={styles.exerciseText}>10 lbs</Text>
+          </View>
+
+          <View style={styles.cardRow}>
+            <Text style={styles.exerciseText}>Set 3</Text>
+            <Text style={styles.exerciseText}>4 reps</Text>
+            <Text style={styles.exerciseText}>15 lbs</Text>
+          </View>
+
+          <View style={styles.cardRowBottom}>
+            <Text style={styles.exerciseText}>3 sets</Text>
+            <Text style={styles.exerciseText}>11 reps</Text>
+            <Text style={styles.exerciseText}>110 lbs</Text>
+          </View>
+        </View>
+      );
+    }
+
+    return cards;
   }
 }
 
@@ -63,7 +108,6 @@ const styles = StyleSheet.create({
   cardsContainer: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 17,
   },
   card: {
     width: '90%',
@@ -71,11 +115,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 5,
     padding: 10,
+    marginTop: 17,
   },
   cardTitle: {
-    flexDirection: 'row',
     flex: 1,
+    flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 17,
+  },
+  cardRow: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  cardRowBottom: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft: 10,
+    marginRight: 10,
+    paddingTop: 10,
+    borderTopWidth: 0.5,
+    borderTopColor: '#333',
   },
   exerciseLabel: {
     fontWeight: 'bold',

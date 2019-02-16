@@ -13,10 +13,10 @@ import {
 } from 'react-navigation';
 
 import DetailScreen from './app/screens/Detail';
-
-import Calendar from './app/Components/Calendar';
-import BottomBar from './app/Components/BottomBar';
 import WorkoutScreen from './app/screens/Workouts';
+
+import Calendar from './app/components/Calendar';
+import BottomBar from './app/components/BottomBar';
 
 
 class HomeScreen extends React.Component {
