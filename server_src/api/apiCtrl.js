@@ -116,7 +116,7 @@ let logWorkout = function logWorkout(req, res) {
     };
 
     //Push the newWorkout log to the user profile
-    schemaCtrl.ProfileSchema.update(
+    schemaCtrl.Profile.update(
       { uid: req.body.uid }, 
       { $push: { logs : newWorkout } },
     );
