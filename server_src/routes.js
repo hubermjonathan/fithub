@@ -15,6 +15,7 @@ router.get('/users/:uid/workouts',apiCtrl.workouts);        //Get a users workou
 router.get('/users/:uid/exercises',apiCtrl.exercises);      //Get a users exercises
 router.post('/workouts/new',apiCtrl.newWorkout);            //Create a new workout plan
 router.post('/exercise/new',apiCtrl.newExercise);           //Create a new exercise
-router.post('/workouts/log',apiCtrl.logWorkout);            //Log a users workout
+router.post('/workouts/log',apiCtrl.newLog);            //Log a users workout
+router.get('/workouts/log',apiCtrl.logs);            //Log a users workout
 
 module.exports = router;

@@ -14,12 +14,19 @@ function connectToDb() {
 let login = function login(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-
+    console.log("Here");
   });
 }
 
 //Register a user
-let register = passport.authenticate('googleToken', {session: false});
+let register = passport.authenticate('googleToken', { successRedirect: '/',
+                                                     failureRedirect: '/login' });
+
+// let register = passport.authenticate('googleToken', function(err, user, info) {
+//     if (err) { return next(err); }
+//     else if (!info) { return res.redirect("/login"); }
+//     else { return "/login";}
+//   });
 
 //Create a new workout for the master workout library
 let newWorkout = function newWorkout(req, res) {
@@ -91,11 +98,10 @@ let newExercise = function newExercise(req, res) {
 }
 
 //Log a user's workout into the DB
-let logWorkout = function logWorkout(req, res) {
+let newLog = function newLog(req, res) {
   
   let db = connectToDb();
   db.once('open', () => {
-      
     let exercises = [];    
     //Construct the JSON exercise objects and push them to exercises
     req.body.exercises.forEach(exercise => {
@@ -116,10 +122,35 @@ let logWorkout = function logWorkout(req, res) {
     };
 
     //Push the newWorkout log to the user profile
-    schemaCtrl.Profile.update(
+    schemaCtrl.Profile.updateOne(
       { uid: req.body.uid }, 
       { $push: { logs : newWorkout } },
+      {},
+      (err, raw) => {
+        if (err) {
+          res.status(300).send({"message" : "Error"});
+        } else{
+          res.status(200).send({"message" : "Workout added successfully"});
+        }
+      }
     );
+
+  });    
+}
+
+//Get a user's logs from the database
+let logs = function logs(req, res) {
+  
+  let db = connectToDb();
+  db.once('open', () => {
+    schemaCtrl.Profile.findOne({ "uid" : req.body.uid}, function(err, user) {
+      if (err) return handleError(err);
+      if (!user){
+        res.status(404).send({ "message": "User not found"}) 
+      } else {
+        res.status(200).send({ "logs" :user.logs});
+      }
+    });
   });    
 }
 
@@ -180,7 +211,8 @@ let apiCtrl = {
   register: register,
   newExercise: newExercise,
   newWorkout: newWorkout,
-  logWorkout: logWorkout,
+  newLog: newLog,
+  logs: logs,
   workouts: workouts,
   exercises: exercises,
 }
