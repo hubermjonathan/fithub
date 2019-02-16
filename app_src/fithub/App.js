@@ -49,7 +49,7 @@ class HomeScreen extends React.Component {
       );
     }
   }
-  }
+}
 
 const styles = StyleSheet.create({
   containerIOS: {
@@ -73,8 +73,8 @@ const AppNavigator = createStackNavigator({
   Home: HomeScreen,
   Detail: DetailScreen,
 }, {
-  initialRouteName: 'Home',
-});
+    initialRouteName: 'Home',
+  });
 
 const AppContainer = createAppContainer(AppNavigator);
 

@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import Dash from 'react-native-dash';
 import { Icon } from 'react-native-elements';
+import BottomBar from '../Components/BottomBar.js';
+import StickyHeaderFooterScrollView from 'react-native-sticky-header-footer-scroll-view';
 
 export default class WorkoutScreen extends React.Component {
 
@@ -18,83 +20,89 @@ export default class WorkoutScreen extends React.Component {
     let workouts = this.getWorkouts(/*put id here, idk how to get it for now */);
     return (
 
-      <ScrollView>
-        <Text style={styles.title}> Saved Workouts</Text>
-        <Dash style={styles.line} />
-        
-        <View style={styles.add}>
-          <TouchableOpacity>
-            <Icon
-              name="plus"
-              type="entypo"
-              size={35}
-            />
-          </TouchableOpacity>
+      <StickyHeaderFooterScrollView 
+        renderStickyFooter={() => (
+          <View style={styles.bottomBar}>
+          <BottomBar />
         </View>
-        <View style={{ paddingTop: 15 }}>
-          <Text style={styles.group}>
-            MuscleGroup
-          </Text>
-          <Text style={styles.large}>
-            Lower Body - 6 Excercises
-          </Text>
-          <Text style={styles.large}>
-            upper Body - 6 Excercises
-          </Text>
-          <TouchableOpacity>
-            <Icon
-              name="chevron-right"
-              type="entypo"
-              size={35}
-            />
-          </TouchableOpacity>
-        </View>
+        )}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Text style={styles.title}> Saved Workouts</Text>
+          <Dash style={styles.line} />
 
-        <View style={{ paddingTop: 15 }}>
-          <Text style={styles.group}>
-            Chest
+          <View style={styles.add}>
+            <TouchableOpacity>
+              <Icon
+                name="plus"
+                type="entypo"
+                size={35}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={{ paddingTop: 15 }}>
+            <Text style={styles.group}>
+              MuscleGroup
           </Text>
-          <Text style={styles.large}>
-            Chest - 4 Excercises
+            <Text style={styles.large}>
+              Lower Body - 6 Excercises
           </Text>
-          <Text style={styles.large}>
-            Upper Chest - 3 Excercises
+            <Text style={styles.large}>
+              upper Body - 6 Excercises
           </Text>
-          <Text style={styles.large}>
-            Lower Lower - 2 Excercises
-          </Text>
-          <TouchableOpacity>
-            <Icon
-              name="chevron-right"
-              type="entypo"
-              size={35}
-            />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity>
+              <Icon
+                name="chevron-right"
+                type="entypo"
+                size={35}
+              />
+            </TouchableOpacity>
+          </View>
 
-        <View style={{ paddingTop: 15 }}>
-          <Text style={styles.group}>
-            Back
+          <View style={{ paddingTop: 15 }}>
+            <Text style={styles.group}>
+              Chest
           </Text>
-          <Text style={styles.large}>
-            Lats - 3 Excercises
+            <Text style={styles.large}>
+              Chest - 4 Excercises
           </Text>
-          <Text style={styles.large}>
-            Rear Delts - 3 Excercises
+            <Text style={styles.large}>
+              Upper Chest - 3 Excercises
           </Text>
-          <Text style={styles.large}>
-            Traps - 2 Excercises
+            <Text style={styles.large}>
+              Lower Lower - 2 Excercises
           </Text>
-          <TouchableOpacity>
-            <Icon
-              name="chevron-right"
-              type="entypo"
-              size={35}
-            />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity>
+              <Icon
+                name="chevron-right"
+                type="entypo"
+                size={35}
+              />
+            </TouchableOpacity>
+          </View>
 
-      </ScrollView>
+          <View style={{ paddingTop: 15 }}>
+            <Text style={styles.group}>
+              Back
+          </Text>
+            <Text style={styles.large}>
+              Lats - 3 Excercises
+          </Text>
+            <Text style={styles.large}>
+              Rear Delts - 3 Excercises
+          </Text>
+            <Text style={styles.large}>
+              Traps - 2 Excercises
+          </Text>
+            <TouchableOpacity>
+              <Icon
+                name="chevron-right"
+                type="entypo"
+                size={35}
+              />
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </StickyHeaderFooterScrollView>
     )
   }
 
@@ -139,6 +147,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     paddingBottom: 25
+  },
+  bottomBar: {
+    flex: 1,
   }
 
 });
