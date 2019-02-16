@@ -1,55 +1,69 @@
 import React from 'react';
-import { Icon, View } from 'react-native-elements';
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-import Profile from '../screens/Profile';
+
+import {
+  StyleSheet,
+  View,
+} from 'react-native';
+
+import { Icon } from 'react-native-elements';
+
+import {
+  createStackNavigator,
+  createAppContainer
+} from 'react-navigation';
+
 
 export default class BottomBar extends React.Component{
   constructor(props){
     super(props);
   }
-    render(){
-        return (
-            <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                alignItems: 'flex-end',
-            }}>
-            <Icon
-                name="book"
-                type="material-community"
-                size={50}
-                // onPress={() => this.props.navigation.navigate('Details')}
-            />
-            <Icon
-              name="plus"
-              type="entypo"
-              size={50}
-              //onPress={() => this.props.navigation.navigate('Details')}
-            />
-            <Icon
-              name="home"
-              type="material-community"
-              size={50}
-              //onPress={() => this.props.navigation.navigate('Details')}
-            />
-            <Icon
-              name="globe"
-              type="entypo"
-              size={50}
-              //onPress={() => this.props.navigation.navigate('Details')}
-            />
-            <Icon
-                name="account"
-                type="material-community"
-                size={50}
-                //onPress={() => this.props.navigation.navigate('Profile')}
-            />
-            </View>
-        );
-    }
+
+  render(){
+    return (
+      <View style={styles.barContainer}>
+        <Icon
+          name="book"
+          type="material-community"
+          size={35}
+          // onPress={() => this.props.navigation.navigate('Details')}
+        />
+        <Icon
+          name="plus"
+          type="entypo"
+          size={35}
+          //onPress={() => this.props.navigation.navigate('Details')}
+        />
+        <Icon
+          name="home"
+          type="material-community"
+          size={35}
+          //onPress={() => this.props.navigation.navigate('Details')}
+        />
+        <Icon
+          name="globe"
+          type="entypo"
+          size={35}
+          //onPress={() => this.props.navigation.navigate('Details')}
+        />
+        <Icon
+          name="account"
+          type="material-community"
+          size={35}
+          //onPress={() => this.props.navigation.navigate('Profile')}
+        />
+      </View>
+    );
+  }
 }
 
-//module.exports = BottomBar;
+const styles = StyleSheet.create({
+  barContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    paddingTop: 20,
+  }
+});
 
 /* const RootStack = createStackNavigator(
     {

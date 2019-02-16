@@ -8,7 +8,7 @@ import {
     Platform
 } from 'react-native';
 
-export default class Register extends React.Component {
+export default class RegisterScreen extends React.Component {
 
     render() {
         return (

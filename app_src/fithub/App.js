@@ -1,198 +1,75 @@
 import React from 'react';
+
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   Platform,
-  TouchableHighlight
 } from 'react-native';
-import { Agenda } from 'react-native-calendars';
-import { Icon } from 'react-native-elements';
-import { BottomBar } from './app/Components/BottomBar';
+
 import {
   createStackNavigator,
   createAppContainer
 } from 'react-navigation';
-import Detail from './app/screens/Detail';
-import Profile from './app/screens/Profile';
-import Feed from './app/screens/Feed';
-import AddWorkout from './app/screens/AddWorkout';
+
+import DetailScreen from './app/screens/Detail';
+
+import Calendar from './app/components/Calendar';
+import BottomBar from './app/components/BottomBar';
 
 
 class HomeScreen extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      workouts: {},
-    }
-  }
-
   render() {
-    if (Platform.OS === 'ios') {
+    if(Platform.OS === 'ios') {
       return (
-        <SafeAreaView style={styles.container}>
-          <Agenda
-            items={this.state.workouts}
-            selected={this.getCurrentDate()}
-            loadItemsForMonth={this.loadItems.bind(this)}
-            renderItem={this.renderItem.bind(this)}
-            renderEmptyDate={this.renderEmptyDate.bind(this)}
-            rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
-          />
-          <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                alignItems: 'flex-end',
-            }}>
-            <Icon
-                name="book"
-                type="material-community"
-                size={50}
-            />
-            <Icon
-              name="plus"
-              type="entypo"
-              size={50}
-              onPress={() => this.props.navigation.navigate('Add')}
-            />
-            <Icon
-              name="home"
-              type="material-community"
-              size={50}
-              onPress={() => this.props.navigation.navigate('Home')}
-            />
-            <Icon
-              name="globe"
-              type="entypo"
-              size={50}
-              onPress={() => this.props.navigation.navigate('Feed')}
-            />
-            <Icon
-                name="account"
-                type="material-community"
-                size={50}
-                onPress={() => this.props.navigation.navigate('Profile')}
-            />
-            </View>
+        <SafeAreaView style={styles.containerIOS}>
+          <View style={styles.calendar}>
+            <Calendar navigation={this.props.navigation} />
+          </View>
+          <View style={styles.bottomBar}>
+            <BottomBar />
+          </View>
         </SafeAreaView>
       );
     } else {
       return (
-        <View style={styles.container}>
-          <Agenda
-            items={this.state.workouts}
-            selected={'2019-02-09'}
-            renderItem={this.renderItem.bind(this)}
-            renderEmptyDate={this.renderEmptyDate.bind(this)}
-            rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
-          />
+        <View style={styles.containerAND}>
+          <View style={styles.calendar}>
+            <Calendar navigation={this.props.navigation} />
+          </View>
+          <View style={styles.bottomBar}>
+            <BottomBar />
+          </View>
         </View>
       );
     }
   }
-
-  getCurrentDate() {
-    let date = new Date();
-    return date.toJSON().slice(0, 10);
-  }
-
-  loadItems(month) {
-    setTimeout(() => {
-      loadedWorkouts = {}
-
-      fetch("https://swapi.co/api/people")
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        for(let i = 0; i < 31; i++) {
-          let date = new Date(month.timestamp + (i * 24 * 60 * 60 * 1000));
-          date = date.toJSON().slice(0, 10);
-          loadedWorkouts[date] = [];
-        }
-
-        for(let i = 0; i < data.results.length; i++) {
-          let date = new Date(data.results[i].created);
-          date = date.toJSON().slice(0, 10);
-          if(loadedWorkouts[date] == undefined) {
-            loadedWorkouts[date] = [];
-          }
-          loadedWorkouts[date].push({ text: data.results[i].name });
-        }
-
-        this.setState({
-          workouts: loadedWorkouts
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    }, 1000);
-  }
-
-  timeToString(time) {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
-  }
-
-  renderItem(item) {
-    return (
-      <TouchableHighlight onPress={this.linkToDetail.bind(this, item)} style={styles.item}>
-        <Text>{item.text}</Text>
-      </TouchableHighlight>
-    );
-  }
-
-  linkToDetail(item) {
-    console.log(item);
-    this.props.navigation.push('Detail', {
-      name: item.text,
-    });
-  }
-
-  renderEmptyDate() {
-    return (
-      <View style={styles.empty}>
-        <Text>You missed the gym this day!</Text>
-      </View>
-    );
-  }
 }
 
-
-
 const styles = StyleSheet.create({
-  container: {
+  containerIOS: {
     flex: 1,
     backgroundColor: '#fff',
   },
-  item: {
+  containerAND: {
     flex: 1,
     backgroundColor: '#fff',
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17,
-    height: 15
+    paddingTop: 10,
   },
-  empty: {
+  calendar: {
+    flex: 11,
+  },
+  bottomBar: {
     flex: 1,
-    height: 15,
-    paddingTop: 30
   },
 });
 
 const AppNavigator = createStackNavigator({
   Home: HomeScreen,
-  Detail: Detail,
-  Profile: Profile,
-  Feed: Feed,
-  Add: AddWorkout
+  Detail: DetailScreen,
 }, {
   initialRouteName: 'Home',
-  headerMode: 'none'
+  headerMode: 'none',
 });
 
 const AppContainer = createAppContainer(AppNavigator);

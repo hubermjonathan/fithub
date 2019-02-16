@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { AppRegistry, StyleSheet, Text, View, TextInput, ScrollView, Image, Label, Button, Flexbox, Container, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default class SignIn extends Component {
+export default class SignInScreen extends Component {
 
     press() {
         Console.log('Button Pressed');

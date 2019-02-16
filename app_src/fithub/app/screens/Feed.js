@@ -8,7 +8,7 @@ import {
     Platform
 } from 'react-native';
 
-export default class Feed extends React.Component {
+export default class FeedScreen extends React.Component {
 
     render() {
         return (
