@@ -8,13 +8,14 @@ router.use(bodyParser.json());
 const apiCtrl = require('./api/apiCtrl');
 
 //api
-router.post('/oauth/google', apiCtrl.reg);
-router.post('/users/login',apiCtrl.login);
-router.post('/users/register',apiCtrl.register);
-router.get('/users/:uid/workouts',apiCtrl.workouts);
-router.get('/users/:uid/exercises',apiCtrl.exercises);
-router.post('/workouts/new',apiCtrl.newWorkout);
-router.post('/workouts/log',apiCtrl.logWorkout);
-router.post('/exercise/new',apiCtrl.newExercise);
+
+router.post('/users/login',apiCtrl.login);                  //Login a user
+router.post('/users/register',apiCtrl.register);            //Register a user
+router.get('/users/:uid/workouts',apiCtrl.workouts);        //Get a users workouts
+router.get('/users/:uid/exercises',apiCtrl.exercises);      //Get a users exercises
+router.post('/workouts/new',apiCtrl.newWorkout);            //Create a new workout plan
+router.post('/exercise/new',apiCtrl.newExercise);           //Create a new exercise
+router.post('/workouts/log',apiCtrl.newLog);            //Log a users workout
+router.get('/workouts/log',apiCtrl.logs);            //Log a users workout
 
 module.exports = router;

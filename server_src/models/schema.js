@@ -2,70 +2,38 @@ const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 //Schema for a user's profile, represents everything associated with a user
-let ProfileSchema = new Schema({
-    name: { type: String, required: true },
-    //pseudonym will be the user name
-    pseudonym: { type: String, required: true },
-    //url tag to be concatenated with database storing pictures link
-    avatar: { type: String, required: true },
-    //exercises that the user created
-    exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseSchema"}],
-    //workouts that the user created
-    workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutSchema"}],
-    //logging data for the user
-    log: { type: Schema.Types.ObjectId, ref: "LogSchema" },
-    //For authentication
-    uid: { type: String, required: true },
+let Profile = new Schema({
+    name: { type: String, required: true },                             //Full Name
+    pseudonym: { type: String, required: true },                        //Nickname
+    email : { type: String, required: true },                           //User email
+    avatar: { type: String, required: true },                           //User profile picture
+    exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],       //Exercises the user has submitted to the master list
+    workouts: [{ type: Schema.Types.ObjectId, ref: "Workout"}],         //Workout plans the user has submitted to the master list
+    logs : { type : Array , "default" : [] },                           //Array of JSON objects which contain arrays of exercises
+    uid: { type: String, required: true },                              //Google unique user id
     token : { type: String, required: true },
-    email : { type: String, required: true }
-});
-
-//Sub-schema of ProfileSchema for a user's log information, contains an array of days
-let LogSchema = new Schema({
-    days: [{ type: Schema.Types.ObjectId, ref: "LogDaySchema"}],
-    //owner: { type: Schema.Types.ObjectId, ref: "ProfileSchema" }
-    ownerUID : { type: String, required: true }
-});
-
-//Sub-schema of LogSchema representing data for exercises performed on a specific day
-let LogDaySchema = new Schema({
-    exercises: [{ type: Schema.Types.ObjectId, ref: "LogExerciseSchema"}],
-    date: { type: Date, required: true },
-    ownerUID : { type: String, required: true }
-});
-
-//Sub-schema of LogSchema representing data 
-let LogExerciseSchema = new Schema({
-    name: { type: String, required: true },
-    sets: { type: Number, required: true },
-    reps: { type: Number, required: true },
-    weight: { type: Number, required: true },
-    isWarmup: { type: Boolean, required: true },
 });
 
 //Schema for creating a new exercise
-let ExerciseSchema = new Schema({
+let Exercise = new Schema({
     name: { type: String, required: true },
     description: { type: Number, required: true },
     ownerUID : { type: String, required: true }
 });
 
 //Schema for creating a new workout
-let WorkoutSchema = new Schema({
+let Workout = new Schema({
     name: { type: String, required: true },
-    description: { type: Number, required: true },
-    exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseSchema"}],
+    description: { type: String, required: true },
+    exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],
     ownerUID : { type: String, required: true }
 });
 
 //map the schemas to mongo collections
 let schemaCtrl = {
-    ProfileSchema: mongoose.model("ProfileSchema", ProfileSchema),
-    LogSchema: mongoose.model("LogSchema", LogSchema),
-    LogExerciseSchema: mongoose.model("LogExerciseSchema", LogExerciseSchema),
-    LogWorkoutSchema: mongoose.model("LogWorkoutSchema", LogWorkoutSchema),
-    ExerciseSchema: mongoose.model("ExerciseSchema", ExerciseSchema),
-    WorkoutSchema: mongoose.model("WorkoutSchema", WorkoutSchema),
+    Profile: mongoose.model("Profile", Profile),
+    Exercise: mongoose.model("Exercise", Exercise),
+    Workout: mongoose.model("Workout", Workout),
 }
 
 module.exports = schemaCtrl;

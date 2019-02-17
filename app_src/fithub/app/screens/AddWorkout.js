@@ -8,7 +8,7 @@ import {
     Platform
 } from 'react-native';
 
-export default class AddWorkout extends React.Component {
+export default class AddWorkoutScreen extends React.Component {
 
     render() {
         return (

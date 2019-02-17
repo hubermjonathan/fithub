@@ -10,91 +10,164 @@ function connectToDb() {
   return db;
 }
 
-let reg = passport.authenticate('googleToken', {session: false});
-
 //Log a user in
 let login = function login(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-
+    console.log("Here");
   });
 }
 
 //Register a user
-let register = function register(req, res) {
-  //let db = connectToDb();
-  //db.once('open', () => {
-  //});
-  console.log("auth");
-  passport.authenticate('googleToken', {session: false});
+let register = passport.authenticate('googleToken', { successRedirect: '/',
+                                                     failureRedirect: '/login' });
 
-}
+// let register = passport.authenticate('googleToken', function(err, user, info) {
+//     if (err) { return next(err); }
+//     else if (!info) { return res.redirect("/login"); }
+//     else { return "/login";}
+//   });
 
 //Create a new workout for the master workout library
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    //parse body for exercises and retrieve ObjectIDs of each from the exercise collection
+    schemaCtrl.Profile.findOne({ "uid" : req.body.uid}, function(err, user) {
 
-    //build the workout by adding requested exercise ObjectIDs into an array
-    let newWorkout = new schemaCtrl.WorkoutSchema({
-      name: req.body.name,
-      exercises: [],
-      description: req.body.description,
-      ownerUID: req.body.uid,
-    });
+      let exerciseIDs = [];
+      if (user){
+        console.log("----------Found user----------\n" + user + "\n------------------------------");
+      } else {
+        res.status(404).send({message : "User not found"});
+        return;
+      }
+      req.body.exercises.forEach(id => {
+        exerciseIDs.push(id);
+      });
 
-    //save the workout to the master workout collection
-    newWorkout.save(function (err, newWorkout) {
-      if (err) return res.status(500).send({ message: 'Workout unsuccessfully added' });
-      else res.status(200).send({ message: 'Workout successfully added' });
+      console.log(exerciseIDs);
+
+      //build the workout by adding requested exercise ObjectIDs into an array
+      let newWorkout = new schemaCtrl.Workout({
+        name: req.body.name,
+        exercises: exerciseIDs,
+        description: req.body.description,
+        ownerUID: req.body.uid,
+      });
+
+      //save the workout to the master workout collection
+      newWorkout.save(function (err, newWorkout) {
+        if (err) {
+          console.log(err);
+          return res.status(500).send({ message: 'Workout unsuccessfully added' });
+        }
+        else {
+          res.status(200).send({ message: 'Workout successfully added' })
+        };
+      });
     });
   });
 }
 
-//Add a new exercise for the  master exercise library
+//Add exercise to user profile
 let newExercise = function newExercise(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    //create the exercise
-    let newExercise = new schemaCtrl.ExerciseSchema({
-      name: req.body.name
-      description: req.body.description,
-      ownerUID: req.body.uid,
-    });
+    schemaCtrl.Profile.findOne({ "uid" : profile.uid}, function(err, user) {
+      if (user){
+        console.log("----------Found user----------\n" + user + "\n------------------------------");
+      } else {
+        res.status(404).send({message : "User not found"});
+        return;
+      }
+      //parse body for exercises and retrieve ObjectIDs of each from the exercise collection
+      for (exercise in req.body.exercises){
+        let newExercise = new schemaCtrl.Exercise({
+          name: exercise.name,
+          description: exercise.description,
+          ownerUID: req.body.uid,
+        });
 
-    //save the exercise to the master exercise collection
-    newExercise.save(function (err, newExercise) {
-      if (err) return res.status(500).send({ message: 'Exercise unsuccessfully added' });
-      else res.status(200).send({ message: 'Exercise successfully added' });
+        newExercise.save(function (err, newExercise) {
+          if (err) return res.status(500).send({ message: 'Error when parsing JSON exercises' });
+          else res.status(200).send();
+        });
+      }
     });
   });
 }
 
 //Log a user's workout into the DB
-let logWorkout = function logWorkout(req, res) {
+let newLog = function newLog(req, res) {
+  
   let db = connectToDb();
   db.once('open', () => {
-    let uid = req.body.uid;
-    let newLog = new schemaCtrl.LogSchema({
-      exercise: req.body.exercise,
-      data: req.body.data,
-      dates: req.body.date
+    let exercises = [];    
+    //Construct the JSON exercise objects and push them to exercises
+    req.body.exercises.forEach(exercise => {
+      let newExercise = {
+        name: exercise.name,
+        reps: exercise.reps,
+        weight: exercise.weight,
+        isWarmup: exercise.isWarmup
+      };
+      exercises.push(newExercise);
     });
-    newLog.save(function (err, newLog) {
-      if (err) return res.status(500).send({ message: 'Log unsuccessfully added' });
-      else res.status(200).send({ message: 'Log successfully added' });
+
+    //Construct the workout JSON object
+    let newWorkout = {
+      name: req.body.name,
+      date: req.body.date,
+      exercises: exercises,
+    };
+
+    //Push the newWorkout log to the user profile
+    schemaCtrl.Profile.updateOne(
+      { uid: req.body.uid }, 
+      { $push: { logs : newWorkout } },
+      {},
+      (err, raw) => {
+        if (err) {
+          res.status(300).send({"message" : "Error"});
+        } else{
+          res.status(200).send({"message" : "Workout added successfully"});
+        }
+      }
+    );
+
+  });    
+}
+
+//Get a user's logs from the database
+let logs = function logs(req, res) {
+  
+  let db = connectToDb();
+  db.once('open', () => {
+    schemaCtrl.Profile.findOne({ "uid" : req.body.uid}, function(err, user) {
+      if (err) return handleError(err);
+      if (!user){
+        res.status(404).send({ "message": "User not found"}) 
+      } else {
+        res.status(200).send({ "logs" :user.logs});
+      }
     });
-  });
+  });    
 }
 
 //Get a user's workouts from DB, queries using req body UID of the caller
-let workouts = function workouts(req, res) {
+let workouts = function getUserWorkouts(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
-    schemaCtrl.ProfileSchema
-    .findOne({uid : req.body.uid}, function(err, workouts))
+    schemaCtrl.Profile
+    .findOne({uid : req.body.uid}, function(err, workouts){
+      if(err){
+        res.status(500).send({message: "Error getting workouts"});
+      }
+      else{
+        res.send(workouts);
+      }
+    })
     .populate('workouts')
     .exec(function(err, workouts){
       if(err){
@@ -108,12 +181,19 @@ let workouts = function workouts(req, res) {
 }
 
 //Get a user's exercises from DB, queries using req body UID of the caller
-let exercises = function exercises(req, res) {
+let exercises = function getUserexercises(req, res) {
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
-    schemaCtrl.ProfileSchema
-    .findOne({uid : req.body.uid}, function(err, exercises))
+    schemaCtrl.Profile
+    .findOne({uid : req.body.uid}, function(err, exercises){
+      if(err){
+        res.status(500).send({message: "Error getting exercises"});
+      }
+      else{
+        res.send(exercises);
+      }
+    })
     .populate('exercises')
     .exec(function(err, exercises){
       if(err){
@@ -131,11 +211,10 @@ let apiCtrl = {
   register: register,
   newExercise: newExercise,
   newWorkout: newWorkout,
-  logWorkout: logWorkout,
+  newLog: newLog,
+  logs: logs,
   workouts: workouts,
   exercises: exercises,
-  passport: passport,
-  reg: reg
 }
 
 module.exports = apiCtrl;

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import BottomBar from '../Components/BottomBar';
 
-export default class Profile extends React.Component {
+export default class ProfileScreen extends React.Component {
 
     render() {
         return (
