@@ -13,12 +13,6 @@ import {
 } from 'react-navigation';
 
 import DetailScreen from './app/screens/Detail';
-<<<<<<< HEAD
-
-import Calendar from './app/components/Calendar';
-import BottomBar from './app/components/BottomBar';
-=======
->>>>>>> 4cbba25303989adf90239b352251afe6c5a24336
 import WorkoutScreen from './app/screens/Workouts';
 
 import Calendar from './app/components/Calendar';

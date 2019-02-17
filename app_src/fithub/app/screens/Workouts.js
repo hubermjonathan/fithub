@@ -7,11 +7,14 @@ import {
   StatusBar,
   Platform,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Dimensions
 } from 'react-native';
+
 import Dash from 'react-native-dash';
 import { Icon } from 'react-native-elements';
-import BottomBar from '../components/BottomBar.js';
+import BottomBar from '../components/BottomBar';
+import WorkoutCard from '../components/WorkoutCard';
 import StickyHeaderFooterScrollView from 'react-native-sticky-header-footer-scroll-view';
 
 export default class WorkoutScreen extends React.Component {
@@ -20,16 +23,10 @@ export default class WorkoutScreen extends React.Component {
     let workouts = this.getWorkouts(/*put id here, idk how to get it for now */);
     return (
 
-      <StickyHeaderFooterScrollView 
-        renderStickyFooter={() => (
-          <View style={styles.bottomBar}>
-          <BottomBar />
-        </View>
-        )}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+      <View>
+        <View>
           <Text style={styles.title}> Saved Workouts</Text>
           <Dash style={styles.line} />
-
           <View style={styles.add}>
             <TouchableOpacity>
               <Icon
@@ -39,70 +36,28 @@ export default class WorkoutScreen extends React.Component {
               />
             </TouchableOpacity>
           </View>
-          <View style={{ paddingTop: 15 }}>
-            <Text style={styles.group}>
-              MuscleGroup
-          </Text>
-            <Text style={styles.large}>
-              Lower Body - 6 Excercises
-          </Text>
-            <Text style={styles.large}>
-              upper Body - 6 Excercises
-          </Text>
-            <TouchableOpacity>
-              <Icon
-                name="chevron-right"
-                type="entypo"
-                size={35}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View style={{ paddingTop: 15 }}>
-            <Text style={styles.group}>
-              Chest
-          </Text>
-            <Text style={styles.large}>
-              Chest - 4 Excercises
-          </Text>
-            <Text style={styles.large}>
-              Upper Chest - 3 Excercises
-          </Text>
-            <Text style={styles.large}>
-              Lower Lower - 2 Excercises
-          </Text>
-            <TouchableOpacity>
-              <Icon
-                name="chevron-right"
-                type="entypo"
-                size={35}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View style={{ paddingTop: 15 }}>
-            <Text style={styles.group}>
-              Back
-          </Text>
-            <Text style={styles.large}>
-              Lats - 3 Excercises
-          </Text>
-            <Text style={styles.large}>
-              Rear Delts - 3 Excercises
-          </Text>
-            <Text style={styles.large}>
-              Traps - 2 Excercises
-          </Text>
-            <TouchableOpacity>
-              <Icon
-                name="chevron-right"
-                type="entypo"
-                size={35}
-              />
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </StickyHeaderFooterScrollView>
+        </View>
+        <View style={{padding:20,paddingBottom:80}}>
+          <WorkoutCard
+            group='Muscle Group'
+            subgroup1="Lower Body"
+            subgroup2="Upper Body"
+          />
+          <WorkoutCard
+            group='Chest'
+            subgroup1="Chest"
+            subgroup2="Upper Chest"
+            subgroup3="Lower Chest"
+          />
+          <WorkoutCard
+            group='Back'
+            subgroup1="Lats"
+            subgroup2="Rear Delts"
+            subgroup3="Traps"
+          />
+        </View>
+        <BottomBar />
+      </View>
     )
   }
 
@@ -125,16 +80,20 @@ const styles = StyleSheet.create({
     fontSize: 30,
     top: 35
   },
+  addSpace: {
+
+  },
   line: {
     width: 1000,
     height: 1,
     top: 50,
+    paddingBottom: 30
 
   },
   add: {
     flexDirection: 'row-reverse',
     right: 15,
-    bottom: 3,
+    bottom: 30,
 
   },
   group: {
@@ -150,6 +109,8 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     flex: 1,
+  
+
   }
 
 });
