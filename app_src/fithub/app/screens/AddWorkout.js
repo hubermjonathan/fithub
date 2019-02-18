@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         fontFamily:'System'
     },
     cancel:{
-        
+
     },
 
 });
