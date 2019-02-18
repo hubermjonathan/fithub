@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 
 import {
   StyleSheet,
@@ -78,6 +79,9 @@ const AppNavigator = createStackNavigator({
   });
 
 const AppContainer = createAppContainer(AppNavigator);
+=======
+import AppContainer from './app/components/AppContainer';
+>>>>>>> f9d2ea86d05673dfc97dd4e7cccdab9b1fb63f91
 
 export default class App extends React.Component {
   render() {
