@@ -39,6 +39,7 @@ export default class AddWorkoutScreen extends React.Component {
 
     render() {
         return (
+<<<<<<< HEAD
             <View style={{ flex: 1 }}>
                 <ScrollView>
                     <View style={{ padding: 50 }}>
@@ -169,6 +170,61 @@ export default class AddWorkoutScreen extends React.Component {
                 <View>
                     <BottomBar navigation={this.props.navigation} />
                 </View>
+=======
+            <View>
+                <View style={{ top: 80 }}>
+                    <View style={styles.center}>
+                        <Text style={styles.centerText}>Workout Name</Text>
+                        <TextInput
+                        style={styles.input}
+                        clearButtonMode='while-editing'
+                        defaultValue='e.g "The Dorito"' 
+                        selectTextOnFocus = {true}/>
+                    </View>
+                    <View style={styles.center}>
+                        <Text style={styles.centerText}>Description</Text>
+                        <TextInput 
+                        style={styles.input} 
+                        clearButtonMode='while-editing'
+                        defaultValue='"low gravity day"' 
+                        selectTextOnFocus = {true}/>
+                    </View>
+
+                    <Modal
+                        animationType="fade"
+                        transparent={false}
+                        visible={this.state.modalVisible}
+                        onRequestClose={() => {
+                            Alert.alert('Modal has been closed.');
+                        }}>
+                        <View style={{ marginTop: 22 }}>
+                            <View style={styles.center}>
+                            <Button 
+                                style={styles.cancel}
+                                title="cancel"
+                                onPress={() => { this.setModalVisible(false) }}>
+                            </Button>
+                                <Text sytle={{fontSize:18}}> Exercise Name</Text>
+                                <TextInput 
+                                style={styles.input} 
+                                clearButtonMode='while-editing'/>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Button 
+                        style={styles.buttonText}
+                        title="Add Exercise"
+                        onPress={() => {
+                            this.setModalVisible(true);
+                        }}>
+                    </Button>
+                </View>
+
+                <View>
+                    <BottomBar navigation={this.props.navigation}/>
+                </View>
+            </View>
+>>>>>>> c08344679b8717ddfeb6a3eb762d07d69c7a66d5
 
             </View >
 
@@ -229,6 +285,15 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'grey'
     },
+<<<<<<< HEAD
 
+=======
+    buttonText:{
+        fontFamily:'System'
+    },
+    cancel:{
+        
+    },
+>>>>>>> c08344679b8717ddfeb6a3eb762d07d69c7a66d5
 
 });

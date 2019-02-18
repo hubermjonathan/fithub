@@ -16,12 +16,30 @@ class ProfileScreen extends React.Component {
 
     render() {
         return (
-            <View>
-                <Text>Profile Screen</Text>
-                <BottomBar navigation={this.props.navigation}/>
+            <View style={styles.container}>
+                <View style={styles.text}> 
+                    <Text>Profile Screen</Text>
+                </View>
+                <View style={styles.bottomBar}>
+                    <BottomBar navigation={this.props.navigation}/>
+                </View>
             </View>
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    text: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    bottomBar: {
+      flex: 1,
+    },
+  });
 
 export default ProfileScreen;
