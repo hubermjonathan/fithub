@@ -1,4 +1,3 @@
-import React,{ Component } from 'react';
 import React from 'react';
 import {
     StyleSheet,
@@ -8,7 +7,7 @@ import {
     StatusBar,
     Platform
 } from 'react-native';
-import BottomBar from '../Components/BottomBar';
+import BottomBar from '../components/BottomBar';
 
 export default class ProfileScreen extends React.Component {
 

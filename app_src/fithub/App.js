@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 
 import {
   StyleSheet,
@@ -13,13 +14,8 @@ import {
 } from 'react-navigation';
 
 import DetailScreen from './app/screens/Detail';
-<<<<<<< HEAD
-
-import Calendar from './app/components/Calendar';
-import BottomBar from './app/components/BottomBar';
-=======
->>>>>>> 4cbba25303989adf90239b352251afe6c5a24336
 import WorkoutScreen from './app/screens/Workouts';
+import AddWorkoutScreen from './app/screens/AddWorkout';
 
 import Calendar from './app/components/Calendar';
 import BottomBar from './app/components/BottomBar';
@@ -83,6 +79,9 @@ const AppNavigator = createStackNavigator({
   });
 
 const AppContainer = createAppContainer(AppNavigator);
+=======
+import AppContainer from './app/components/AppContainer';
+>>>>>>> f9d2ea86d05673dfc97dd4e7cccdab9b1fb63f91
 
 export default class App extends React.Component {
   render() {
