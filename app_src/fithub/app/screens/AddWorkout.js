@@ -27,53 +27,58 @@ export default class AddWorkoutScreen extends React.Component {
     render() {
         let customWorkout = {};
         return (
-            <View style={{ top: 80 }}>
-                <View style={styles.center}>
-                    <Text style={styles.centerText}>Workout Name</Text>
-                    <TextInput
-                     style={styles.input}
-                     clearButtonMode='while-editing'
-                     defaultValue='e.g "The Dorito"' 
-                     selectTextOnFocus = {true}/>
-                </View>
-                <View style={styles.center}>
-                    <Text style={styles.centerText}>Description</Text>
-                    <TextInput 
-                     style={styles.input} 
-                     clearButtonMode='while-editing'
-                     defaultValue='"low gravity day"' 
-                     selectTextOnFocus = {true}/>
+            <View>
+                <View style={{ top: 80 }}>
+                    <View style={styles.center}>
+                        <Text style={styles.centerText}>Workout Name</Text>
+                        <TextInput
+                        style={styles.input}
+                        clearButtonMode='while-editing'
+                        defaultValue='e.g "The Dorito"' 
+                        selectTextOnFocus = {true}/>
+                    </View>
+                    <View style={styles.center}>
+                        <Text style={styles.centerText}>Description</Text>
+                        <TextInput 
+                        style={styles.input} 
+                        clearButtonMode='while-editing'
+                        defaultValue='"low gravity day"' 
+                        selectTextOnFocus = {true}/>
+                    </View>
+
+                    <Modal
+                        animationType="fade"
+                        transparent={false}
+                        visible={this.state.modalVisible}
+                        onRequestClose={() => {
+                            Alert.alert('Modal has been closed.');
+                        }}>
+                        <View style={{ marginTop: 22 }}>
+                            <View style={styles.center}>
+                            <Button 
+                                style={styles.cancel}
+                                title="cancel"
+                                onPress={() => { this.setModalVisible(false) }}>
+                            </Button>
+                                <Text sytle={{fontSize:18}}> Exercise Name</Text>
+                                <TextInput 
+                                style={styles.input} 
+                                clearButtonMode='while-editing'/>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Button 
+                        style={styles.buttonText}
+                        title="Add Exercise"
+                        onPress={() => {
+                            this.setModalVisible(true);
+                        }}>
+                    </Button>
                 </View>
 
-                <Modal
-                    animationType="fade"
-                    transparent={false}
-                    visible={this.state.modalVisible}
-                    onRequestClose={() => {
-                        Alert.alert('Modal has been closed.');
-                    }}>
-                    <View style={{ marginTop: 22 }}>
-                        <View style={styles.center}>
-                        <Button 
-                            style={styles.cancel}
-                            title="cancel"
-                            onPress={() => { this.setModalVisible(false) }}>
-                        </Button>
-                            <Text sytle={{fontSize:18}}> Exercise Name</Text>
-                            <TextInput 
-                             style={styles.input} 
-                             clearButtonMode='while-editing'/>
-                        </View>
-                    </View>
-                </Modal>
-                <Button 
-                    style={styles.buttonText}
-                    title="Add Exercise"
-                    onPress={() => {
-                        this.setModalVisible(true);
-                    }}>
-                </Button>
-                <BottomBar navigation={this.props.navigation}/>
+                <View>
+                    <BottomBar navigation={this.props.navigation}/>
+                </View>
             </View>
 
 
@@ -134,6 +139,6 @@ const styles = StyleSheet.create({
     },
     cancel:{
         
-    }
+    },
 
 });
