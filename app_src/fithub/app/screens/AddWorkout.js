@@ -76,7 +76,7 @@ export default class AddWorkoutScreen extends React.Component {
                     </Button>
                 </View>
 
-                <View>
+                <View style={styles.bottomBar}>
                     <BottomBar navigation={this.props.navigation}/>
                 </View>
             </View>
@@ -140,5 +140,8 @@ const styles = StyleSheet.create({
     cancel:{
         
     },
+    bottomBar: {
+        justifyContent: 'flex-end',
+    }
 
 });

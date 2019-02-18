@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     bottomBar: {
-      flex: 1,
+      justifyContent: 'flex-end',
     },
   });
 
