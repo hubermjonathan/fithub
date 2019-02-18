@@ -23,18 +23,26 @@ import {
 //   {isWarmup: false, reps: 10, weight: 135, key: '6'}
 // ];
 
-export default class ExerciseCard extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
     //Exercise title: this.props.exercise
     //Exercise equipment_type: this.props.equipment
     //Exercise sets: this.props.sets
     //Exercise set isWarmup: this.props.sets[i].isWarmup
     //Exercise set #reps: this.props.sets[i].reps
     //Exercise set #lbs: this.props.sets[i].weight
+
+export default class ExerciseCard extends React.Component {
+  constructor(props) {
+    super(props);
+
+    //Provided props can be modified when within a Card. Therefore, they need to be in state.
+    this.state = {
+        exercise: this.props.exercise,
+        equipment_type: this.props.equipment_type,
+        sets: this.props.sets,
+    }
+  }
+
+  render() {
 
     console.log(this.props);
     var totalSets;
@@ -89,13 +97,13 @@ export default class ExerciseCard extends React.Component {
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.button}
-                    onPress={this._addSet}
+                    onPress={this._editSet}
                 >
                     <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={this._addSet}
+                    onPress={this._deleteSet}
                 >
                     <Text style={styles.buttonText}>Delete</Text>
                 </TouchableOpacity>
@@ -103,23 +111,50 @@ export default class ExerciseCard extends React.Component {
         </View>
         );
     }
+
+    _addSet() {
+        //TODO: Call small dialog box, requesting reps, weight, and isWarmup
+        this.setState(previousState  => ({
+            sets: [previousState.sets, {isWarmup: null, reps: null, weight: null, key: null}]
+        }));
+        //TODO: Make changes persist within database (Future)
+        //Database functions need to be moved to an independent package for reusability 
+    }
+
+    _editSet() {
+        //TODO: Call small dialog box, allowing user to modify previously generated set data
+        this.setState(previousState => ({
+            sets: [previousState.sets, {isWarmup: null, reps: null, weight: null, key: null}]
+        }));
+        //TODO: Make changes persist within database (Future)
+        //Database functions need to be moved to an independent package for reusability 
+    }
+
+    _deleteSet() {
+        //TODO: Call small dialog box, asking user if they would like to delete a set, or entire workout
+        this.setState(previousState => ({
+            sets: [previousState.sets, {isWarmup: null, reps: null, weight: null, key: null}]
+        }));
+        //TODO: Make changes persist within database (Future)
+        //Database functions need to be moved to an independent package for reusability 
+    }
 }
 
 const styles = StyleSheet.create({
     card: {
-    flex: 0,
-    width: '90%',
-    height: 'auto',
-    borderTopColor: .5,
-    borderRadius: 5,
-    marginTop: 5,
-    marginBottom: 5,
+        flex: 0,
+        width: '90%',
+        height: 'auto',
+        borderTopColor: .5,
+        borderRadius: 5,
+        marginTop: 5,
+        marginBottom: 5,
     },
     cardTitle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: 10,
-    paddingBottom: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingTop: 10,
+        paddingBottom: 5,
     },
     setRow: {
         flex: 1,
@@ -133,47 +168,47 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
     },
     cardRow: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginLeft: 10,
-    marginRight: 10,
-    marginTop: 2,
-    marginBottom: 2,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 2,
+        marginBottom: 2,
     },
     cardRowBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginLeft: 10,
-    marginRight: 10,
-    paddingTop: 10,
-    borderTopWidth: 0.5,
-    borderTopColor: '#333',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginLeft: 10,
+        marginRight: 10,
+        paddingTop: 10,
+        borderTopWidth: 0.5,
+        borderTopColor: '#333',
     },
     exerciseLabel: {
-    fontWeight: 'bold',
-    fontSize: 24,
+        fontWeight: 'bold',
+        fontSize: 24,
     },
     exerciseText: {
-    textAlign: 'right',
-    fontSize: 24,
-    color: '#333',
+        textAlign: 'right',
+        fontSize: 24,
+        color: '#333',
     },
     exerciseTextWarmUp: {
-    fontSize: 24,
-    color: '#00adf5',
+        fontSize: 24,
+        color: '#00adf5',
     },
     badge: {
-    width: '35%',
-    height: 30,
-    backgroundColor: '#00adf5',
-    borderRadius: 5,
-    alignItems: 'center',
+        width: '35%',
+        height: 30,
+        backgroundColor: '#00adf5',
+        borderRadius: 5,
+        alignItems: 'center',
     },
     badgeText: {
-    color: '#fff',
-    fontSize: 18,
-    paddingTop: 6,
+        color: '#fff',
+        fontSize: 18,
+        paddingTop: 6,
     },
     cardRowButtons: {
         flex: 1,
