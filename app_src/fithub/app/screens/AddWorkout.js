@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     Button
 } from 'react-native';
+import BottomBar from '../components/BottomBar';
 
 export default class AddWorkoutScreen extends React.Component {
     state = {
@@ -72,6 +73,7 @@ export default class AddWorkoutScreen extends React.Component {
                         this.setModalVisible(true);
                     }}>
                 </Button>
+                <BottomBar navigation={this.props.navigation}/>
             </View>
 
 

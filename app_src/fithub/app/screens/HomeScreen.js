@@ -23,7 +23,7 @@ export default class HomeScreen extends React.Component {
               <Calendar navigation={this.props.navigation} />
             </View>
             <View style={styles.bottomBar}>
-              <BottomBar />
+              <BottomBar navigation={this.props.navigation}/>
             </View>
           </SafeAreaView>
         );
@@ -34,7 +34,7 @@ export default class HomeScreen extends React.Component {
               <Calendar navigation={this.props.navigation} />
             </View>
             <View style={styles.bottomBar}>
-              <BottomBar />
+              <BottomBar navigation={this.props.navigation}/>
             </View>
           </View>
         );

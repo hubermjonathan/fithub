@@ -9,14 +9,19 @@ import {
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
 
-export default class ProfileScreen extends React.Component {
+class ProfileScreen extends React.Component {
+    constructor(props){
+        super(props);
+      }
 
     render() {
         return (
             <View>
                 <Text>Profile Screen</Text>
-                <BottomBar />
+                <BottomBar navigation={this.props.navigation}/>
             </View>
         )
     }
 }
+
+export default ProfileScreen;

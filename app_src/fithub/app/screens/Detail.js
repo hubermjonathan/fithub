@@ -7,6 +7,7 @@ import {
   Platform,
   Button
 } from 'react-native';
+import BottomBar from '../components/BottomBar';
 
 export default class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -33,11 +34,13 @@ export default class DetailScreen extends React.Component {
             <Cards exercises={this.state.exercises} />
             
           </View>
+          <BottomBar navigation={this.props.navigation}/>
         </SafeAreaView>
       );
     } else {
       return (
         <View style={styles.containerAND}>
+          <BottomBar navigation={this.props.navigation}/>
         </View>
       );
     }

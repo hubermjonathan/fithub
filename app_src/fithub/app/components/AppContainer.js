@@ -9,7 +9,7 @@ const AppNavigator = createStackNavigator({
     Home: HomeScreen,
     Details: DetailScreen,
     Profile: ProfileScreen,
-    Add: AddWorkoutScreen,
+    AddWorkout: AddWorkoutScreen,
     Feed: FeedScreen,
   }, {
       initialRouteName: 'Home',
