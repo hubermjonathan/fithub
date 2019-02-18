@@ -229,10 +229,17 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'grey'
     },
+<<<<<<< HEAD
     buttonText:{
         fontFamily:'System'
     },
     cancel:{
+=======
+    buttonText: {
+        fontFamily: 'System'
+    },
+    cancel: {
+>>>>>>> c49e797f21277be2956c04c6c0e6428e823701fd
 
     },
 
