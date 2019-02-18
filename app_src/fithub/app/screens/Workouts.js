@@ -37,7 +37,7 @@ export default class WorkoutScreen extends React.Component {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{padding:20,paddingBottom:80}}>
+       <View style={{padding:20,paddingBottom:80}}>
           <WorkoutCard
             group='Muscle Group'
             subgroup1="Lower Body"
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     flex: 1,
-  
+
 
   }
 

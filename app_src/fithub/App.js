@@ -14,6 +14,7 @@ import {
 
 import DetailScreen from './app/screens/Detail';
 import WorkoutScreen from './app/screens/Workouts';
+import AddWorkoutScreen from './app/screens/AddWorkout';
 
 import Calendar from './app/components/Calendar';
 import BottomBar from './app/components/BottomBar';
