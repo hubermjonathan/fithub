@@ -163,7 +163,7 @@ let newLog = function newLog(req, res) {
 
 //Get a user's logs from the database
 let logs = function logs(req, res) {
-  
+
   let db = connectToDb();
   db.once('open', () => {
     schemaCtrl.Profile.findOne({ "uid" : req.body.uid}, (err, user) => {
@@ -179,11 +179,12 @@ let logs = function logs(req, res) {
 
 //Get a user's workouts from DB, queries using req body UID of the caller
 let workouts = function getUserWorkouts(req, res) {
+
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
     schemaCtrl.Profile
-    .findOne({uid : req.body.uid}, (err, workouts) => {
+    .findOne({uid : req.params.uid}, (err, workouts) => {
       if(err){
         res.status(500).send({message: "Error getting workouts"});
       }
@@ -243,6 +244,7 @@ let exercises = function exercises(req, res) {
 
 let uExercises = function uExercises(req, res) {
   let db = connectToDb();
+    console.log(req.params.uid);  
   db.once('open', () => {
   });
 }
