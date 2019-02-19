@@ -67,34 +67,51 @@ class Cards extends React.Component {
             }
           </View>
 
-          <View style={styles.cardRow}>
-            <Text style={styles.exerciseText}>Set 1</Text>
-            <Text style={styles.exerciseText}>4 reps</Text>
-            <Text style={styles.exerciseText}>5 lbs</Text>
-          </View>
-          
-          <View style={styles.cardRow}>
-            <Text style={styles.exerciseText}>Set 2</Text>
-            <Text style={styles.exerciseText}>3 reps</Text>
-            <Text style={styles.exerciseText}>10 lbs</Text>
-          </View>
-
-          <View style={styles.cardRow}>
-            <Text style={styles.exerciseText}>Set 3</Text>
-            <Text style={styles.exerciseText}>4 reps</Text>
-            <Text style={styles.exerciseText}>15 lbs</Text>
-          </View>
-
-          <View style={styles.cardRowBottom}>
-            <Text style={styles.exerciseText}>3 sets</Text>
-            <Text style={styles.exerciseText}>11 reps</Text>
-            <Text style={styles.exerciseText}>110 lbs</Text>
-          </View>
+          <Sets reps={this.props.exercises[i].reps} weight={this.props.exercises[i].weight} />
         </View>
       );
     }
 
     return cards;
+  }
+}
+
+class Sets extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    let sets = [];
+    
+    let totalReps = 0;
+    let totalWeight = 0;
+    for(let i = 0; i < this.props.reps.length; i++) {
+      totalReps += this.props.reps[i];
+      totalWeight += this.props.weight[i];
+    }
+
+    for(let i = 0; i < this.props.reps.length; i++) {
+      if(i === this.props.reps.length-1) {
+        sets.push(
+          <View key={"set-"+i} style={styles.cardRowBottom}>
+            <Text style={styles.exerciseText}>{i} sets</Text>
+            <Text style={styles.exerciseText}>{totalReps} reps</Text>
+            <Text style={styles.exerciseText}>{totalWeight} lbs</Text>
+          </View>
+        );
+      } else {
+        sets.push(
+          <View key={"set-"+i} style={styles.cardRow}>
+            <Text style={styles.exerciseText}>Set {i+1}</Text>
+            <Text style={styles.exerciseText}>{this.props.reps[i]} reps</Text>
+            <Text style={styles.exerciseText}>{this.props.weight[i]} lbs</Text>
+          </View>
+        );
+      }
+    }
+
+    return sets;
   }
 }
 

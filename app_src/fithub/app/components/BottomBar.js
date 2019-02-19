@@ -7,7 +7,6 @@ import {
 
 import { Icon } from 'react-native-elements';
 
-import AppContainer from './AppContainer';
 
 
 export default class BottomBar extends React.Component{
