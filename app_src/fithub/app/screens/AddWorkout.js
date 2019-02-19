@@ -11,7 +11,8 @@ import {
     TouchableHighlight,
     TouchableOpacity,
     ScrollView,
-    Alert
+    Alert,
+    Switch
 } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { Container, Header, Content, Footer, Title } from 'native-base';
@@ -27,9 +28,10 @@ export default class AddWorkoutScreen extends React.Component {
 
         exerciseName: "",
         sets: 0,
-        reps: 0,
+        warmupSets:0,
+        reps: [],
+        warmup: [],
 
-        correct: false
     };
 
     setModalVisible(visible) {
@@ -41,7 +43,7 @@ export default class AddWorkoutScreen extends React.Component {
         return (
             <View style={{ flex: 1 }}>
                 <ScrollView>
-                    <View style={{ padding: 50 }}>
+                    <View style={{ padding: '15%', marginTop: '20%' }}>
                         <View style={styles.center}>
                             <Text style={styles.centerText}>Workout Name</Text>
                             <TextInput
@@ -50,7 +52,6 @@ export default class AddWorkoutScreen extends React.Component {
                                 defaultValue='e.g "The Dorito"'
                                 selectTextOnFocus={true}
                                 onChangeText={(text) => this.setState({ workoutName: text })} />
-                            <Text>{this.state.workoutName}</Text>
                         </View>
                         <View style={styles.center}>
                             <Text style={styles.centerText}>Description</Text>
@@ -59,7 +60,6 @@ export default class AddWorkoutScreen extends React.Component {
                                 clearButtonMode='while-editing'
                                 selectTextOnFocus={true}
                                 onChangeText={(text) => this.setState({ description: text })} />
-                            <Text>{this.state.description}</Text>
                         </View>
 
                         <Modal
@@ -71,18 +71,10 @@ export default class AddWorkoutScreen extends React.Component {
                             }}
                             style={{ flex: 1 }}>
                             <ScrollView>
-                                <View style={{ marginTop: 22, paddingBottom: 20 }}>
+
+                                <View style={{ marginTop: '25%', paddingBottom: 20 }}>
                                     <View style={styles.centerE}>
-                                        <Button
-                                            style={{ paddingBottom: 50 }}
-                                            title="cancel"
-                                            onPress={() => {
-                                                this.setModalVisible(false);
-                                                this.setState({ exerciseName: "" });
-                                                this.setState({ exerciseDescription: "" });
-                                                this.setState({ sets: 0 });
-                                                this.setState({ reps: 0 });
-                                            }} />
+
                                         <Text style={styles.centerText}> Exercise Name</Text>
                                         <TextInput
                                             style={styles.input}
@@ -90,6 +82,16 @@ export default class AddWorkoutScreen extends React.Component {
                                             defaultValue='e.g "Hammer Curls"'
                                             selectTextOnFocus={true}
                                             onChangeText={(text) => this.setState({ exerciseName: text })} />
+                                    </View>
+                                    <View style={styles.centerE}>
+                                        <Text style={styles.centerText}> # of Warmup Sets</Text>
+                                        <TextInput
+                                            style={styles.input}
+                                            clearButtonMode='while-editing'
+                                            defaultValue='e.g "5"'
+                                            selectTextOnFocus={true}
+                                            keyboardType="number-pad"
+                                            onChangeText={(text) => this.setState({ warmupSets: parseInt(text) })} />
                                     </View>
                                     <View style={styles.centerE}>
                                         <Text style={styles.centerText}> # of Sets</Text>
@@ -109,25 +111,52 @@ export default class AddWorkoutScreen extends React.Component {
                                             defaultValue='e.g "5"'
                                             selectTextOnFocus={true}
                                             keyboardType="number-pad"
-                                            onChangeText={(text) => this.setState({ reps: parseInt(text) })} />
+                                            onChangeText={(text) => {
+                                                let repsArr = [];
+                                                for (let x = 0; x < this.state.sets+this.state.warmupSets; x++) {
+                                                    repsArr.push(parseInt(text));
+                                                }
+                                                this.setState({ reps: repsArr })
+                                            }
+                                            } />
                                     </View>
                                 </View>
                             </ScrollView>
-                            <View>
-                                <Button title='submit'
+                            <View style={{ padding: '1%' }}>
+                                <Button
+                                    style={{ paddingBottom: '1%' }}
+                                    buttonStyle={{ backgroundColor: '#e04a21' }}
+                                    title="cancel"
                                     onPress={() => {
-                                        if (typeof this.state.sets === "number" && typeof this.state.reps === "number" && this.state.exerciseName.length > 0) {
+                                        this.setModalVisible(false);
+                                        this.setState({ exerciseName: "" });
+                                        this.setState({ sets: 0 });
+                                        this.setState({ reps: [] });
+                                        this.setState({warmup:false});
+                                    }} />
+                                <Button
+                                    style={{ paddingBottom: 5 }}
+                                    title='submit'
+                                    onPress={() => {
+                                        if (typeof this.state.sets === "number" && this.state.reps.length > 0 && this.state.exerciseName.length > 0) {
+                                            let warmupObj = [];
+                                            for(let x = 0; x < this.state.warmupSets;x++){
+                                                warmupObj.push(true);
+                                            }
+                                            for(let x = this.state.warmupSets;x < this.state.warmupSets + this.state.sets;x++){
+                                                warmupObj.push(false);
+                                            }
                                             let exerciseObj = {
                                                 name: this.state.exerciseName,
-                                                sets: this.state.sets,
                                                 reps: this.state.reps,
-                                                ownerUID: 0 //dont know how to get userid for now
+                                                warmup: warmupObj
                                             }
                                             this.state.exercises.push(exerciseObj);
-                                            this.setModalVisible(false);
-                                            this.setState({ exerciseName: "" });
+                                            this.setState({ name: "" });
                                             this.setState({ sets: 0 });
                                             this.setState({ reps: 0 });
+                                            this.setModalVisible(false);
+                                            console.log(exerciseObj.warmup);
                                         }
                                         else {
                                             Alert.alert(
@@ -161,7 +190,27 @@ export default class AddWorkoutScreen extends React.Component {
                             }
                             iconRight
                             onPress={() => {
-                                this.postCustomWorkout({ workoutName: this.state.workoutName, description: this.state.description, exercises: this.state.exercises });
+                                if (this.postCustomWorkout({ name: this.state.workoutName, description: this.state.description, exercises: this.state.exercises, ownerUID: '104737446149074205541', likes: 0 })) {
+                                    Alert.alert(
+                                        'Success',
+                                        'Workout added!',
+                                        {
+                                            text: 'Ok',
+                                            style: 'cancel'
+                                        }
+                                    );
+                                }
+                                else {
+                                    Alert.alert(
+                                        'Uh Oh',
+                                        'Workout could not be added!',
+                                        {
+                                            text: 'Ok',
+                                            style: 'cancel'
+                                        }
+                                    )
+                                }
+                                console.log(this.state.exercises);
                             }}
                         />
                     </View>
@@ -175,22 +224,8 @@ export default class AddWorkoutScreen extends React.Component {
         );
     }
 
-
-    /*posts workout data to server*/
-    postStandardWorkout(workout) {
-        fetch('/workouts/new', {
-            method: 'POST',
-            body: JSON.stringify(workout)
-        }).then(res => res.json())
-            .then((res) => console.log('Success', JSON.stringify(res)))
-            .catch(function (e) {
-                console.log('Error');
-            });
-    }
-
-    /*could delete this later since it's identical to first one*/
     postCustomWorkout(workout) {
-        fetch('/workouts/new', {
+        fetch('https://fithub-server.herokuapp.com/workouts/new', {
             method: 'POST',
             body: JSON.stringify(workout)
         }).then(res => res.json())
@@ -210,30 +245,25 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'System',
         fontSize: 18,
-        padding: 5,
+        padding: '2%',
         color: 'grey'
     },
     center: {
         justifyContent: 'center',
         alignItems: 'center',
-        paddingBottom: 15
+        paddingBottom: '10%'
     },
     centerE: {
         justifyContent: 'center',
         alignItems: 'center',
-        paddingBottom: 25
+        paddingBottom: '10%',
+
     },
     centerText: {
         textAlign: 'center',
         fontFamily: 'System',
-        fontSize: 20,
-        color: 'grey'
-    },
-    buttonText: {
-        fontFamily: 'System'
-    },
-    cancel: {
-
-    },
-
+        fontSize: 22,
+        color: 'grey',
+        paddingBottom:'1%'
+    }
 });
