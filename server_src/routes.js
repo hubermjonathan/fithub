@@ -19,7 +19,7 @@ router.get('/exercises/', apiCtrl.exercises);               //Get the standard e
 router.get('/exercises/:uid', apiCtrl.uExercises);          //Get a users CUSTOM exercises
 router.post('/exercises/new', apiCtrl.newExercise);         //Post a custom exercise to a user profile
 
-router.get('/logs/', apiCtrl.logs);                         //Get a users workout logs
+router.get('/logs/:uid', apiCtrl.logs);                     //Get a users workout logs
 router.post('/logs/new', apiCtrl.newLog);                   //Post a users workout
 
 router.post('/dev/exercises/new', apiCtrl.devExercise);     //Post a custom standard exercise (DEV ONLY)
