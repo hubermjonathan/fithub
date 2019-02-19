@@ -153,7 +153,7 @@ let newLog = function newLog(req, res) {
         if (err) {
           res.status(300).send({"message" : "Error"});
         } else{
-          res.status(200).send({"message" : "Workout log added successfully"});
+          res.status(200).send({"message" : newWorkout});
         }
       }
     );
