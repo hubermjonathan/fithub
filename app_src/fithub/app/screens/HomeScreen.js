@@ -14,7 +14,7 @@ export default class HomeScreen extends React.Component {
     static navigationOptions = {
       header: null,
     }
-  
+
     render() {
       if(Platform.OS === 'ios') {
         return (

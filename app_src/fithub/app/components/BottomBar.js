@@ -17,7 +17,6 @@ import {
   createAppContainer
 } from 'react-navigation';*/
 
-import AppContainer from './AppContainer';
 
 
 export default class BottomBar extends React.Component{

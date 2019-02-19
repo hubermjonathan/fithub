@@ -48,29 +48,9 @@ export default class Calendar extends React.Component {
 
   loadItems(month) {
     setTimeout(() => {
-      loadedWorkouts = {
-        '2019-02-15': [
-          {
-            name: 'The Dorito',
-            exercises: [
-              {
-                name: 'Bench',
-                reps: [4,3,4],
-                weight: [5,10,15],
-                isWarmup: true,
-              },
-              {
-                name: 'Squat',
-                reps: [10,3,1],
-                weight: [200,5,300],
-                isWarmup: false,
-              },
-            ],
-          },
-        ],
-      };
+      loadedWorkouts = {};
 
-      fetch('https://swapi.co/api/people')
+      fetch('https://fithub-server.herokuapp.com/logs/104737446149074205541')
       .then((res) => {
         return res.json();
       })
@@ -83,13 +63,13 @@ export default class Calendar extends React.Component {
           }
         }
 
-        for(let i = 0; i < data.results.length; i++) {
-          let date = new Date(data.results[i].created);
+        for(let i = 0; i < data.logs.length; i++) {
+          let date = new Date(data.logs[i].date);
           date = date.toJSON().slice(0, 10);
           if(loadedWorkouts[date] === undefined) {
             loadedWorkouts[date] = [];
           }
-          loadedWorkouts[date].push({ name: data.results[i].name });
+          loadedWorkouts[date].push(data.logs[i]);
         }
 
         this.setState({
@@ -110,7 +90,7 @@ export default class Calendar extends React.Component {
   renderItem(item) {
     return (
       <TouchableHighlight
-        onPress={() => { this.props.navigation.push('Detail', item)}}
+        onPress={() => { this.props.navigation.push('Details', item)}}
         style={styles.item}
         underlayColor='#eee'
       >
