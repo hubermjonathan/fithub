@@ -28,7 +28,7 @@ export default class AddWorkoutScreen extends React.Component {
 
         exerciseName: "",
         sets: 0,
-        warmupSets:0,
+        warmupSets: 0,
         reps: [],
         warmup: [],
 
@@ -113,7 +113,7 @@ export default class AddWorkoutScreen extends React.Component {
                                             keyboardType="number-pad"
                                             onChangeText={(text) => {
                                                 let repsArr = [];
-                                                for (let x = 0; x < this.state.sets+this.state.warmupSets; x++) {
+                                                for (let x = 0; x < this.state.sets + this.state.warmupSets; x++) {
                                                     repsArr.push(parseInt(text));
                                                 }
                                                 this.setState({ reps: repsArr })
@@ -131,8 +131,9 @@ export default class AddWorkoutScreen extends React.Component {
                                         this.setModalVisible(false);
                                         this.setState({ exerciseName: "" });
                                         this.setState({ sets: 0 });
+                                        this.setState({ warmpupSets: 0 });
                                         this.setState({ reps: [] });
-                                        this.setState({warmup:false});
+                                        this.setState({ warmup: false });
                                     }} />
                                 <Button
                                     style={{ paddingBottom: 5 }}
@@ -140,23 +141,24 @@ export default class AddWorkoutScreen extends React.Component {
                                     onPress={() => {
                                         if (typeof this.state.sets === "number" && this.state.reps.length > 0 && this.state.exerciseName.length > 0) {
                                             let warmupObj = [];
-                                            for(let x = 0; x < this.state.warmupSets;x++){
+                                            for (let x = 0; x < this.state.warmupSets; x++) {
                                                 warmupObj.push(true);
                                             }
-                                            for(let x = this.state.warmupSets;x < this.state.warmupSets + this.state.sets;x++){
+                                            for (let x = this.state.warmupSets; x < this.state.warmupSets + this.state.sets; x++) {
                                                 warmupObj.push(false);
                                             }
                                             let exerciseObj = {
                                                 name: this.state.exerciseName,
                                                 reps: this.state.reps,
-                                                warmup: warmupObj
+                                                warmup: this.state.warmup
                                             }
                                             this.state.exercises.push(exerciseObj);
                                             this.setState({ name: "" });
                                             this.setState({ sets: 0 });
-                                            this.setState({ reps: 0 });
+                                            this.setState({ warmpupSets: 0 });
+                                            this.setState({ reps: [] });
                                             this.setModalVisible(false);
-                                            console.log(exerciseObj.warmup);
+                                           
                                         }
                                         else {
                                             Alert.alert(
@@ -179,6 +181,7 @@ export default class AddWorkoutScreen extends React.Component {
                             color='blue'
                             onPress={() => {
                                 this.setModalVisible(true);
+                                
                             }} />
                         <Button
                             titleStyle={{ fontSize: 30, color: 'white' }}
@@ -190,27 +193,8 @@ export default class AddWorkoutScreen extends React.Component {
                             }
                             iconRight
                             onPress={() => {
-                                if (this.postCustomWorkout({ name: this.state.workoutName, description: this.state.description, exercises: this.state.exercises, ownerUID: '104737446149074205541', likes: 0 })) {
-                                    Alert.alert(
-                                        'Success',
-                                        'Workout added!',
-                                        {
-                                            text: 'Ok',
-                                            style: 'cancel'
-                                        }
-                                    );
-                                }
-                                else {
-                                    Alert.alert(
-                                        'Uh Oh',
-                                        'Workout could not be added!',
-                                        {
-                                            text: 'Ok',
-                                            style: 'cancel'
-                                        }
-                                    )
-                                }
-                                console.log(this.state.exercises);
+                                this.postCustomWorkout({ name: this.state.workoutName, date: '2019-02-25', description: this.state.description, exercises: this.state.exercises, uid: '104737446149074205541', likes: 0 })
+                                this.setState({exercises:[]});
                             }}
                         />
                     </View>
@@ -227,11 +211,13 @@ export default class AddWorkoutScreen extends React.Component {
     postCustomWorkout(workout) {
         fetch('https://fithub-server.herokuapp.com/workouts/new', {
             method: 'POST',
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(workout)
         }).then(res => res.json())
             .then((res) => console.log('Success', JSON.stringify(res)))
             .catch(function (e) {
-                console.log('Error');
+                console.log(JSON.stringify(workout));
+
             });
     }
 
@@ -264,6 +250,6 @@ const styles = StyleSheet.create({
         fontFamily: 'System',
         fontSize: 22,
         color: 'grey',
-        paddingBottom:'1%'
+        paddingBottom: '1%'
     }
 });
