@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
-//const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+const url = "mongodb://admin:team5308@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
 
-const url = "";
 
 function connectToDb(res) {
   mongoose.connect(url, { useNewUrlParser: true });
@@ -39,7 +38,7 @@ let register = function(req,res) {
 
 //Create a new workout for the master workout library
 let newWorkout = function newWorkout(req, res) {
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
     schemaCtrl.Profile.findOne({ _id : req.params.id }, (err, user) => {
 
@@ -98,7 +97,7 @@ let newWorkout = function newWorkout(req, res) {
 //Log a user's workout into the DB
 let newLog = function newLog(req, res) {
   
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
     let exercises = [];    
     //Construct the JSON exercise objects and push them to exercises
@@ -137,7 +136,7 @@ let newLog = function newLog(req, res) {
 }
 
 let newExercise = function newExercise(req, res) {
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
     
     //Push the newWorkout log to the user profile
@@ -158,7 +157,7 @@ let newExercise = function newExercise(req, res) {
 
 //Post an exercise to the standard library
 let devExercise = function devExercise(req, res) {
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
 
     //Construct the exercise from the schema
@@ -204,7 +203,7 @@ let logs = function logs(req, res) {
 
 //Return a users workouts
 let workouts = function workouts(req, res) {
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
     //query profile collection
     schemaCtrl.Profile
@@ -227,7 +226,7 @@ let workouts = function workouts(req, res) {
 
 //Return a users custom exercises
 let uExercises = function uExercises(req, res) {
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
     schemaCtrl.Profile.findOne({ _id : req.params.id }, (err, user) => {
       if (err) {
@@ -244,7 +243,7 @@ let uExercises = function uExercises(req, res) {
 
 //Return all standard exercises
 let exercises = function exercises(req, res) {
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
     schemaCtrl.Exercise.find({}, (err, exercises) => {
       if (err) {

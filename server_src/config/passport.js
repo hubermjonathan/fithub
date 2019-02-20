@@ -11,7 +11,11 @@ const crypto = require('crypto');
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
   let db = mongoose.connection;
-  db.on('error', console.error.bind(console, 'connection error'));
+  db.on('error', () => {
+    res.status(500).send({ "message" : "Database is down"});
+    db.removeAllListeners();
+    return console.error.bind(console, 'connection error');
+  });
   return db;
 }
 
@@ -22,7 +26,7 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
   },
   async(accessToken, refreshToken, profile, done) => {
     try {
-      let db = connectToDb();
+      let db = connectToDb(res);
       db.once('open', () => {
         schemaCtrl.Profile.findOne({ uid : profile.id}, function(err, user) {
           if (err) return handleError(err);
