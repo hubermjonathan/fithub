@@ -199,7 +199,6 @@ let logs = function logs(req, res) {
 
 //Return a users workouts
 let workouts = function workouts(req, res) {
-
   let db = connectToDb();
   db.once('open', () => {
     //query profile collection
@@ -207,12 +206,11 @@ let workouts = function workouts(req, res) {
     .findOne({uid : req.params.uid}, (err, workouts) => {
       if(err){
         res.status(500).send({message: "Error getting workouts"});
-      } else{
-        res.send(workouts);
+        return;
       }
     })
     .populate('workouts')
-    .exec((err, workouts) =>{
+    .exec((err, workouts) => {
       if(err){
         res.status(500).send({message: "Error getting workouts"});
       } else{
