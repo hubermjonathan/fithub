@@ -7,6 +7,8 @@ router.use(bodyParser.json());
 
 const apiCtrl = require('./api/apiCtrl');
 
+
+
 //api
 
 router.post('/users/login', apiCtrl.login);                 //Login a user

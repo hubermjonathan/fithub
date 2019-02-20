@@ -3,6 +3,7 @@ const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
 
+
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
   let db = mongoose.connection;
@@ -19,8 +20,16 @@ let login = function login(req, res) {
 }
 
 //Register a user
-let register = passport.authenticate('googleToken', { successRedirect: '/',
-                                                     failureRedirect: '/login' });
+let register = function(req,res) {
+  passport.authenticate('googleToken', {session: false}, (err, user) => {
+    if(err){
+      res.status(500).send({"message" : "User creation unsuccessful"});
+      return;
+    } else{
+      res.status(200).send({"token" : user.token});
+    }
+  })(req,res);
+}
 
 // let register = passport.authenticate('googleToken', function(err, user, info) {
 //     if (err) { return next(err); }
