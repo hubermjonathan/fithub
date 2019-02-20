@@ -1,13 +1,18 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
-const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+//const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
 
+const url = "";
 
-function connectToDb() {
+function connectToDb(res) {
   mongoose.connect(url, { useNewUrlParser: true });
   let db = mongoose.connection;
-  db.on('error', console.error.bind(console, 'connection error'));
+  db.on('error', () => {
+    res.status(500).send({ "message" : "Database is down"});
+    db.removeAllListeners();
+    return console.error.bind(console, 'connection error');
+  });
   return db;
 }
 
@@ -15,13 +20,12 @@ function connectToDb() {
 let login = function login(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    console.log("Here");
   });
 }
 
 //Register a user
 let register = function(req,res) {
-  passport.authenticate('googleToken', {session: false}, (err, user) => {
+  passport.authenticate('googleToken', {session: false}, (err, user, info) => {
     if(err){
       res.status(500).send({"message" : "User creation unsuccessful"});
       return;
@@ -31,23 +35,15 @@ let register = function(req,res) {
   })(req,res);
 }
 
-// let register = passport.authenticate('googleToken', function(err, user, info) {
-//     if (err) { return next(err); }
-//     else if (!info) { return res.redirect("/login"); }
-//     else { return "/login";}
-//   });
-
 /*--------Functions for posting user information--------*/
 
 //Create a new workout for the master workout library
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ "uid" : req.body.uid}, (err, user) => {
+    schemaCtrl.Profile.findOne({ _id : req.params.id }, (err, user) => {
 
-      if (user){
-        console.log("----------Found user----------\n" + user + "\n------------------------------");
-      } else {
+      if (!user){
         res.status(404).send({message : "User not found"});
         return;
       }
@@ -69,7 +65,7 @@ let newWorkout = function newWorkout(req, res) {
         date: req.body.date,
         description: req.body.description,
         exercises: exercises,
-        ownerUID : req.body.uid,
+        ownerUID : req.body.id,
         likes: 0,
       });
 
@@ -82,7 +78,7 @@ let newWorkout = function newWorkout(req, res) {
         }
         else {
           schemaCtrl.Profile.updateOne(
-            { uid: req.body.uid }, 
+            { _id : req.params.id }, 
             { $push: { workouts : newWorkout._id } },
             {},
             (err, raw) => {
@@ -125,7 +121,7 @@ let newLog = function newLog(req, res) {
 
     //Push the newWorkout log to the user profile
     schemaCtrl.Profile.updateOne(
-      { uid: req.body.uid }, 
+      { _id : req.params.id }, 
       { $push: { logs : newWorkout } },
       {},
       (err, raw) => {
@@ -146,7 +142,7 @@ let newExercise = function newExercise(req, res) {
     
     //Push the newWorkout log to the user profile
     schemaCtrl.Profile.updateOne(
-      { uid: req.body.uid }, 
+      { _id : req.params.id }, 
       { $push: { exercises : req.body.exercises } },
       {},
       (err, raw) => {
@@ -190,9 +186,9 @@ let devExercise = function devExercise(req, res) {
 //Get a user's logs from the database
 let logs = function logs(req, res) {
 
-  let db = connectToDb();
+  let db = connectToDb(res);
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ "uid" : req.params.uid}, (err, user) => {
+    schemaCtrl.Profile.findOne({ _id : req.params.id}, (err, user) => {
       if (err){
         handleError(err);
         res.status(500).send();
@@ -212,7 +208,7 @@ let workouts = function workouts(req, res) {
   db.once('open', () => {
     //query profile collection
     schemaCtrl.Profile
-    .findOne({uid : req.params.uid}, (err, workouts) => {
+    .findOne({ _id : req.params.id}, (err, workouts) => {
       if(err){
         res.status(500).send({message: "Error getting workouts"});
         return;
@@ -233,7 +229,7 @@ let workouts = function workouts(req, res) {
 let uExercises = function uExercises(req, res) {
   let db = connectToDb();
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ "uid" : req.params.uid}, (err, user) => {
+    schemaCtrl.Profile.findOne({ _id : req.params.id }, (err, user) => {
       if (err) {
         handleError(err);
         res.status(500).send();
