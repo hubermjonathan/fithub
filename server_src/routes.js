@@ -7,19 +7,21 @@ router.use(bodyParser.json());
 
 const apiCtrl = require('./api/apiCtrl');
 
+
+
 //api
 
 router.post('/users/login', apiCtrl.login);                 //Login a user
 router.post('/users/register', apiCtrl.register);           //Register a user
 
-router.get('/workouts/:uid', apiCtrl.workouts);             //Get a users workout plans
+router.get('/workouts/:id', apiCtrl.workouts);             //Get a users workout plans
 router.post('/workouts/new', apiCtrl.newWorkout);           //Post a new workout plan
 
 router.get('/exercises/', apiCtrl.exercises);               //Get the standard exercises
-router.get('/exercises/:uid', apiCtrl.uExercises);          //Get a users CUSTOM exercises
+router.get('/exercises/:id', apiCtrl.uExercises);          //Get a users CUSTOM exercises
 router.post('/exercises/new', apiCtrl.newExercise);         //Post a custom exercise to a user profile
 
-router.get('/logs/:uid', apiCtrl.logs);                     //Get a users workout logs
+router.get('/logs/:id', apiCtrl.logs);                     //Get a users workout logs
 router.post('/logs/new', apiCtrl.newLog);                   //Post a users workout
 
 router.post('/dev/exercises/new', apiCtrl.devExercise);     //Post a custom standard exercise (DEV ONLY)
