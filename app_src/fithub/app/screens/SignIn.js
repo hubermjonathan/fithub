@@ -5,10 +5,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { logInToGoogle } from '../lib/AccountFunctions';
 
 export default class SignInScreen extends Component {
-
-    press() {
-        Console.log('Button Pressed');
-    }
+//PROPS:
+//signIn: a function passed to handle pressing the "Sign in with Google" button
 
     render() {
         return(
@@ -32,7 +30,7 @@ export default class SignInScreen extends Component {
                         </Text>
                     </View>
                     <View style={styles.buttonView}>
-                        <TouchableOpacity onPress={this._handleSignIn}>
+                        <TouchableOpacity onPress={this.props.signIn}>
                             <Image
                                 source={require('../../assets/sign-in-with-google.png')}
                                 style={styles.buttonImage}
@@ -42,22 +40,6 @@ export default class SignInScreen extends Component {
                 </View>    
             </View>   
         );
-    }
-
-    async _handleSignIn() {
-        const result = await logInToGoogle();
-        if (result === true) {
-            //NAVIGATE TO HOME PAGE HERE
-        } else {
-            console.log("logInToGoogle() returned false. Unable to log in user")
-            Alert.alert(
-               'SignIn Error',
-               'Google Authentication failed to verify your information. Please try again.',
-               [
-                   {text: "OK", onPress: () => {}}
-               ],
-            );
-        }
     }
 }
 

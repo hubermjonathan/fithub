@@ -3,6 +3,7 @@
 //All SecureStore elements are natively encrypted on Android. iOS can limit Access timing, but it is disabled.
 
 import { Google, SecureStore } from 'expo';
+import { BigInteger } from 'big-integer';
 
 const log_in_config = {
     clientId: '708963865872-4r9nn2r5piaktpks7e4d74r03dmh6c60.apps.googleusercontent.com',
@@ -57,6 +58,14 @@ export async function logOutFromGoogle() {
         console.log(e);
         return false;
     }
+}
+
+//Will verify that the user's Google OAuth credentials are still valid.
+//IF VALID: returns true
+//IF INVALID: returns false
+export async function verifyAuthToken() {
+    return false;
+    //PING BACKEND TO VERIFY AUTHORIZATION
 }
 
 //get function for current_user google_auth_token. 
