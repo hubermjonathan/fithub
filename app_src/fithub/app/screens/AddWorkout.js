@@ -36,6 +36,10 @@ export default class AddWorkoutScreen extends React.Component {
 
     };
 
+    static navigationOptions = {
+        header: null,
+    }
+
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
