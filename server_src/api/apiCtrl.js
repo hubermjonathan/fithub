@@ -41,7 +41,6 @@ let newWorkout = function newWorkout(req, res) {
     });
     return;
   }
-  try{
   schemaCtrl.Profile.findById(req.body.id, (err, user) => {
 
     if (!user) {
@@ -110,11 +109,6 @@ let newWorkout = function newWorkout(req, res) {
       };
     });
   });
-  }
-  catch(err){
-    console.log(err);
-    return;
-  }
 }
 
 //Log a user's workout into the DB
@@ -127,7 +121,6 @@ let newLog = function newLog(req, res) {
     return;
   }
 
-  try{
   schemaCtrl.Profile.findById(req.body.id, (err, user) => {
     if (!user) {
       res.status(404).send({
@@ -180,11 +173,6 @@ let newLog = function newLog(req, res) {
       }
     );
   });
-  }
-  catch(err){
-    console.log(err);
-    return;
-  }
 }
 
 let newExercise = function newExercise(req, res) {
@@ -272,31 +260,37 @@ let logs = function logs(req, res) {
     });
     return;
   }
-  try{
-  schemaCtrl.Profile.findById(req.params.id, (err, user) => {
 
+  let errorNum = 0;
+  schemaCtrl.Profile.findById(req.params.id, (err, user) => {
     if (err) {
+      errorNum = 1;
+    } else if (!user) {
+      errorNum = 2;
+    } else {
+      errorNum = 3;
+    }
+
+    if(errorNum == 1){
       console.log(err);
       res.status(500).send({
         message: "Error"
       });
-    } else if (!user) {
+    }
+    else if(errorNum == 2){
+      console.log(err);
       res.status(404).send({
         message: "User not found"
       })
-    } else {
+    }
+    else if(errorNum == 3){
+      console.log(err);
       res.status(200).send({
         "logs": user.logs
       });
     }
   });
-  }
-  catch(err){
-    console.log(err);
-    return;
-  }
 }
-
 
 //Return a users workouts
 let workouts = function workouts(req, res) {
@@ -308,35 +302,33 @@ let workouts = function workouts(req, res) {
   }
 
   //query profile collection
-  try{
+  let error = false;
   schemaCtrl.Profile
     .findOne({
       _id: req.params.id
     }, (err, workouts) => {
       if (err) {
-        console.log(err);
-        res.status(500).send({
-          "message": "Error"
-        });
-        return;
+        error = true;
       }
     })
     .populate('workouts')
     .exec((err, workouts) => {
-      if (err) {
+      if (err && err == false) {
         console.log(err);
         res.status(500).send({
-          "message": "Error"
+          "message": "Error querying profile collection in exec"
         });
-      } else {
+      } 
+      else if (!err && error == true){
+        console.log(err);
+        res.status(500).send({
+          "message": "Error querying profile collection in findOne"
+        });
+      }
+      else {
         res.send(workouts);
       }
     });
-  }
-  catch(err){
-    console.log(err);
-    return;
-  }
 }
 
 //Return a users custom exercises
