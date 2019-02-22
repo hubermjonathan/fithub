@@ -154,12 +154,12 @@ export default class FeedScreen extends React.Component {
                                             [{
                                                 text: 'Yes',
                                                 onPress: () => this.postWorkoutToLog({
-                                                    token: 'abcd',
-                                                    uid: '104737446149074205541',
+                                                    token: '',
+                                                    uid: '',
                                                     name: val.name,
                                                     date: val.date,
                                                     exercises: val.exercises,
-                                                    id: '5c6f63c51c9d440000000347',
+                                                    id: '',
                                                     likes: 0
                                                 }),
                                                 style: 'cancel'

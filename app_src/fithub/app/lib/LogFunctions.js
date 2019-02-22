@@ -12,21 +12,22 @@ export async function postLog(workout) {
         id: id,
         uid: uid,
         token: token,
-        //date:
-        description: 'user_data_log',
+        date: workout.date,
         name: workout.name,
         exercises: workout.exercises,
+
     }
     console.log("DATA", data);
-
+    console.log(JSON.stringify(workout));
+    
     fetch('https://fithub-server.herokuapp.com/logs/new', {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(workout)
+        body: JSON.stringify(data)
     }).then(res => res.json())
-        .then((res) => console.log('Success', JSON.stringify(res)))
+        .then((data) => console.log('Success', JSON.stringify(data)))
         .catch(function (e) {
             console.log('Error');
         });

@@ -17,7 +17,7 @@ import {
 import { Button, Icon, Input } from 'react-native-elements';
 import { InputAutoSuggest } from 'react-native-autocomplete-search';
 import BottomBar from '../components/BottomBar';
-import { postCustomWorkout } from '../lib/WorkoutFunctions'
+import { postWorkout } from '../lib/WorkoutFunctions'
 import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
@@ -231,15 +231,15 @@ export default class AddWorkoutScreen extends React.Component {
                                 iconRight
                                 onPress={() => {
                                     if (this.state.exercises.length > 0) {
-                                        postCustomWorkout(
+                                        postWorkout(
                                             {
-                                                token: 'abcd',
-                                                uid: '104737446149074205541',
+                                                token: '',
+                                                uid: '',
                                                 name: this.state.workoutName,
                                                 date: this.getCurrentDate(),
                                                 description: this.state.description,
                                                 exercises: this.state.exercises,
-                                                id: '5c6f63c51c9d440000000347',
+                                                id: '',
                                                 likes: 0
                                             }
                                         );
