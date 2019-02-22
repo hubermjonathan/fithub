@@ -41,6 +41,7 @@ let newWorkout = function newWorkout(req, res) {
     });
     return;
   }
+  try{
   schemaCtrl.Profile.findById(req.body.id, (err, user) => {
 
     if (!user) {
@@ -109,6 +110,11 @@ let newWorkout = function newWorkout(req, res) {
       };
     });
   });
+  }
+  catch(err){
+    console.log(err);
+    return;
+  }
 }
 
 //Log a user's workout into the DB
@@ -121,6 +127,7 @@ let newLog = function newLog(req, res) {
     return;
   }
 
+  try{
   schemaCtrl.Profile.findById(req.body.id, (err, user) => {
     if (!user) {
       res.status(404).send({
@@ -173,6 +180,11 @@ let newLog = function newLog(req, res) {
       }
     );
   });
+  }
+  catch(err){
+    console.log(err);
+    return;
+  }
 }
 
 let newExercise = function newExercise(req, res) {
@@ -260,6 +272,7 @@ let logs = function logs(req, res) {
     });
     return;
   }
+  try{
   schemaCtrl.Profile.findById(req.params.id, (err, user) => {
 
     if (err) {
@@ -277,6 +290,11 @@ let logs = function logs(req, res) {
       });
     }
   });
+  }
+  catch(err){
+    console.log(err);
+    return;
+  }
 }
 
 
@@ -290,6 +308,7 @@ let workouts = function workouts(req, res) {
   }
 
   //query profile collection
+  try{
   schemaCtrl.Profile
     .findOne({
       _id: req.params.id
@@ -313,7 +332,11 @@ let workouts = function workouts(req, res) {
         res.send(workouts);
       }
     });
-
+  }
+  catch(err){
+    console.log(err);
+    return;
+  }
 }
 
 //Return a users custom exercises
