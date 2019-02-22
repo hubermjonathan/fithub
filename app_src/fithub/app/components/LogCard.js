@@ -11,13 +11,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import { PostLog } from '../lib/LogFunctions';
+
 export default class LogCard extends React.Component {
     constructor(props) {
         super(props);
     }
 
     render() {
-    console.log(this.props);
+    //console.log(this.props);
     var totalSets;
     var totalReps = 0;
     var totalWeight = 0;
@@ -42,6 +44,7 @@ export default class LogCard extends React.Component {
             <FlatList
                 scrollEnabled={false}
                 data={this.props.sets}
+                keyExtractor={(item, index) => index.toString()}
                 renderItem={({item, index}) => 
                     <View style={styles.setRow}>
                         <Text style={item.isWarmup ? styles.exerciseTextWarmUp : styles.exerciseText}>Set {index + 1}</Text>
@@ -54,14 +57,6 @@ export default class LogCard extends React.Component {
                 <Text style={styles.exerciseText}>{totalSets} sets</Text>
                 <Text style={styles.exerciseText}>{totalReps} reps</Text>
                 <Text style={styles.exerciseText}>{totalWeight} lbs</Text>
-            </View>
-            <View style={styles.cardButton}>
-                <TouchableOpacity 
-                    style={styles.button}
-                    onPress={this.props.addSet()}
-                >
-                    <Text style={styles.buttonText}>Add Set</Text>
-                </TouchableOpacity>
             </View>
         </View>
         );

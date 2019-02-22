@@ -20,7 +20,7 @@ let Profile = new Schema({
     exercises : { type: [{
                             name: { type: String, required: true },
                             description: { type: String, required: true },
-                            muscleGroups : { type: [String] , required: true},
+                            muscleGroups : { type: String , required: true},
                         }], required : true },
     logs : [{                                                           //Array of JSON objects which contain arrays of exercises
                 name: {type : String, required: true},
@@ -41,7 +41,7 @@ let Profile = new Schema({
 let Exercise = new Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
-    muscleGroups : { type: [String] , required: true},
+    muscleGroups : { type: String, required: true},
 });
 
 //Schema for creating a new workout
