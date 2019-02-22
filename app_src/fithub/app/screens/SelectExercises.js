@@ -11,6 +11,8 @@ import {
 
 import ExerciseCard from '../components/ExerciseCard';
 
+import { getWorkouts } from '../lib/WorkoutFunctions';
+
 export default class SelectExercisesScreen extends React.Component {
 
     //PROPS SHOULD CONTAIN RELEVANT DATA IN ORDER TO ACCESS WORKOUT IN DATABASE.
