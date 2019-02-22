@@ -19,7 +19,6 @@ import { InputAutoSuggest } from 'react-native-autocomplete-search';
 import BottomBar from '../components/BottomBar';
 import { postCustomWorkout } from '../lib/WorkoutFunctions'
 import WorkoutCard from '../components/WorkoutCard';
-import SelectExercisesScreen from './SelectExercises';
 
 export default class AddWorkoutScreen extends React.Component {
 
@@ -29,6 +28,7 @@ export default class AddWorkoutScreen extends React.Component {
         modalVisible: false,
         swmodalVisible: false,
         workoutName: "",
+        description: "",
         exercises: [],
 
         exerciseName: "",
@@ -108,15 +108,9 @@ export default class AddWorkoutScreen extends React.Component {
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     <ScrollView>
-                        <View style={styles.header}>
-                            <Text style={styles.headingText}>
-                                Create A Custom Workout
-                            </Text>
-                        </View>
-                        <View style={{ padding: '10%' }}>
+                        <View style={{ padding: '15%', marginTop: '20%' }}>
                             <View style={styles.center}>
-                                
-                                <Text style={styles.subheadingText}>Workout Name</Text>
+                                <Text style={styles.centerText}>Workout Name</Text>
                                 <TextInput
                                     style={styles.input}
                                     clearButtonMode='while-editing'
@@ -124,16 +118,15 @@ export default class AddWorkoutScreen extends React.Component {
                                     selectTextOnFocus={true}
                                     onChangeText={(text) => this.setState({ workoutName: text })} />
                             </View>
-                            <View style={styles.dialog}>
-                                <Text style={styles.subheadingText}>
-                                    Add Exercises
-                                </Text>                            
+                            <View style={styles.center}>
+                                <Text style={styles.centerText}>Description</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    clearButtonMode='while-editing'
+                                    selectTextOnFocus={true}
+                                    onChangeText={(text) => this.setState({ description: text })} />
+                            </View>
                             
-                            </View>
-                            <View style={styles.SelectExercises}>
-                                <SelectExercisesScreen />
-                            </View>
-
                             <Modal
                                 animationType="fade"
                                 transparent={false}
@@ -280,6 +273,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                 uid: '104737446149074205541',
                                                 name: this.state.workoutName,
                                                 date: '2019-02-25',
+                                                description: this.state.description,
                                                 exercises: this.state.exercises,
                                                 id: '5c6f63c51c9d440000000347',
                                                 likes: 0
@@ -327,19 +321,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingBottom: '10%'
     },
-    headingText: {
-        marginTop: 15,
-        textAlign: 'center',
-        fontFamily: 'System',
-        fontSize: 28,
-        color: 'grey'
-    },
-    subheadingText: {
-        textAlign: 'center',
-        fontFamily: 'System',
-        fontSize: 24,
-        color: 'grey'
-    },
     centerE: {
         justifyContent: 'center',
         alignItems: 'center',
@@ -352,15 +333,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'grey'
     },
-    button: {
-        alignItems: 'center',
-        padding: 15,
+    buttonText: {
         fontFamily: 'System'
     },
-    SelectExercises: {
-        flex: 4,
-        alignItems: 'center',
-        padding: 10,
+    cancel: {
+
     },
     bottomBar: {
         justifyContent: 'flex-end',
