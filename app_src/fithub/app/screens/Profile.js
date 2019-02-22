@@ -8,6 +8,7 @@ import {
     Platform
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
+import { Icon } from 'react-native-elements';
 
 class ProfileScreen extends React.Component {
     constructor(props){
@@ -19,9 +20,6 @@ class ProfileScreen extends React.Component {
             <View style={styles.container}>
                 <View style={styles.text}> 
                     <Text>Profile Screen</Text>
-                </View>
-                <View style={styles.bottomBar}>
-                    <BottomBar navigation={this.props.navigation}/>
                 </View>
             </View>
         )
@@ -38,7 +36,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     bottomBar: {
-      flex: 1,
+      justifyContent: 'flex-end',
     },
   });
 

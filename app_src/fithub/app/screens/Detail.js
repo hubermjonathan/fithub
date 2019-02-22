@@ -2,12 +2,14 @@ import React from 'react';
 import {
   View,
   SafeAreaView,
+  ScrollView,
   Text,
   StyleSheet,
   Platform,
   Button
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
+import { Icon } from 'react-native-elements';
 
 export default class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -30,20 +32,48 @@ export default class DetailScreen extends React.Component {
     if(Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.containerIOS}>
-          <View style={styles.cardsContainer}>
+          <ScrollView style={styles.cardsContainer}>
+            <SummaryCard exercises={this.state.exercises} />
             <Cards exercises={this.state.exercises} />
             
-          </View>
-          <BottomBar navigation={this.props.navigation}/>
+          </ScrollView>
         </SafeAreaView>
       );
     } else {
       return (
         <View style={styles.containerAND}>
-          <BottomBar navigation={this.props.navigation}/>
+          <ScrollView style={styles.cardsContainer}>
+            <SummaryCard exercises={this.state.exercises} />
+            <Cards exercises={this.state.exercises} />
+            
+          </ScrollView>
         </View>
       );
     }
+  }
+}
+
+class SummaryCard extends React.Component {
+  render() {
+    let totalSets = 0;
+    let totalReps = 0;
+    let totalVolume = 0;
+
+    for(let i = 0; i < this.props.exercises.length; i++) {
+      totalSets += this.props.exercises[i].reps.length;
+      for(let j = 0; j < this.props.exercises[i].reps.length; j++) {
+        totalReps += this.props.exercises[i].reps[j];
+        totalVolume += this.props.exercises[i].weight[j];
+      }
+    }
+
+    return (
+      <View style={styles.card} key={"summary-card"}>
+        <Text style={styles.summaryText}>Sets: {totalSets}</Text>
+        <Text style={styles.summaryText}>Reps: {totalReps}</Text>
+        <Text style={styles.summaryText}>Volume: {totalVolume} lbs</Text>
+      </View>
+    );
   }
 }
 
@@ -60,14 +90,12 @@ class Cards extends React.Component {
         <View style={styles.card} key={"card-"+i}>
           <View style={styles.cardTitle}>
             <Text style={styles.exerciseLabel}>{this.props.exercises[i].name}</Text>
-            {this.props.exercises[i].isWarmup &&
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>Warmup</Text>
-              </View>
-            }
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{this.props.exercises[i].muscle_group}</Text>
+            </View>
           </View>
 
-          <Sets reps={this.props.exercises[i].reps} weight={this.props.exercises[i].weight} />
+          <Sets reps={this.props.exercises[i].reps} weight={this.props.exercises[i].weight} isWarmup={this.props.exercises[i].isWarmup} />
         </View>
       );
     }
@@ -84,6 +112,7 @@ class Sets extends React.Component {
   render() {
     let sets = [];
     
+    let totalSets = this.props.reps.length;
     let totalReps = 0;
     let totalWeight = 0;
     for(let i = 0; i < this.props.reps.length; i++) {
@@ -92,12 +121,12 @@ class Sets extends React.Component {
     }
 
     for(let i = 0; i < this.props.reps.length; i++) {
-      if(i === this.props.reps.length-1) {
+      if(this.props.isWarmup[i]) {
         sets.push(
-          <View key={"set-"+i} style={styles.cardRowBottom}>
-            <Text style={styles.exerciseText}>{i} sets</Text>
-            <Text style={styles.exerciseText}>{totalReps} reps</Text>
-            <Text style={styles.exerciseText}>{totalWeight} lbs</Text>
+          <View key={"set-"+i} style={styles.cardRow}>
+            <Text style={styles.warmupText}>Set {i+1}</Text>
+            <Text style={styles.warmupText}>{this.props.reps[i]} reps</Text>
+            <Text style={styles.warmupText}>{this.props.weight[i]} lbs</Text>
           </View>
         );
       } else {
@@ -111,6 +140,14 @@ class Sets extends React.Component {
       }
     }
 
+    sets.push(
+      <View key={"summary-row"} style={styles.cardRowBottom}>
+        <Text style={styles.exerciseText}>{totalSets} sets</Text>
+        <Text style={styles.exerciseText}>{totalReps} reps</Text>
+        <Text style={styles.exerciseText}>{totalWeight} lbs</Text>
+      </View>
+    );
+
     return sets;
   }
 }
@@ -119,19 +156,20 @@ const styles = StyleSheet.create({
   containerIOS: {
     flex: 1,
     backgroundColor: '#f4f4f4',
+    alignItems: 'center',
   },
   containerAND: {
     flex: 1,
     backgroundColor: '#f4f4f4',
+    alignItems: 'center',
     paddingTop: 10,
   },
   cardsContainer: {
     flex: 1,
-    alignItems: 'center',
+    width: '90%',
   },
   card: {
-    width: '90%',
-    height: '30%',
+    flex: 0,
     backgroundColor: '#fff',
     borderRadius: 5,
     padding: 10,
@@ -141,12 +179,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 17,
+    marginBottom: 10,
   },
   cardRow: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingTop: 7,
     marginLeft: 10,
     marginRight: 10,
   },
@@ -154,9 +193,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingTop: 7,
     marginLeft: 10,
     marginRight: 10,
-    paddingTop: 10,
+    marginTop: 10,
     borderTopWidth: 0.5,
     borderTopColor: '#333',
   },
@@ -167,6 +207,14 @@ const styles = StyleSheet.create({
   exerciseText: {
     fontSize: 18,
     color: '#333',
+  },
+  warmupText: {
+    fontSize: 18,
+    color: '#00adf5',
+  },
+  summaryText: {
+    fontSize: 32,
+    fontWeight: 'bold',
   },
   badge: {
     width: '35%',

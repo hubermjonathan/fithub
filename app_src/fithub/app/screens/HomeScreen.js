@@ -10,20 +10,15 @@ import {
 import Calendar from '../components/Calendar';
 import BottomBar from '../components/BottomBar';
 
-export default class HomeScreen extends React.Component {
-    static navigationOptions = {
-      header: null,
-    }
+import { Icon } from 'react-native-elements';
 
+export default class HomeScreen extends React.Component {
     render() {
       if(Platform.OS === 'ios') {
         return (
           <SafeAreaView style={styles.containerIOS}>
             <View style={styles.calendar}>
               <Calendar navigation={this.props.navigation} />
-            </View>
-            <View style={styles.bottomBar}>
-              <BottomBar navigation={this.props.navigation}/>
             </View>
           </SafeAreaView>
         );
@@ -32,9 +27,6 @@ export default class HomeScreen extends React.Component {
           <View style={styles.containerAND}>
             <View style={styles.calendar}>
               <Calendar navigation={this.props.navigation} />
-            </View>
-            <View style={styles.bottomBar}>
-              <BottomBar navigation={this.props.navigation}/>
             </View>
           </View>
         );
@@ -56,6 +48,6 @@ export default class HomeScreen extends React.Component {
       flex: 11,
     },
     bottomBar: {
-      flex: 1,
+      justifyContent: 'flex-end',
     },
   });

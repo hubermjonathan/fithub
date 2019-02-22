@@ -8,6 +8,7 @@ import {
     Platform
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
+import { Icon } from 'react-native-elements';
 
 export default class FeedScreen extends React.Component {
 
@@ -15,7 +16,6 @@ export default class FeedScreen extends React.Component {
         return (
             <View>
                 <Text>feed Screen</Text>
-                <BottomBar navigation={this.props.navigation}/>
             </View>
             
         );

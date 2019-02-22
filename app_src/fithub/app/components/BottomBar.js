@@ -6,16 +6,6 @@ import {
 } from 'react-native';
 
 import { Icon } from 'react-native-elements';
-/*import AddWorkoutScreen from '../screens/AddWorkout';
-import HomeScreen from '../screens/HomeScreen';
-import FeedScreen from '../screens/Feed';
-import DetailScreen from '../screens/Detail';
-import ProfileScreen from '../screens/Profile';
-
-import {
-  createStackNavigator,
-  createAppContainer
-} from 'react-navigation';*/
 
 
 
@@ -73,17 +63,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'flex-end',
     paddingTop: 20,
+    backgroundColor: '#fff',
   }
 });
-
-/*const AppNavigator = createStackNavigator({
-  Home: HomeScreen,
-  Detail: DetailScreen,
-  Profile: ProfileScreen,
-  Add: AddWorkoutScreen,
-  Feed: FeedScreen,
-}, {
-    initialRouteName: 'Home',
-  });
-
-const AppContainer = createAppContainer(AppNavigator);*/
