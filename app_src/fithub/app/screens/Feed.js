@@ -137,14 +137,50 @@ export default class FeedScreen extends React.Component {
         else {
             return (
                 <View>
-                    <Button
-                        style={{ paddingBottom: 40 }}
-                        title="Add a Saved Workout"
-                        color='blue'
-                        onPress={() => {
+                   <Spinner
+                        visible={this.state.spinner}
+                        textContent={'Loading...'}
 
-                        }
-                        } />
+                    />
+                    <ScrollView>
+                        {this.state.fetchedWorkouts.map((val, index) => {
+                            //return (<Text key={index}>{val.name}</Text>);
+                            return (
+                                <TouchableOpacity key={index}
+                                    onPress={() => {
+                                        Alert.alert(
+                                            'Confirmation',
+                                            'Are you sure you want to log this workout?',
+                                            [{
+                                                text: 'Yes',
+                                                onPress: () => this.postWorkoutToLog({
+                                                    token: 'abcd',
+                                                    uid: '104737446149074205541',
+                                                    name: val.name,
+                                                    date: val.date,
+                                                    exercises: val.exercises,
+                                                    id: '5c6f63c51c9d440000000347',
+                                                    likes: 0
+                                                }),
+                                                style: 'cancel'
+                                            },
+                                            {
+                                                text:'No',
+                                                style:'cancel'
+                                            }]
+                                        );
+                                    
+                                    }}>
+                                    <WorkoutCard
+                                        name={val.name}
+                                        sets={val.exercises}
+                                        reps={val.exercises}
+                                        
+                                    />
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </ScrollView>
                 </View>
             );
         }

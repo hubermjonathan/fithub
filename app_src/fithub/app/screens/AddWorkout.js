@@ -53,45 +53,9 @@ export default class AddWorkoutScreen extends React.Component {
         this.setState({ swmodalVisible: visible })
     }
 
-    getExercises() {
-        fetch('https://fithub-server.herokuapp.com/exercises', {
-            method: 'GET',
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }).then(res => res.json())
-            .then((res) => {
-                let stringify = JSON.stringify(res);
-                let parsed = JSON.parse(stringify);
-                //console.log(parsed.exercises);
-                for (let x = 0; x < parsed.exercises.length; x++) {
-                    this.state.exerciseNames.push(parsed.exercises[x].name);
-                }
-
-            })
-            .catch(function (e) {
-                console.log(e);
-            });
-    }
-
-    getSavedWorkouts() {
-        fetch('https://fithub-server.herokuapp.com/workouts/104737446149074205541', {
-            method: 'GET',
-            header: {
-                "Content-Type": "application/json",
-            }
-        }).then(res => res.json())
-            .then((res) => {
-                let stringify = JSON.stringify(res);
-                let parsed = JSON.parse(stringify);
-                for (let x = 0; x < parsed.workouts.length; x++) {
-                    this.state.savedWorkouts.push(parsed.workouts[x]);
-                }
-                console.log(this.state.savedWorkouts);
-            })
-            .catch(function (e) {
-                console.log(e);
-            });
+    getCurrentDate() {
+        let date = new Date();
+        return date.toJSON().slice(0, 10);
     }
 
     showText = () => {
@@ -126,7 +90,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     selectTextOnFocus={true}
                                     onChangeText={(text) => this.setState({ description: text })} />
                             </View>
-                            
+
                             <Modal
                                 animationType="fade"
                                 transparent={false}
@@ -245,7 +209,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 </SafeAreaView>
                             </Modal>
 
-                        
+
                             <Button
                                 style={{ paddingBottom: 40 }}
                                 title="Add Exercise"
@@ -253,7 +217,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 onPress={() => {
                                     this.setModalVisible(true);
                                     if (this.state.exerciseNames.length == 0) {
-                                        this.getExercises();
+                                        //this.getExercises();
                                     }
                                 }} />
                             <Button
@@ -272,7 +236,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                 token: 'abcd',
                                                 uid: '104737446149074205541',
                                                 name: this.state.workoutName,
-                                                date: '2019-02-25',
+                                                date: this.getCurrentDate(),
                                                 description: this.state.description,
                                                 exercises: this.state.exercises,
                                                 id: '5c6f63c51c9d440000000347',
