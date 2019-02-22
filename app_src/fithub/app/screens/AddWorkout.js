@@ -226,10 +226,6 @@ export default class AddWorkoutScreen extends React.Component {
                                 }
                                 iconRight
                                 onPress={() => {
-<<<<<<< HEAD
-                                    if (this.state.exercises.length > 0) {
-                                        postWorkout(
-=======
                                     if (this.state.workoutName == 'e.g "The Dorito"' || this.state.workoutName == ""){
                                         Alert.alert(
                                             'Error',
@@ -241,8 +237,7 @@ export default class AddWorkoutScreen extends React.Component {
                                         );
                                     }
                                     else if (this.state.exercises.length > 0) {
-                                        postCustomWorkout(
->>>>>>> f2a9c0aff4bcd9c4c7f3c7b38919219532de756e
+                                        postWorkout(
                                             {
                                                 token: '',
                                                 uid: '',
@@ -252,6 +247,14 @@ export default class AddWorkoutScreen extends React.Component {
                                                 exercises: this.state.exercises,
                                                 id: '',
                                                 likes: 0
+                                            }
+                                        );
+                                        Alert.alert(
+                                            'Success',
+                                            'Workout has been added!',
+                                            {
+                                                text: 'Ok',
+                                                style: 'cancel'
                                             }
                                         );
                                         this.setState({ exercises: [] });
