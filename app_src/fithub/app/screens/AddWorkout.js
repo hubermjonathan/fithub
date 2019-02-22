@@ -74,6 +74,7 @@ export default class AddWorkoutScreen extends React.Component {
                     <ScrollView>
                         <View style={{ padding: '15%', marginTop: '20%' }}>
                             <View style={styles.center}>
+                                {/*Workout Name prompt */}
                                 <Text style={styles.centerText}>Workout Name</Text>
                                 <TextInput
                                     style={styles.input}
@@ -81,8 +82,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     defaultValue='e.g "The Dorito"'
                                     selectTextOnFocus={true}
                                     onChangeText={(text) => this.setState({ workoutName: text })} />
-                            </View>
-                            <View style={styles.center}>
+                                {/*Description prompt */}
                                 <Text style={styles.centerText}>Description</Text>
                                 <TextInput
                                     style={styles.input}
@@ -91,6 +91,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     onChangeText={(text) => this.setState({ description: text })} />
                             </View>
 
+                            {/*Modal for adding custom exercise */}
                             <Modal
                                 animationType="fade"
                                 transparent={false}
@@ -152,6 +153,7 @@ export default class AddWorkoutScreen extends React.Component {
                                             </View>
                                         </View>
                                     </ScrollView>
+                                    {/*Cancel and Add buttons */}
                                     <View style={{ padding: '1%' }}>
                                         <Button
                                             style={{ paddingBottom: '1%' }}
@@ -230,7 +232,17 @@ export default class AddWorkoutScreen extends React.Component {
                                 }
                                 iconRight
                                 onPress={() => {
-                                    if (this.state.exercises.length > 0) {
+                                    if (this.state.workoutName == 'e.g "The Dorito"' || this.state.workoutName == ""){
+                                        Alert.alert(
+                                            'Error',
+                                            'You must have a name for your workout!',
+                                            {
+                                                text: 'Ok',
+                                                style: 'cancel'
+                                            }
+                                        );
+                                    }
+                                    else if (this.state.exercises.length > 0) {
                                         postCustomWorkout(
                                             {
                                                 token: 'abcd',
