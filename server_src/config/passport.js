@@ -5,17 +5,18 @@ const schemaCtrl = require('../models/schema');
 
 const mongoose = require('mongoose');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
-
 const crypto = require('crypto');
 
 function connectToDb() {
   mongoose.connect(url, { useNewUrlParser: true });
   let db = mongoose.connection;
-  db.on('error', () => {
-    res.status(500).send({ "message" : "Database is down"});
-    db.removeAllListeners();
-    return console.error.bind(console, 'connection error');
+  db.on('error', () => {    
+    console.log("Database connection failure");
+    console.error.bind(console, 'connection error');
   });
+  if(!db.readyState){
+    return false;
+  }
   return db;
 }
 
@@ -26,13 +27,15 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
   },
   async(accessToken, refreshToken, profile, done) => {
     try {
-      let db = connectToDb(res);
+      let db = connectToDb();
+      if(!db){
+        return done(true, null, "DB connection failure");        
+      }
       db.once('open', () => {
         schemaCtrl.Profile.findOne({ uid : profile.id}, function(err, user) {
-          if (err) return handleError(err);
+          if (err) return done(err, null);
           if (user){
-            //console.log("----------Found user----------\n" + user + "\n------------------------------");
-            return done(null, user, false);
+            return done(null, user);
           }
           let token = crypto.randomBytes(48).toString('hex');
           user = new schemaCtrl.Profile({
@@ -44,20 +47,16 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
             token : token,
             email : profile.emails[0].value
           })
-          //console.log("----------Saving user----------\n" + user + "\n------------------------------");        
           user.save(function (err, newLog) {
-            if (err) return done(error, null, error.message);
-            else return done(null, user, true);
+            if (err) return done(error, null);
+            else return done(null, user);
           });
         });
       });
     } catch(error) {
-      res.status(500).send({message : "Internal server error"});
-      done(error, null, error.message);
+      return done(error, null);
     }
   }
 ));
-
-
 
 module.exports = passport;

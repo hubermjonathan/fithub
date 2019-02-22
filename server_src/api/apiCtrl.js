@@ -8,7 +8,7 @@ function connectToDb(res) {
   mongoose.connect(url, { useNewUrlParser: true });
   let db = mongoose.connection;
   db.on('error', () => {
-    res.status(500).send({ "message" : "Database is down"});
+    res.status(500).send({ "message" : " Database is down "});
     db.removeAllListeners();
     return console.error.bind(console, 'connection error');
   });
@@ -17,9 +17,10 @@ function connectToDb(res) {
 
 //Register a user
 let login = function login(req,res) {
-  passport.authenticate('googleToken', {session: false}, (err, user, info) => {
+  passport.authenticate('googleToken', {session: false}, (err, user) => {
     if(err){
-      res.status(500).send({"message" : "User creation unsuccessful"});
+      console.log(err);
+      res.status(500).send({"message" : "Error"});
       return;
     } else{
       res.status(200).send({"id": user._id,
@@ -72,7 +73,8 @@ let newWorkout = function newWorkout(req, res) {
       newWorkout.save((err, newWorkout) => {
         if (err) {
           console.log(err);
-          return res.status(500).send({ message: 'Workout unsuccessfully added' });
+          res.status(500).send({ "message": "Error" });
+          return;
         }
         else {
           user.updateOne(
@@ -80,7 +82,9 @@ let newWorkout = function newWorkout(req, res) {
             {},
             (err, raw) => {
               if (err) {
-                return res.status(500).send({ message: 'Workout unsuccessfully added' });
+                console.log(err);
+                res.status(500).send({ "message": "Error" });
+                return;
               } else{
                 res.status(200).send({"message" : "Workout added successfully"});
               }
@@ -97,7 +101,7 @@ let newLog = function newLog(req, res) {
   let db = connectToDb(res);
   db.once('open', () => {
     schemaCtrl.Profile.findOne({ _id : req.body.id }, (err, user) => {
-      
+    
       if (!user){
         res.status(404).send({ message : "User not found"});
         return;
@@ -123,7 +127,7 @@ let newLog = function newLog(req, res) {
       let newWorkout = {
         name: req.body.name,
         date: req.body.date,
-        exercises: exercises,
+        exercises: req.body.exercises,
       };
 
       //Push the newWorkout log to the user profile
@@ -132,9 +136,9 @@ let newLog = function newLog(req, res) {
         {},
         (err, raw) => {
           if (err) {
-            res.status(300).send({"message" : "Error"});
+            res.status(500).send({"message" : " Error: Log addition unsuccessful"});
           } else{
-            res.status(200).send({"message" : newWorkout});
+            res.status(200).send({"message" : " Log added successfully "});
           }
         }
       );
@@ -206,7 +210,8 @@ let logs = function logs(req, res) {
   db.once('open', () => {
     schemaCtrl.Profile.findOne({ _id : req.params.id}, (err, user) => {
       if (err){
-        res.status(500).send({message : err.message});
+        console.log(err);
+        res.status(500).send({message : "Error"});
       } else if (!user){
         res.status(404).send({ message: "User not found"}) 
       } else {
@@ -225,14 +230,16 @@ let workouts = function workouts(req, res) {
     schemaCtrl.Profile
     .findOne({ _id : req.params.id}, (err, workouts) => {
       if(err){
-        res.status(500).send({message: "Error getting workouts"});
+        console.log(err);
+        res.status(500).send({ "message" : "Error"});
         return;
       }
     })
     .populate('workouts')
     .exec((err, workouts) => {
       if(err){
-        res.status(500).send({message: "Error getting workouts"});
+        console.log(err);
+        res.status(500).send({ "message" : "Error" });
       } else{
         res.send(workouts);
       }
@@ -246,12 +253,12 @@ let uExercises = function uExercises(req, res) {
   db.once('open', () => {
     schemaCtrl.Profile.findOne({ _id : req.params.id }, (err, user) => {
       if (err) {
-        handleError(err);
-        res.status(500).send();
+        console.log(err);
+        res.status(500).send({ "message": "Error"});
       } else if (!user){
-        res.status(404).send({ "message": "User not found"}) 
+        res.status(404).send({ "message": "User not found" }) 
       } else {
-        res.status(200).send({ "logs" : user.exercises});
+        res.status(200).send({ "exercises" : user.exercises});
       }
     });
   });
@@ -263,7 +270,7 @@ let exercises = function exercises(req, res) {
   db.once('open', () => {
     schemaCtrl.Exercise.find({}, (err, exercises) => {
       if (err) {
-        handleError(err);
+        console.log(err);
         res.status(500).send({ "message": "Error"});
       } else {
         res.status(200).send({ "exercises" : exercises});
