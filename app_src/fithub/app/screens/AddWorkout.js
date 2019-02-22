@@ -32,7 +32,9 @@ export default class AddWorkoutScreen extends React.Component {
         warmupSets: 0,
         reps: [],
         warmup: [],
-        exerciseNames: []
+        exerciseNames: [],
+
+        max:0
 
     };
 
@@ -44,27 +46,34 @@ export default class AddWorkoutScreen extends React.Component {
         this.setState({ modalVisible: visible });
     }
 
+    setExerciseNames(names) {
+        this.setState({ exerciseNames: names });
+    }
+
+    getExercises() {
+        fetch('https://fithub-server.herokuapp.com/exercises', {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }).then(res => res.json())
+            .then((res) => {
+                let stringify = JSON.stringify(res)
+                let parsed = JSON.parse(stringify);
+                console.log(parsed.exercises);
+                for(let x = 0; x < parsed.exercises.length;x++){
+                    this.state.exerciseNames.push(parsed.exercises[x].name);
+                }
+                
+            })
+            .catch(function (e) {
+                console.log(e);
+            });
+    }
 
     render() {
-        function getExercises() {
-            fetch('https://fithub-server.herokuapp.com/exercises', {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            }).then(res => res.json())
-                .then((res) => {
-                    console.log('Success', JSON.stringify(res));
-                    this.setState({exerciseNames:JSON.parse(res)});
-            
-                })
-                .catch(function (e) {
-                    console.log('Error');
-                });
-        }
-
+       
         
-
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
@@ -209,7 +218,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 color='blue'
                                 onPress={() => {
                                     this.setModalVisible(true);
-                                    getExercises();
+                                    this.getExercises();
                                 }} />
                             <Button
                                 titleStyle={{ fontSize: 30, color: 'white' }}
@@ -221,8 +230,22 @@ export default class AddWorkoutScreen extends React.Component {
                                 }
                                 iconRight
                                 onPress={() => {
-                                    postCustomWorkout({ name: this.state.workoutName, date: '2019-02-25', description: this.state.description, exercises: this.state.exercises, uid: '104737446149074205541', likes: 0 });
-                                    this.setState({ exercises: [] });
+                                    if (this.state.exercises.length > 0) {
+                                        postCustomWorkout({ name: this.state.workoutName, date: '2019-02-25', description: this.state.description, exercises: this.state.exercises, uid: '104737446149074205541', likes: 0 });
+                                        this.setState({ exercises: [] });
+
+                                    }
+                                    else {
+                                        Alert.alert(
+                                            'Error',
+                                            'You must add at least 1 exercise!',
+                                            {
+                                                text: 'Ok',
+                                                style: 'cancel'
+                                            }
+                                        );
+                                        console.log(this.state.exerciseNames);
+                                    }
                                 }}
                             />
                         </View>
