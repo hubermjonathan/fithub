@@ -8,24 +8,18 @@ import {
     Platform
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
+import { Icon } from 'react-native-elements';
 
 class ProfileScreen extends React.Component {
     constructor(props){
         super(props);
       }
 
-    static navigationOptions = {
-        header: null,
-    }
-
     render() {
         return (
             <View style={styles.container}>
                 <View style={styles.text}> 
                     <Text>Profile Screen</Text>
-                </View>
-                <View style={styles.bottomBar}>
-                    <BottomBar navigation={this.props.navigation}/>
                 </View>
             </View>
         )
