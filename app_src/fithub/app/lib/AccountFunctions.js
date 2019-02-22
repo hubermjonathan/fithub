@@ -14,31 +14,48 @@ const log_in_config = {
 //Promps the user to log in to an active google account. Creates/Refreshes all user data stored locally.
 export async function logInToGoogle() {
     try {
-        const result = await Google.logInAsync(log_in_config)
-
-        if (result.type === 'success') {
+        const google = await Google.logInAsync(log_in_config)
+        if (google.type === 'success') {
+            
             //API TOKEN IS VALID
-            // console.log("Access Token: " + result.accessToken);
-            // console.log("Refresh Token: " + result.refreshToken);
-            // console.log("User ID: " + result.user.id);
-            // console.log("User Name: " + result.user.name);
-            // console.log("User Given Name: " + result.user.givenName);
-            // console.log("User Family Name: " + result.user.familyName);
-            // console.log("User Photo URL: " + result.user.photoUrl);
-            // console.log("User Email: " + result.user.email);
-
-            await SecureStore.setItemAsync('user_google_auth_token', result.accessToken);
-            if (result.refreshToken !== undefined) {
-                await SecureStore.setItemAsync('user_google_auth_refresh_token', result.refreshToken);
-            }
-            await SecureStore.setItemAsync('user_id', result.user.id);
-            await SecureStore.setItemAsync('user_name', result.user.name);
-            await SecureStore.setItemAsync('user_given_name', result.user.givenName);
-            await SecureStore.setItemAsync('user_family_name', result.user.familyName);
-            await SecureStore.setItemAsync('user_photo_url', result.user.photoUrl);
-            await SecureStore.setItemAsync('user_email', result.user.email);
+            //Prompt backend for server authentication
+            //await SecureStore.setItemAsync('user_google_auth_token', result.accessToken);
+            // const result = await fetch('https://fithub-server.herokuapp.com/users/login', {
+            //     method: "POST",
+            //     headers: {'Content-Type': 'application/json'},
+            //     body: JSON.stringify({access_token: google.accessToken})
+            // });
+            //     console.log("RESULT", result);
+            //     if(result.ok === true) {
+            //         await SecureStore.setItemAsync('user_id', result.JSON().body.id);
+            //         await SecureStore.setItemAsync('user_uid', result.JSON().body.uid);
+            //         await SecureStore.setItemAsync('user_token', result.JSON().body.token);
+            //         console.log("ID", result.JSON().body.id);
+            //     } 
+            
+            fetch('https://fithub-server.herokuapp.com/users/login', {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({access_token: google.accessToken})
+            }).then((res) => {
+        return res.json();
+        })
+        .then((data) => {
+                SecureStore.setItemAsync('user_id', data.id);
+                SecureStore.setItemAsync('user_uid', data.uid);
+                SecureStore.setItemAsync('user_token', data.token);
+        });
+            // if (result.refreshToken !== undefined) {
+            //     await SecureStore.setItemAsync('user_google_auth_refresh_token', result.refreshToken);
+            // }
+            //await SecureStore.setItemAsync('user_id', result.user.id);
+            //await SecureStore.setItemAsync('user_name', result.user.name);
+            // await SecureStore.setItemAsync('user_given_name', result.user.givenName);
+            // await SecureStore.setItemAsync('user_family_name', result.user.familyName);
+            // await SecureStore.setItemAsync('user_photo_url', result.user.photoUrl);
+            // await SecureStore.setItemAsync('user_email', result.user.email);
             return true;
-        } else if (result.type === 'cancel') {
+        } else if (google.type === 'cancel') {
             //AUTHENTICATION PROCESS TIMED OUT OR WAS CANCELLED
             return false;
         }
@@ -60,35 +77,14 @@ export async function logOutFromGoogle() {
     }
 }
 
-//Will verify that the user's Google OAuth credentials are still valid.
-//IF VALID: returns true
-//IF INVALID: returns false
 export async function verifyAuthToken() {
-    let token = await getUserToken();
-    fetch("/users/login", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'},
-            body: dataJSON.stringify({access_token: token})
-        })
-        .then(res => {
-            if(res.ok){
-                return res.json();
-            } else {
-                return false;
-            }
-        }).then(data => {
-            await setUserId(data.id);
-            await setUserUId(data.uid);
-            await setUserServerToken(data.token);            
-        })
     return false;
-    //PING BACKEND TO VERIFY AUTHORIZATION
 }
 
 //get function for current_user google_auth_token. 
 //IF VALID: returns current_user google_auth_token
 //IF INVALID: returns undefined (must prompt/reprompt user to login, or revalidate)
-export async function getUserToken() {
+export async function getGoogleAuthToken() {
     try {
     const promise = await SecureStore.getItemAsync('user_google_auth_token');
     return promise;
@@ -99,37 +95,25 @@ export async function getUserToken() {
     }
 }
 
-//set function for current_user google_auth_token.
-//IF SUCCESSFUL: returns true
-//IF UNSUCCESSFUL: returns false
-export async function setUserToken(auth_token) {
+export async function getUserToken() {
     try {
-        const promise = await SecureStore.setItemAsync('user_google_auth_token', auth_token)
-        return true
+    const promise = await SecureStore.getItemAsync('user_token');
+    return promise;
     } catch(e) {
         console.log(e);
-        return false;
+        //Attempt to refresh token with google API, else return undefined
+        return undefined;
     }
 }
 
-/*--------Functions for storing authentication information---------*/
 export async function getUserID() {
     try {
     const promise = await SecureStore.getItemAsync('user_id');
     return promise;
     } catch(e) {
         console.log(e);
+        //Attempt to refresh token with google API, else return undefined
         return undefined;
-    }
-}
-
-export async function setUserServerToken(data) {
-    try {
-        const promise = await SecureStore.setItemAsync('user_id', data)
-        return true
-    } catch(e) {
-        console.log(e);
-        return false;
     }
 }
 
@@ -139,40 +123,16 @@ export async function getUserUID() {
     return promise;
     } catch(e) {
         console.log(e);
+        //Attempt to refresh token with google API, else return undefined
         return undefined;
     }
 }
 
-export async function setUserUID(data) {
-    try {
-        const promise = await SecureStore.setItemAsync('user_uid', data)
-        return true
-    } catch(e) {
-        console.log(e);
-        return false;
-    }
-}
 
-export async function getUserServerToken() {
-    try {
-    const promise = await SecureStore.getItemAsync('user_server_token');
-    return promise;
-    } catch(e) {
-        console.log(e);
-        return undefined;
-    }
-}
 
-export async function setUserServerToken(data) {
-    try {
-        const promise = await SecureStore.setItemAsync('user_server_token', data)
-        return true
-    } catch(e) {
-        console.log(e);
-        return false;
-    }
-}
-/*-----------------------------------------------------------------*/
+
+
+
 
 
 //get function for current_user google_auth_refresh_token. 
