@@ -138,17 +138,4 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
 
     },
-<<<<<<< HEAD
-    cardButton: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginLeft: 10,
-        marginRight: 10,
-        paddingTop: 10,
-        borderTopWidth: 0.5,
-        borderTopColor: '#333',
-    }
 });
-=======
-});
->>>>>>> 0c1d0821e4cc18c54992f9b377eeed281aa0c1f9
