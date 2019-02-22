@@ -52,6 +52,7 @@ passport.use("googleToken", new GooglePlusTokenStrategy({
         });
       });
     } catch(error) {
+      res.status(500).send({message : "Internal server error"});
       done(error, null, error.message);
     }
   }
