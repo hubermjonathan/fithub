@@ -14,15 +14,16 @@ import {
     Alert,
     Switch
 } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
-import { Container, Header, Content, Footer, Title } from 'native-base';
+import { Button, Icon, Input } from 'react-native-elements';
+import { InputAutoSuggest } from 'react-native-autocomplete-search';
 import BottomBar from '../components/BottomBar';
-import { postStandardWorkout, postCustomWorkout } from '../lib/WorkoutFunctions'
+import { postCustomWorkout } from '../lib/WorkoutFunctions'
 
 export default class AddWorkoutScreen extends React.Component {
 
     state = {
         modalVisible: false,
+        swmodalVisible: false,
         workoutName: "",
         description: "",
         exercises: [],
@@ -34,7 +35,8 @@ export default class AddWorkoutScreen extends React.Component {
         warmup: [],
         exerciseNames: [],
 
-        max:0
+        savedWorkouts: []
+
 
     };
 
@@ -45,9 +47,8 @@ export default class AddWorkoutScreen extends React.Component {
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
-
-    setExerciseNames(names) {
-        this.setState({ exerciseNames: names });
+    setswModalVisible(visible) {
+        this.setState({ swmodalVisible: visible })
     }
 
     getExercises() {
@@ -58,22 +59,43 @@ export default class AddWorkoutScreen extends React.Component {
             }
         }).then(res => res.json())
             .then((res) => {
-                let stringify = JSON.stringify(res)
+                let stringify = JSON.stringify(res);
                 let parsed = JSON.parse(stringify);
-                console.log(parsed.exercises);
-                for(let x = 0; x < parsed.exercises.length;x++){
+                //console.log(parsed.exercises);
+                for (let x = 0; x < parsed.exercises.length; x++) {
                     this.state.exerciseNames.push(parsed.exercises[x].name);
                 }
-                
+
             })
             .catch(function (e) {
                 console.log(e);
             });
     }
 
+    getSavedWorkouts() {
+        fetch('https://fithub-server.herokuapp.com/workouts/104737446149074205541', {
+            method: 'GET',
+            header: {
+                "Content-Type": "application/json",
+            }
+        }).then(res => res.json())
+            .then((res) => {
+                let stringify = JSON.stringify(res);
+                let parsed = JSON.parse(stringify);
+                for (let x = 0; x < parsed.workouts.length; x++) {
+                    this.state.savedWorkouts.push(parsed.workouts[x]);
+                }
+                //console.log(this.state.savedWorkouts);
+            })
+            .catch(function (e) {
+                console.log(e);
+            });
+    }
+
+
     render() {
-       
-        
+
+
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
@@ -96,6 +118,29 @@ export default class AddWorkoutScreen extends React.Component {
                                     selectTextOnFocus={true}
                                     onChangeText={(text) => this.setState({ description: text })} />
                             </View>
+
+                            <Modal
+                                animationType="fade"
+                                transparent={false}
+                                visible={this.state.swmodalVisible}
+                                onRequestClose={() => {
+                                    Alert.alert('Modal has been closed.');
+                                }}
+                            >
+                                <SafeAreaView style={{flex:1}}>
+                                    <ScrollView>
+                                    </ScrollView>
+                                    <Button
+                                        style={{ paddingBottom: '1%' }}
+                                        buttonStyle={{ backgroundColor: '#e04a21' }}
+                                        title="Cancel"
+                                        onPress={() => {
+                                            this.setswModalVisible(false);
+                                        }} />
+                                </SafeAreaView>
+
+                            </Modal>
+
 
                             <Modal
                                 animationType="fade"
@@ -193,6 +238,9 @@ export default class AddWorkoutScreen extends React.Component {
                                                     this.setState({ sets: 0 });
                                                     this.setState({ warmpupSets: 0 });
                                                     this.setState({ reps: [] });
+                                                    this.setState({savedWorkouts:[]});
+                                                    this.setState({warmup:[]});
+                                    
                                                     this.setModalVisible(false);
 
                                                 }
@@ -214,11 +262,24 @@ export default class AddWorkoutScreen extends React.Component {
 
                             <Button
                                 style={{ paddingBottom: 40 }}
+                                title="Add a Saved Workout"
+                                color='blue'
+                                onPress={() => {
+                                    this.setswModalVisible(true);
+                                    if (this.state.savedWorkouts.length == 0) {
+                                        this.getSavedWorkouts();
+                                    }
+                                }} />
+
+                            <Button
+                                style={{ paddingBottom: 40 }}
                                 title="Add Exercise"
                                 color='blue'
                                 onPress={() => {
                                     this.setModalVisible(true);
-                                    this.getExercises();
+                                    if (this.state.exerciseNames.length == 0) {
+                                        this.getExercises();
+                                    }
                                 }} />
                             <Button
                                 titleStyle={{ fontSize: 30, color: 'white' }}
