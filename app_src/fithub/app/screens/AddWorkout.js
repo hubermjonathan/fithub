@@ -18,6 +18,7 @@ import { Button, Icon, Input } from 'react-native-elements';
 import { InputAutoSuggest } from 'react-native-autocomplete-search';
 import BottomBar from '../components/BottomBar';
 import { postCustomWorkout } from '../lib/WorkoutFunctions'
+import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
 
@@ -92,11 +93,21 @@ export default class AddWorkoutScreen extends React.Component {
             });
     }
 
+    test() {
+
+        for (let x = 0; x < 5; x++) {
+            return (
+                <Text>hey{x}</Text>
+            );
+        }
+    }
+
 
     render() {
 
 
         return (
+
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     <ScrollView>
@@ -125,10 +136,17 @@ export default class AddWorkoutScreen extends React.Component {
                                 visible={this.state.swmodalVisible}
                                 onRequestClose={() => {
                                     Alert.alert('Modal has been closed.');
-                                }}
-                            >
-                                <SafeAreaView style={{flex:1}}>
+                                }}>
+                                <SafeAreaView style={{ flex: 1 }}>
                                     <ScrollView>
+                                        <View>
+                                            <WorkoutCard
+                                                name={"test"}
+                                                description={"description"}
+                                                sets={"sets"}
+                                                reps={"reps"}>
+                                            </WorkoutCard>
+                                        </View>
                                     </ScrollView>
                                     <Button
                                         style={{ paddingBottom: '1%' }}
@@ -137,6 +155,13 @@ export default class AddWorkoutScreen extends React.Component {
                                         onPress={() => {
                                             this.setswModalVisible(false);
                                         }} />
+                                    <Button
+                                        title="populate"
+                                        onPress={() => {
+                                            
+                                        }}
+                                    />
+                                    {this.test()}
                                 </SafeAreaView>
 
                             </Modal>
@@ -238,9 +263,9 @@ export default class AddWorkoutScreen extends React.Component {
                                                     this.setState({ sets: 0 });
                                                     this.setState({ warmpupSets: 0 });
                                                     this.setState({ reps: [] });
-                                                    this.setState({savedWorkouts:[]});
-                                                    this.setState({warmup:[]});
-                                    
+                                                    this.setState({ savedWorkouts: [] });
+                                                    this.setState({ warmup: [] });
+
                                                     this.setModalVisible(false);
 
                                                 }
@@ -267,9 +292,11 @@ export default class AddWorkoutScreen extends React.Component {
                                 onPress={() => {
                                     this.setswModalVisible(true);
                                     if (this.state.savedWorkouts.length == 0) {
-                                        this.getSavedWorkouts();
+                                        // this.getSavedWorkouts();
                                     }
-                                }} />
+
+                                }
+                                } />
 
                             <Button
                                 style={{ paddingBottom: 40 }}
@@ -292,7 +319,18 @@ export default class AddWorkoutScreen extends React.Component {
                                 iconRight
                                 onPress={() => {
                                     if (this.state.exercises.length > 0) {
-                                        postCustomWorkout({ name: this.state.workoutName, date: '2019-02-25', description: this.state.description, exercises: this.state.exercises, uid: '104737446149074205541', likes: 0 });
+                                        postCustomWorkout(
+                                            {
+                                                token: 'abcd',
+                                                uid: '104737446149074205541',
+                                                name: this.state.workoutName,
+                                                date: '2019-02-25',
+                                                description: this.state.description,
+                                                exercises: this.state.exercises,
+                                                id: '5c6f63c51c9d440000000347',
+                                                likes: 0
+                                            }
+                                        );
                                         this.setState({ exercises: [] });
 
                                     }
