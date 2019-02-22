@@ -27,13 +27,13 @@ const AppContainer = createAppContainer(createBottomTabNavigator(
     Logger: {
       screen: LoggerScreen,
       navigationOptions: {
-        tabBarIcon: <Icon name="book" type="material" size={35} />
+        tabBarIcon: <Icon name="add" type="material" size={35} />
       }
     },
     Workouts: {
       screen: AddWorkoutScreen,
       navigationOptions: {
-        tabBarIcon: <Icon name="add" type="material" size={35} />
+        tabBarIcon: <Icon name="book" type="material" size={35} />
       }
     },
     Home: {
