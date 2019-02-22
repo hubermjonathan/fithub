@@ -3,7 +3,7 @@ import { Icon } from 'react-native-elements';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
 
 import AddWorkoutScreen from '../screens/AddWorkout';
-import WorkoutLoggerScreen from '../screens/WorkoutLogger';
+import LoggerScreen from '../screens/Logger';
 import HomeScreen from '../screens/HomeScreen';
 import FeedScreen from '../screens/Feed';
 import ProfileScreen from '../screens/Profile';
@@ -25,7 +25,7 @@ const HomeStack = createStackNavigator({
 const AppContainer = createAppContainer(createBottomTabNavigator(
   {
     Logger: {
-      screen: WorkoutLoggerScreen,
+      screen: LoggerScreen,
       navigationOptions: {
         tabBarIcon: <Icon name="book" type="material" size={35} />
       }

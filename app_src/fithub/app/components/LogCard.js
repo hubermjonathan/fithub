@@ -138,7 +138,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
 
     },
-<<<<<<< HEAD
     cardButton: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -149,6 +148,3 @@ const styles = StyleSheet.create({
         borderTopColor: '#333',
     }
 });
-=======
-});
->>>>>>> 0c1d0821e4cc18c54992f9b377eeed281aa0c1f9
