@@ -3,6 +3,7 @@ const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
 
+
 mongoose.connect(url, {
   useNewUrlParser: true
 });
@@ -227,20 +228,31 @@ let devExercise = function devExercise(req, res) {
     });
     return;
   }
+
+  if(req.body.authenticate!="e498a0841ce3c3ed948e48e9b788dcf620742070304ea327b3bdb0a83d26f37065dac9e611ce0e2d51478655c4007cef"){
+    res.status(401).send({message:"Unauthorized"});
+    return;
+  }
+
   //Construct the exercise from the schema
   let newExercise = new schemaCtrl.Exercise({
     name: req.body.name,
     description: req.body.description,
-    muscleGroup: req.body.muscleGroup,
+    muscleGroups: req.body.muscleGroups,
   });
 
   //save the workout to the master workout collection
   newExercise.save((err, newWorkout) => {
     if (err) {
       console.log(err);
-      return res.status(500).send({
+      if(err.name=='ValidationError'){
+        res.status(400).send({message: "Bad request"});
+        return;
+      }
+      res.status(500).send({
         message: 'Workout unsuccessfully added'
       });
+      return;
     } else {
       return res.status(200).send({
         "message": "Workout added successfully"

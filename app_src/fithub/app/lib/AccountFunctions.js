@@ -64,6 +64,23 @@ export async function logOutFromGoogle() {
 //IF VALID: returns true
 //IF INVALID: returns false
 export async function verifyAuthToken() {
+    let token = await getUserToken();
+    fetch("/users/login", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: dataJSON.stringify({access_token: token})
+        })
+        .then(res => {
+            if(res.ok){
+                return res.json();
+            } else {
+                return false;
+            }
+        }).then(data => {
+            await setUserId(data.id);
+            await setUserUId(data.uid);
+            await setUserServerToken(data.token);            
+        })
     return false;
     //PING BACKEND TO VERIFY AUTHORIZATION
 }
@@ -95,6 +112,69 @@ export async function setUserToken(auth_token) {
     }
 }
 
+/*--------Functions for storing authentication information---------*/
+export async function getUserID() {
+    try {
+    const promise = await SecureStore.getItemAsync('user_id');
+    return promise;
+    } catch(e) {
+        console.log(e);
+        return undefined;
+    }
+}
+
+export async function setUserServerToken(data) {
+    try {
+        const promise = await SecureStore.setItemAsync('user_id', data)
+        return true
+    } catch(e) {
+        console.log(e);
+        return false;
+    }
+}
+
+export async function getUserUID() {
+    try {
+    const promise = await SecureStore.getItemAsync('user_uid');
+    return promise;
+    } catch(e) {
+        console.log(e);
+        return undefined;
+    }
+}
+
+export async function setUserUID(data) {
+    try {
+        const promise = await SecureStore.setItemAsync('user_uid', data)
+        return true
+    } catch(e) {
+        console.log(e);
+        return false;
+    }
+}
+
+export async function getUserServerToken() {
+    try {
+    const promise = await SecureStore.getItemAsync('user_server_token');
+    return promise;
+    } catch(e) {
+        console.log(e);
+        return undefined;
+    }
+}
+
+export async function setUserServerToken(data) {
+    try {
+        const promise = await SecureStore.setItemAsync('user_server_token', data)
+        return true
+    } catch(e) {
+        console.log(e);
+        return false;
+    }
+}
+/*-----------------------------------------------------------------*/
+
+
 //get function for current_user google_auth_refresh_token. 
 //IF VALID: returns current_user google_auth_refresh_token.
 //IF INVALID: returns undefined (must prompt/reprompt user to login, or revalidate)
@@ -121,18 +201,6 @@ export async function setUserRefreshToken(refresh_token) {
     }
 }
 
-//get function for user_id. 
-//IF VALID: returns user_id
-//IF INVALID: returns undefined (must prompt/reprompt user to login, or revalidate)
-export async function getUserOptionalID() {
-    try {
-    const promise = await SecureStore.getItemAsync('user_id');
-    return promise;
-    } catch(e) {
-        console.log(e);
-        return undefined;
-    }
-}
 
 //get function for user_name. 
 //IF VALID: returns user_name
