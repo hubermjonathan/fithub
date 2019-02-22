@@ -12,7 +12,6 @@ const apiCtrl = require('./api/apiCtrl');
 //api
 
 router.post('/users/login', apiCtrl.login);                 //Login a user
-router.post('/users/register', apiCtrl.register);           //Register a user
 
 router.get('/workouts/:id', apiCtrl.workouts);             //Get a users workout plans
 router.post('/workouts/new', apiCtrl.newWorkout);           //Post a new workout plan

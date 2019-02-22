@@ -15,21 +15,16 @@ function connectToDb(res) {
   return db;
 }
 
-//Log a user in
-let login = function login(req, res) {
-  let db = connectToDb();
-  db.once('open', () => {
-  });
-}
-
 //Register a user
-let register = function(req,res) {
+let login = function login(req,res) {
   passport.authenticate('googleToken', {session: false}, (err, user, info) => {
     if(err){
       res.status(500).send({"message" : "User creation unsuccessful"});
       return;
     } else{
-      res.status(200).send({"token" : user.token});
+      res.status(200).send({"id": user._id,
+                           "uid" : user.uid, 
+                           "token" : user.token});
     }
   })(req,res);
 }
@@ -40,10 +35,15 @@ let register = function(req,res) {
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb(res);
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ _id : req.params.id }, (err, user) => {
+    schemaCtrl.Profile.findOne({ _id : req.body.id }, (err, user) => {
 
       if (!user){
-        res.status(404).send({message : "User not found"});
+        res.status(404).send({ message : "User not found"});
+        return;
+      }
+
+      if (user.uid!=req.body.uid || user.token!=req.body.token){
+        res.status(401).send({ message : "Unauthorized"});
         return;
       }
 
@@ -68,7 +68,6 @@ let newWorkout = function newWorkout(req, res) {
         likes: 0,
       });
 
-
       //save the workout to the master workout collection
       newWorkout.save((err, newWorkout) => {
         if (err) {
@@ -76,8 +75,7 @@ let newWorkout = function newWorkout(req, res) {
           return res.status(500).send({ message: 'Workout unsuccessfully added' });
         }
         else {
-          schemaCtrl.Profile.updateOne(
-            { _id : req.params.id }, 
+          user.updateOne(
             { $push: { workouts : newWorkout._id } },
             {},
             (err, raw) => {
@@ -96,62 +94,81 @@ let newWorkout = function newWorkout(req, res) {
 
 //Log a user's workout into the DB
 let newLog = function newLog(req, res) {
-  
   let db = connectToDb(res);
   db.once('open', () => {
-    let exercises = [];    
-    //Construct the JSON exercise objects and push them to exercises
-    req.body.exercises.forEach(exercise => {
-      let newExercise = {
-        name: exercise.name,
-        reps: exercise.reps,
-        weight: exercise.weight,
-        isWarmup: exercise.isWarmup
-      };
-      exercises.push(newExercise);
-    });
-
-    //Construct the workout JSON object
-    let newWorkout = {
-      name: req.body.name,
-      date: req.body.date,
-      exercises: exercises,
-    };
-
-    //Push the newWorkout log to the user profile
-    schemaCtrl.Profile.updateOne(
-      { _id : req.params.id }, 
-      { $push: { logs : newWorkout } },
-      {},
-      (err, raw) => {
-        if (err) {
-          res.status(300).send({"message" : "Error"});
-        } else{
-          res.status(200).send({"message" : newWorkout});
-        }
+    schemaCtrl.Profile.findOne({ _id : req.body.id }, (err, user) => {
+      
+      if (!user){
+        res.status(404).send({ message : "User not found"});
+        return;
       }
-    );
+      if (user.uid!=req.body.uid || user.token!=req.body.token){
+        res.status(401).send({ message : "Unauthorized"});
+        return;
+      }
 
+      let exercises = [];    
+      //Construct the JSON exercise objects and push them to exercises
+      req.body.exercises.forEach(exercise => {
+        let newExercise = {
+          name: exercise.name,
+          reps: exercise.reps,
+          weight: exercise.weight,
+          isWarmup: exercise.isWarmup
+        };
+        exercises.push(newExercise);
+      });
+
+      //Construct the workout JSON object
+      let newWorkout = {
+        name: req.body.name,
+        date: req.body.date,
+        exercises: exercises,
+      };
+
+      //Push the newWorkout log to the user profile
+      user.updateOne(
+        { $push: { logs : newWorkout } },
+        {},
+        (err, raw) => {
+          if (err) {
+            res.status(300).send({"message" : "Error"});
+          } else{
+            res.status(200).send({"message" : newWorkout});
+          }
+        }
+      );
+    });
   });    
 }
 
 let newExercise = function newExercise(req, res) {
   let db = connectToDb(res);
   db.once('open', () => {
-    
     //Push the newWorkout log to the user profile
-    schemaCtrl.Profile.updateOne(
-      { _id : req.params.id }, 
-      { $push: { exercises : req.body.exercises } },
-      {},
-      (err, raw) => {
-        if (err) {
-          res.status(500).send({"message" : "Error"});
-        } else{
-          res.status(200).send({"message" : "Success"});
-        }
+    schemaCtrl.Profile.findOne({ _id : req.body.id }, (err, user) => {
+
+      if (!user){
+        res.status(404).send({ message : "User not found"});
+        return;
       }
-    );
+      if (user.uid!=req.body.uid || user.token!=req.body.token){
+        res.status(401).send({ message : "Unauthorized"});
+        return;
+      }
+
+      user.updateOne(
+        { $push: { exercises : req.body.exercises } },
+        {},
+        (err, raw) => {
+          if (err) {
+            res.status(500).send({"message" : "Error"});
+          } else{
+            res.status(200).send({"message" : "Success"});
+          }
+        }
+      );
+    });
   });
 }
 
@@ -189,10 +206,9 @@ let logs = function logs(req, res) {
   db.once('open', () => {
     schemaCtrl.Profile.findOne({ _id : req.params.id}, (err, user) => {
       if (err){
-        handleError(err);
-        res.status(500).send();
+        res.status(500).send({message : err.message});
       } else if (!user){
-        res.status(404).send({ "message": "User not found"}) 
+        res.status(404).send({ message: "User not found"}) 
       } else {
         res.status(200).send({ "logs" : user.logs});
       }
@@ -259,7 +275,6 @@ let exercises = function exercises(req, res) {
 
 let apiCtrl = {
   login: login,
-  register: register,
   
   workouts: workouts,
   newWorkout: newWorkout,
