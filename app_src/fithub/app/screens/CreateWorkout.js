@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import SelectExercisesScreen from './SelectExercises';
+import { Button } from 'react-native-elements';
 
 export default class CreateWorkoutScreen extends React.Component {
 
@@ -19,8 +20,7 @@ export default class CreateWorkoutScreen extends React.Component {
         super(props);
     }
     /*state = {
-        exerciseName,
-        equipmentType,
+        workoutName,
     };*/
 
     componentWillMount() {
@@ -43,29 +43,31 @@ export default class CreateWorkoutScreen extends React.Component {
                             </Text>
                         </View>
                         <View style={styles.dialog}>
-                            <Text style={styles.subheadingHext}>
+                            <Text style={styles.subheadingText}>
                                 Workout Name
                             </Text>
                             <TextInput
                                 style={styles.textInput}
                                 clearButtonMode='while-editing'
-                                defaultValue='e.g "Bench Press"'
+                                defaultValue='e.g "The Dorito"'
                                 selectTextOnFocus={true}
                                 onChangeText={(text) => this.setState({ exerciseName: text })}
                             />
                         </View>
                         <View style={styles.dialog}>
-                            <Text style={styles.subheadingHext}>
+                            <Text style={styles.subheadingText}>
                                 Add Exercises
                             </Text>                            
+                            
+                        </View>
+                        <View style={styles.SelectExercises}>
                             <SelectExercisesScreen />
                         </View>
-                        <View>
-                            <TouchableOpacity
-                                style={styles.button}
-                                onPress={this._onSubmitExercise}
-                            >
-                            </TouchableOpacity>
+                        <View style={styles.button}>
+                            <Button
+                                title= 'Create'
+                                onPress={this._onSubmitWorkout}
+                            />
                         </View>
                     </View>
                 </ScrollView>
@@ -73,9 +75,9 @@ export default class CreateWorkoutScreen extends React.Component {
         );
     }
 
-    _onSubmitExercise() {
+    _onSubmitWorkout() {
         //If exerciseName or equipmentType is null
-        if (this.state.exerciseName === undefined || this.state.equipmentType === undefined) {
+        if (this.state.workoutName === undefined) {
             Alert.alert(
                 'Error',
                 'Please specify a valid exercise name and equipment type',
@@ -107,10 +109,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
-        flex: 1,
+        //flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        margintop: 20
+        margintop: 50
         //paddingBottom: 15
     },
     header: {
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
     headingText: {
         textAlign: 'center',
         fontFamily: 'System',
-        fontSize: 24,
+        fontSize: 30,
         color: 'grey'
     },
     dialog: {
@@ -129,7 +131,7 @@ const styles = StyleSheet.create({
     subheadingText: {
         textAlign: 'center',
         fontFamily: 'System',
-        fontSize: 20,
+        fontSize: 24,
         color: 'grey'
     },
     textInput: {
@@ -143,12 +145,14 @@ const styles = StyleSheet.create({
         padding: 5,
         color: 'grey'
     },
-    button: {
+    SelectExercises: {
+        flex: .4,
         alignItems: 'center',
-        backgroundColor: 'blue',
         padding: 10,
     },
-    buttonText: {
+    button: {
+        alignItems: 'center',
+        padding: 15,
         fontFamily: 'System'
     },
 });
