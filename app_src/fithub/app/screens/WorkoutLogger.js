@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, SafeAreaView, Text, StyleSheet, Platform, FlatList } from 'react-native';
 
-import LogCard from './app/components/LogCard';
+import LogCard from '../components/LogCard';
 
 export default class WorkoutLoggerScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {

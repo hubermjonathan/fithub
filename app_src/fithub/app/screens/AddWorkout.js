@@ -40,10 +40,6 @@ export default class AddWorkoutScreen extends React.Component {
 
     };
 
-    static navigationOptions = {
-        header: null,
-    }
-
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
@@ -311,9 +307,6 @@ export default class AddWorkoutScreen extends React.Component {
                             />
                         </View>
                     </ScrollView>
-                    <View>
-                        <BottomBar navigation={this.props.navigation} />
-                    </View>
                 </View >
             </SafeAreaView>
         );

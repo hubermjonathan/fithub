@@ -18,7 +18,6 @@ import WorkoutCard from '../components/WorkoutCard';
 import StickyHeaderFooterScrollView from 'react-native-sticky-header-footer-scroll-view';
 
 export default class WorkoutScreen extends React.Component {
-
   render() {
     let workouts = this.getWorkouts(/*put id here, idk how to get it for now */);
     return (
@@ -56,7 +55,6 @@ export default class WorkoutScreen extends React.Component {
             subgroup3="Traps"
           />
         </View>
-        <BottomBar />
       </View>
     )
   }
