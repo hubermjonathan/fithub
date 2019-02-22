@@ -12,7 +12,8 @@ import {
     TouchableOpacity,
     ScrollView,
     Alert,
-    Switch
+    Switch,
+    KeyboardAvoidingView
 } from 'react-native';
 import { Button, Icon, Input } from 'react-native-elements';
 import { InputAutoSuggest } from 'react-native-autocomplete-search';
@@ -101,8 +102,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 }}
                                 style={{ flex: 1 }}>
                                 <SafeAreaView style={{ flex: 1 }}>
-                                    <ScrollView>
-
+                                    {/* <ScrollView> */}
                                         <View style={{ marginTop: '25%', paddingBottom: 20 }}>
                                             <View style={styles.centerE}>
 
@@ -113,8 +113,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                     defaultValue='e.g "Hammer Curls"'
                                                     selectTextOnFocus={true}
                                                     onChangeText={(text) => this.setState({ exerciseName: text })} />
-                                            </View>
-                                            <View style={styles.centerE}>
                                                 <Text style={styles.centerText}> # of Warmup Sets</Text>
                                                 <TextInput
                                                     style={styles.input}
@@ -123,8 +121,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                     selectTextOnFocus={true}
                                                     keyboardType="number-pad"
                                                     onChangeText={(text) => this.setState({ warmupSets: parseInt(text) })} />
-                                            </View>
-                                            <View style={styles.centerE}>
                                                 <Text style={styles.centerText}> # of Sets</Text>
                                                 <TextInput
                                                     style={styles.input}
@@ -133,8 +129,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                     selectTextOnFocus={true}
                                                     keyboardType="number-pad"
                                                     onChangeText={(text) => this.setState({ sets: parseInt(text) })} />
-                                            </View>
-                                            <View style={styles.centerE}>
                                                 <Text style={styles.centerText}> # of Reps</Text>
                                                 <TextInput
                                                     style={styles.input}
@@ -152,7 +146,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                     } />
                                             </View>
                                         </View>
-                                    </ScrollView>
+                                    {/* </ScrollView> */} 
                                     {/*Cancel and Add buttons */}
                                     <View style={{ padding: '1%' }}>
                                         <Button
