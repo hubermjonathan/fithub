@@ -11,7 +11,11 @@ import {
 
 import ExerciseCard from '../components/ExerciseCard';
 
+import { getWorkouts } from '../lib/WorkoutFunctions';
+
 export default class SelectExercisesScreen extends React.Component {
+
+ 
 
     //PROPS SHOULD CONTAIN RELEVANT DATA IN ORDER TO ACCESS WORKOUT IN DATABASE.
     //EXERCISES SELECTED HERE WILL BE SENT TO SERVER IN REAL TIME
@@ -44,7 +48,7 @@ export default class SelectExercisesScreen extends React.Component {
                 <FlatList
                     data={this.state.exercises}
                     renderItem={({item, index}) => 
-                        <TouchableHighlight onPress={this._onExercisePress.bind(this)}>
+                        <TouchableHighlight onPress={this._onExercisePress}>
                             <ExerciseCard
                                 exercise={item.exercise}
                                 equipment={item.equipment}
@@ -63,7 +67,7 @@ export default class SelectExercisesScreen extends React.Component {
             [
                 //Buttons are in the order: (Neutral), Negative, Positive
                 {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-                {text: 'Yes', onPress: () => {/*SEND EXERCISE TO SERVER TO BE ADDED TO WORKOUT*/}},
+                {text: 'Yes', onPress: () => {/*{this.props.getExercise(this.item)}*/} },
             ]
         );
     }

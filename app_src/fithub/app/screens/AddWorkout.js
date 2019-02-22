@@ -18,8 +18,11 @@ import { Button, Icon, Input } from 'react-native-elements';
 import { InputAutoSuggest } from 'react-native-autocomplete-search';
 import BottomBar from '../components/BottomBar';
 import { postCustomWorkout } from '../lib/WorkoutFunctions'
+import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
+
+
 
     state = {
         modalVisible: false,
@@ -35,14 +38,13 @@ export default class AddWorkoutScreen extends React.Component {
         warmup: [],
         exerciseNames: [],
 
-        savedWorkouts: []
+        savedWorkouts: [],
+
+        show: false
+
 
 
     };
-
-    static navigationOptions = {
-        header: null,
-    }
 
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
@@ -85,18 +87,24 @@ export default class AddWorkoutScreen extends React.Component {
                 for (let x = 0; x < parsed.workouts.length; x++) {
                     this.state.savedWorkouts.push(parsed.workouts[x]);
                 }
-                //console.log(this.state.savedWorkouts);
+                console.log(this.state.savedWorkouts);
             })
             .catch(function (e) {
                 console.log(e);
             });
     }
 
+    showText = () => {
+        this.setState({ show: true });
+    }
+
+
 
     render() {
 
 
         return (
+
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     <ScrollView>
@@ -118,30 +126,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     selectTextOnFocus={true}
                                     onChangeText={(text) => this.setState({ description: text })} />
                             </View>
-
-                            <Modal
-                                animationType="fade"
-                                transparent={false}
-                                visible={this.state.swmodalVisible}
-                                onRequestClose={() => {
-                                    Alert.alert('Modal has been closed.');
-                                }}
-                            >
-                                <SafeAreaView style={{flex:1}}>
-                                    <ScrollView>
-                                    </ScrollView>
-                                    <Button
-                                        style={{ paddingBottom: '1%' }}
-                                        buttonStyle={{ backgroundColor: '#e04a21' }}
-                                        title="Cancel"
-                                        onPress={() => {
-                                            this.setswModalVisible(false);
-                                        }} />
-                                </SafeAreaView>
-
-                            </Modal>
-
-
+                            
                             <Modal
                                 animationType="fade"
                                 transparent={false}
@@ -238,9 +223,9 @@ export default class AddWorkoutScreen extends React.Component {
                                                     this.setState({ sets: 0 });
                                                     this.setState({ warmpupSets: 0 });
                                                     this.setState({ reps: [] });
-                                                    this.setState({savedWorkouts:[]});
-                                                    this.setState({warmup:[]});
-                                    
+                                                    this.setState({ savedWorkouts: [] });
+                                                    this.setState({ warmup: [] });
+
                                                     this.setModalVisible(false);
 
                                                 }
@@ -260,17 +245,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 </SafeAreaView>
                             </Modal>
 
-                            <Button
-                                style={{ paddingBottom: 40 }}
-                                title="Add a Saved Workout"
-                                color='blue'
-                                onPress={() => {
-                                    this.setswModalVisible(true);
-                                    if (this.state.savedWorkouts.length == 0) {
-                                        this.getSavedWorkouts();
-                                    }
-                                }} />
-
+                        
                             <Button
                                 style={{ paddingBottom: 40 }}
                                 title="Add Exercise"
@@ -292,7 +267,18 @@ export default class AddWorkoutScreen extends React.Component {
                                 iconRight
                                 onPress={() => {
                                     if (this.state.exercises.length > 0) {
-                                        postCustomWorkout({ name: this.state.workoutName, date: '2019-02-25', description: this.state.description, exercises: this.state.exercises, uid: '104737446149074205541', likes: 0 });
+                                        postCustomWorkout(
+                                            {
+                                                token: 'abcd',
+                                                uid: '104737446149074205541',
+                                                name: this.state.workoutName,
+                                                date: '2019-02-25',
+                                                description: this.state.description,
+                                                exercises: this.state.exercises,
+                                                id: '5c6f63c51c9d440000000347',
+                                                likes: 0
+                                            }
+                                        );
                                         this.setState({ exercises: [] });
 
                                     }
@@ -311,9 +297,6 @@ export default class AddWorkoutScreen extends React.Component {
                             />
                         </View>
                     </ScrollView>
-                    <View>
-                        <BottomBar navigation={this.props.navigation} />
-                    </View>
                 </View >
             </SafeAreaView>
         );

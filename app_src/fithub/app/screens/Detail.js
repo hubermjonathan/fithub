@@ -9,6 +9,7 @@ import {
   Button
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
+import { Icon } from 'react-native-elements';
 
 export default class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
