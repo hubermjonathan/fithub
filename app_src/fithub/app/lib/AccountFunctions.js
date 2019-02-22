@@ -64,7 +64,7 @@ export async function logOutFromGoogle() {
 //IF VALID: returns true
 //IF INVALID: returns false
 export async function verifyAuthToken() {
-    return false;
+    return true;
     //PING BACKEND TO VERIFY AUTHORIZATION
 }
 
