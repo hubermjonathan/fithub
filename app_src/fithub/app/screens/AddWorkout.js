@@ -29,6 +29,7 @@ export default class AddWorkoutScreen extends React.Component {
         modalVisible: false,
         swmodalVisible: false,
         workoutName: "",
+        exercise: "",
         exercises: [],
 
         exerciseName: "",
@@ -98,7 +99,14 @@ export default class AddWorkoutScreen extends React.Component {
         this.setState({ show: true });
     }
 
+    _onExercisePress = (exercise) => {
+        this.exercises.push(exercise);
+        console.log(exercises);
+    }
 
+    /*makeExercise = () => {
+        exercise = 
+    }*/
 
     render() {
 
@@ -113,10 +121,10 @@ export default class AddWorkoutScreen extends React.Component {
                                 Create A Custom Workout
                             </Text>
                         </View>
-                        <View style={{ padding: '10%' }}>
+                        <View style={{ padding: '15%' }}>
                             <View style={styles.center}>
                                 
-                                <Text style={styles.subheadingText}>Workout Name</Text>
+                                <Text style={styles.subheadingText}> Workout Name </Text>
                                 <TextInput
                                     style={styles.input}
                                     clearButtonMode='while-editing'
@@ -131,7 +139,7 @@ export default class AddWorkoutScreen extends React.Component {
                             
                             </View>
                             <View style={styles.SelectExercises}>
-                                <SelectExercisesScreen />
+                                <SelectExercisesScreen /*getExercise={this._onExercisePress}*//>
                             </View>
 
                             <Modal
