@@ -18,10 +18,13 @@ import {
   createAppContainer
 } from 'react-navigation';
 
+import { getUserID } from '../lib/AccountFunctions';
+
 
 export default class Calendar extends React.Component {
   constructor(props) {
     super(props);
+    
 
     this.state = {
       workouts: {},
@@ -46,10 +49,12 @@ export default class Calendar extends React.Component {
     return date.toJSON().slice(0, 10);
   }
 
-  loadItems(month) {
+  async loadItems(month) {
+    let id = await getUserID();
     setTimeout(() => {
+      console.log(id);
       loadedWorkouts = {};
-      fetch('https://fithub-server.herokuapp.com/logs/5c6f63c51c9d440000000347')
+      fetch('https://fithub-server.herokuapp.com/logs/'+id)
       .then((res) => {
         return res.json();
       })
