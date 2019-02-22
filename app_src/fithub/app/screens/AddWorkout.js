@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import {
     StyleSheet,
@@ -19,11 +18,15 @@ import { Button, Icon, Input } from 'react-native-elements';
 import { InputAutoSuggest } from 'react-native-autocomplete-search';
 import BottomBar from '../components/BottomBar';
 import { postCustomWorkout } from '../lib/WorkoutFunctions'
+import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
 
+
+
     state = {
         modalVisible: false,
+        swmodalVisible: false,
         workoutName: "",
         description: "",
         exercises: [],
@@ -35,16 +38,13 @@ export default class AddWorkoutScreen extends React.Component {
         warmup: [],
         exerciseNames: [],
 
+        savedWorkouts: [],
 
-        weights: [],
-        weight: 0
+        show: false
+
 
 
     };
-
-    static navigationOptions = {
-        header: null,
-    }
 
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
@@ -56,26 +56,10 @@ export default class AddWorkoutScreen extends React.Component {
     getCurrentDate() {
         let date = new Date();
         return date.toJSON().slice(0, 10);
-      }
-    getExercises() {
-        fetch('https://fithub-server.herokuapp.com/exercises', {
-            method: 'GET',
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }).then(res => res.json())
-            .then((res) => {
-                let stringify = JSON.stringify(res);
-                let parsed = JSON.parse(stringify);
-                //console.log(parsed.exercises);
-                for (let x = 0; x < parsed.exercises.length; x++) {
-                    this.state.exerciseNames.push(parsed.exercises[x].name);
-                }
+    }
 
-            })
-            .catch(function (e) {
-                console.log(e);
-            });
+    showText = () => {
+        this.setState({ show: true });
     }
 
 
@@ -84,6 +68,7 @@ export default class AddWorkoutScreen extends React.Component {
 
 
         return (
+
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     <ScrollView>
@@ -117,7 +102,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 <SafeAreaView style={{ flex: 1 }}>
                                     <ScrollView>
 
-                                        <View style={{ marginTop: '20%', paddingBottom: 20 }}>
+                                        <View style={{ marginTop: '25%', paddingBottom: 20 }}>
                                             <View style={styles.centerE}>
 
                                                 <Text style={styles.centerText}> Exercise Name</Text>
@@ -157,23 +142,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                     selectTextOnFocus={true}
                                                     keyboardType="number-pad"
                                                     onChangeText={(text) => {
-                                                        let weightsArr = [];
-                                                        for (let x = 0; x < this.state.sets + this.state.warmupSets; x++) {
-                                                            weightsArr.push(parseInt(text));
-                                                        }
-                                                        this.setState({ weights: weightsArr })
-                                                    }
-                                                    } />
-                                            </View>
-                                            <View style={styles.centerE}>
-                                                <Text style={styles.centerText}> Weight </Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "5"'
-                                                    selectTextOnFocus={true}
-                                                    keyboardType="number-pad"
-                                                    onChangeText={(text) => {
                                                         let repsArr = [];
                                                         for (let x = 0; x < this.state.sets + this.state.warmupSets; x++) {
                                                             repsArr.push(parseInt(text));
@@ -196,14 +164,11 @@ export default class AddWorkoutScreen extends React.Component {
                                                 this.setState({ warmpupSets: 0 });
                                                 this.setState({ reps: [] });
                                                 this.setState({ warmup: false });
-                                                this.setState({ weight: 0 });
-                                                this.setState({ weights: [] });
                                             }} />
                                         <Button
                                             style={{ paddingBottom: 5 }}
                                             title='Add'
                                             onPress={() => {
-                                                
                                                 if (typeof this.state.sets === "number" && this.state.reps.length > 0 && this.state.exerciseName.length > 0) {
                                                     let warmupObj = [];
                                                     for (let x = 0; x < this.state.warmupSets; x++) {
@@ -222,10 +187,8 @@ export default class AddWorkoutScreen extends React.Component {
                                                     this.setState({ sets: 0 });
                                                     this.setState({ warmpupSets: 0 });
                                                     this.setState({ reps: [] });
-
+                                                    this.setState({ savedWorkouts: [] });
                                                     this.setState({ warmup: [] });
-                                                    this.setState({ weight: 0 });
-                                                    this.setState({ weights: [] })
 
                                                     this.setModalVisible(false);
 
@@ -245,6 +208,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     </View>
                                 </SafeAreaView>
                             </Modal>
+
 
                             <Button
                                 style={{ paddingBottom: 40 }}
@@ -269,35 +233,17 @@ export default class AddWorkoutScreen extends React.Component {
                                     if (this.state.exercises.length > 0) {
                                         postCustomWorkout(
                                             {
-                                                token:'abcd',
+                                                token: 'abcd',
                                                 uid: '104737446149074205541',
                                                 name: this.state.workoutName,
                                                 date: this.getCurrentDate(),
                                                 description: this.state.description,
                                                 exercises: this.state.exercises,
                                                 id: '5c6f63c51c9d440000000347',
-                                                likes: 0,
-                                                weight: this.state.weights
-                                            });
-                                        this.setState(
-                                            {
-                                                workoutName: "",
-                                                description: "",
-                                                exercises: [],
-
-                                                exerciseName: "",
-                                                sets: 0,
-                                                warmupSets: 0,
-                                                reps: [],
-                                                warmup: [],
-                                                exerciseNames: [],
-
-
-                                                weights: [],
-                                                weight: 0
-
-                                            });
-
+                                                likes: 0
+                                            }
+                                        );
+                                        this.setState({ exercises: [] });
 
                                     }
                                     else {
@@ -309,7 +255,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                 style: 'cancel'
                                             }
                                         );
-                                        //console.log(this.state.exerciseNames);
+                                        console.log(this.state.exerciseNames);
                                     }
                                 }}
                             />
