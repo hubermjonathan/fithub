@@ -15,15 +15,25 @@ export default class WorkoutCard extends React.Component {
     constructor(props) {
         super(props);
     }
+
+
     render() {
         return (
             <SafeAreaView>
-                <View style={{padding:"5%"}}>
+                <View style={{paddingLeft:"5%",paddingRight:"5%",paddingBottom:"5%"}}>
                     <View style={styles.border}>
-                        <Text style={styles.title}>{this.props.name}</Text>
-                        <Text style={styles.title}>{this.props.description}</Text>
-                        <Text style={styles.title}>{this.props.sets}</Text>
-                        <Text style={styles.title}>{this.props.reps}</Text>
+                        <Text style={styles.title}>Name: "{this.props.name}"</Text>
+                        <Text style={styles.title}> Exercises </Text>
+                        {this.props.sets.map((val,index)=>{
+                            return(
+                                <Text
+                                    key={index}
+                                    style={styles.title}> "{val.name}"/{val.reps.length}-sets/{val.reps[0]}-reps/{val.weight[0]}lb
+                                </Text>
+                            );
+                        })}
+                       
+                      
                     </View>
                 </View>
             </SafeAreaView >
@@ -37,19 +47,6 @@ const styles = StyleSheet.create({
         fontSize: 25,
         paddingTop: "5%"
 
-    },
-    subgroup: {
-        textAlign: 'center',
-        fontSize: 20,
-        padding: "5%"
-    },
-    bottomBar: {
-        flex: 1,
-    },
-    addPadding: {
-        textAlign: 'center',
-        fontSize: 20,
-        paddingBottom: "5%"
     },
     border: {
         borderColor: 'gray',
