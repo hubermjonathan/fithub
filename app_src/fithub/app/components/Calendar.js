@@ -49,7 +49,6 @@ export default class Calendar extends React.Component {
   loadItems(month) {
     setTimeout(() => {
       loadedWorkouts = {};
-
       fetch('https://fithub-server.herokuapp.com/logs/5c6f63c51c9d440000000347')
       .then((res) => {
         return res.json();
