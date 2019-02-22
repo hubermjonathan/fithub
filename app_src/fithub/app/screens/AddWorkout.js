@@ -38,6 +38,10 @@ export default class AddWorkoutScreen extends React.Component {
 
     };
 
+    static navigationOptions = {
+        header: null,
+    }
+
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
@@ -282,8 +286,17 @@ const styles = StyleSheet.create({
     centerText: {
         textAlign: 'center',
         fontFamily: 'System',
-        fontSize: 22,
-        color: 'grey',
-        paddingBottom: '1%'
+        fontSize: 20,
+        color: 'grey'
+    },
+    buttonText: {
+        fontFamily: 'System'
+    },
+    cancel: {
+
+    },
+    bottomBar: {
+        justifyContent: 'flex-end',
     }
+
 });

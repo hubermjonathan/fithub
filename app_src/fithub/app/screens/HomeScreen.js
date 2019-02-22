@@ -56,6 +56,6 @@ export default class HomeScreen extends React.Component {
       flex: 11,
     },
     bottomBar: {
-      flex: 1,
+      justifyContent: 'flex-end',
     },
   });

@@ -10,12 +10,9 @@ import {
 import BottomBar from '../components/BottomBar';
 
 export default class DetailScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: navigation.getParam('name', 'Workout'),
-      headerTintColor: '#00adf5',
-    };
-  };
+  static navigationOptions = {
+    header: null,
+}
 
   constructor(props) {
     super(props);
