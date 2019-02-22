@@ -260,6 +260,17 @@ class ProfileScreen extends React.Component {
                                 }
                                 iconRight
                                 onPress={() => {
+                                    let reg = /^\d{4}-\d{2}-\d{2}$/
+                                    if (!reg.test(this.state.date)){
+                                        Alert.alert(
+                                            'Error',
+                                            'Enter Date YYYY-MM-DD',
+                                            {
+                                                text: 'Ok',
+                                                style: 'cancel'
+                                            }
+                                        );
+                                    }
                                     if (this.state.exercises.length > 0) {
                                         postLog(
                                             {
