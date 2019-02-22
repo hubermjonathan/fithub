@@ -22,6 +22,8 @@ import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
 
+
+
     state = {
         modalVisible: false,
         swmodalVisible: false,
@@ -36,7 +38,10 @@ export default class AddWorkoutScreen extends React.Component {
         warmup: [],
         exerciseNames: [],
 
-        savedWorkouts: []
+        savedWorkouts: [],
+
+        show: false
+
 
 
     };
@@ -82,21 +87,17 @@ export default class AddWorkoutScreen extends React.Component {
                 for (let x = 0; x < parsed.workouts.length; x++) {
                     this.state.savedWorkouts.push(parsed.workouts[x]);
                 }
-                //console.log(this.state.savedWorkouts);
+                console.log(this.state.savedWorkouts);
             })
             .catch(function (e) {
                 console.log(e);
             });
     }
 
-    test() {
-
-        for (let x = 0; x < 5; x++) {
-            return (
-                <Text>hey{x}</Text>
-            );
-        }
+    showText = () => {
+        this.setState({ show: true });
     }
+
 
 
     render() {
@@ -125,44 +126,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     selectTextOnFocus={true}
                                     onChangeText={(text) => this.setState({ description: text })} />
                             </View>
-
-                            <Modal
-                                animationType="fade"
-                                transparent={false}
-                                visible={this.state.swmodalVisible}
-                                onRequestClose={() => {
-                                    Alert.alert('Modal has been closed.');
-                                }}>
-                                <SafeAreaView style={{ flex: 1 }}>
-                                    <ScrollView>
-                                        <View>
-                                            <WorkoutCard
-                                                name={"test"}
-                                                description={"description"}
-                                                sets={"sets"}
-                                                reps={"reps"}>
-                                            </WorkoutCard>
-                                        </View>
-                                    </ScrollView>
-                                    <Button
-                                        style={{ paddingBottom: '1%' }}
-                                        buttonStyle={{ backgroundColor: '#e04a21' }}
-                                        title="Cancel"
-                                        onPress={() => {
-                                            this.setswModalVisible(false);
-                                        }} />
-                                    <Button
-                                        title="populate"
-                                        onPress={() => {
-                                            
-                                        }}
-                                    />
-                                    {this.test()}
-                                </SafeAreaView>
-
-                            </Modal>
-
-
+                            
                             <Modal
                                 animationType="fade"
                                 transparent={false}
@@ -281,19 +245,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 </SafeAreaView>
                             </Modal>
 
-                            <Button
-                                style={{ paddingBottom: 40 }}
-                                title="Add a Saved Workout"
-                                color='blue'
-                                onPress={() => {
-                                    this.setswModalVisible(true);
-                                    if (this.state.savedWorkouts.length == 0) {
-                                        // this.getSavedWorkouts();
-                                    }
-
-                                }
-                                } />
-
+                        
                             <Button
                                 style={{ paddingBottom: 40 }}
                                 title="Add Exercise"
