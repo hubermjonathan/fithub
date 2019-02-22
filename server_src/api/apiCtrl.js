@@ -3,10 +3,14 @@ const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
 
+let connection;
 
 function connectToDb(res) {
-  mongoose.connect(url, { useNewUrlParser: true });
-  let db = mongoose.connection;
+  if(connection==null){
+    mongoose.connect(url, { useNewUrlParser: true });
+    connection = mongoose.connection;
+  }
+  let db = connection;
   db.on('error', () => {
     res.status(500).send({ "message" : " Database is down "});
     db.removeAllListeners();
@@ -36,7 +40,7 @@ let login = function login(req,res) {
 let newWorkout = function newWorkout(req, res) {
   let db = connectToDb(res);
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ _id : req.body.id }, (err, user) => {
+    schemaCtrl.Profile.findById(req.body.id, (err, user) => {
 
       if (!user){
         res.status(404).send({ message : "User not found"});
@@ -94,14 +98,14 @@ let newWorkout = function newWorkout(req, res) {
       });
     });
   });
+  
 }
 
 //Log a user's workout into the DB
 let newLog = function newLog(req, res) {
   let db = connectToDb(res);
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ _id : req.body.id }, (err, user) => {
-    
+    schemaCtrl.Profile.findById(req.body.id, (err, user) => {
       if (!user){
         res.status(404).send({ message : "User not found"});
         return;
@@ -150,7 +154,7 @@ let newExercise = function newExercise(req, res) {
   let db = connectToDb(res);
   db.once('open', () => {
     //Push the newWorkout log to the user profile
-    schemaCtrl.Profile.findOne({ _id : req.body.id }, (err, user) => {
+    schemaCtrl.Profile.findById(req.body.id, (err, user) => {
 
       if (!user){
         res.status(404).send({ message : "User not found"});
@@ -174,6 +178,7 @@ let newExercise = function newExercise(req, res) {
       );
     });
   });
+  
 }
 
 //Post an exercise to the standard library
@@ -199,6 +204,7 @@ let devExercise = function devExercise(req, res) {
       }
     });
   });
+  
 }
 
 /*--------Functions for returning user information--------*/
@@ -208,7 +214,7 @@ let logs = function logs(req, res) {
 
   let db = connectToDb(res);
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ _id : req.params.id}, (err, user) => {
+    schemaCtrl.Profile.findById(req.body.id, (err, user) => {
       if (err){
         console.log(err);
         res.status(500).send({message : "Error"});
@@ -219,6 +225,7 @@ let logs = function logs(req, res) {
       }
     });
   });    
+  
 }
 
 
@@ -245,13 +252,14 @@ let workouts = function workouts(req, res) {
       }
     });
   });
+  
 }
 
 //Return a users custom exercises
 let uExercises = function uExercises(req, res) {
   let db = connectToDb(res);
   db.once('open', () => {
-    schemaCtrl.Profile.findOne({ _id : req.params.id }, (err, user) => {
+    schemaCtrl.Profile.findById(req.body.id, (err, user) => {
       if (err) {
         console.log(err);
         res.status(500).send({ "message": "Error"});
@@ -262,6 +270,7 @@ let uExercises = function uExercises(req, res) {
       }
     });
   });
+  
 }
 
 //Return all standard exercises
@@ -278,6 +287,7 @@ let exercises = function exercises(req, res) {
     });    
 
   });
+  
 }
 
 let apiCtrl = {
