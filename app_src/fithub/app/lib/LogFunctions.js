@@ -18,7 +18,7 @@ export async function postLog(workout) {
         exercises: workout.exercises,
     }
     console.log("DATA", data);
-
+    console.log("JSON", JSON.stringify(workout));
     fetch('https://fithub-server.herokuapp.com/logs/new', {
         method: 'POST',
         headers: {
