@@ -19,7 +19,6 @@ export default class SignInScreen extends Component {
                     />
                 </View>
                 {/*CONTENT: Login ~ Login With Google*/}
-                <View style={styles.content}>
                     {/*HEADING: Login*/}
                     <View style={styles.heading}>
                         <Text style={styles.headingText}>
@@ -37,7 +36,6 @@ export default class SignInScreen extends Component {
                             />
                         </TouchableOpacity>
                     </View>
-                </View>    
             </View>   
         );
     }
@@ -47,7 +45,7 @@ const styles = StyleSheet.create({
     page: {
         flex: 1, 
         flexDirection: 'column', 
-        justifyContent: 'space-between', 
+        justifyContent: 'center', 
         alignItems: 'center',
     },
     header: {

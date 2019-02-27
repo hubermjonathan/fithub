@@ -12,12 +12,13 @@ import {
     TouchableOpacity,
     ScrollView,
     Alert,
-    Switch
+    Switch,
+    KeyboardAvoidingView
 } from 'react-native';
 import { Button, Icon, Input } from 'react-native-elements';
 import { InputAutoSuggest } from 'react-native-autocomplete-search';
 import BottomBar from '../components/BottomBar';
-import { postCustomWorkout } from '../lib/WorkoutFunctions'
+import { postWorkout } from '../lib/WorkoutFunctions'
 import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
@@ -74,6 +75,7 @@ export default class AddWorkoutScreen extends React.Component {
                     <ScrollView>
                         <View style={{ padding: '15%', marginTop: '20%' }}>
                             <View style={styles.center}>
+                                {/*Workout Name prompt */}
                                 <Text style={styles.centerText}>Workout Name</Text>
                                 <TextInput
                                     style={styles.input}
@@ -81,8 +83,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     defaultValue='e.g "The Dorito"'
                                     selectTextOnFocus={true}
                                     onChangeText={(text) => this.setState({ workoutName: text })} />
-                            </View>
-                            <View style={styles.center}>
+                                {/*Description prompt */}
                                 <Text style={styles.centerText}>Description</Text>
                                 <TextInput
                                     style={styles.input}
@@ -91,6 +92,7 @@ export default class AddWorkoutScreen extends React.Component {
                                     onChangeText={(text) => this.setState({ description: text })} />
                             </View>
 
+                            {/*Modal for adding custom exercise */}
                             <Modal
                                 animationType="fade"
                                 transparent={false}
@@ -100,8 +102,7 @@ export default class AddWorkoutScreen extends React.Component {
                                 }}
                                 style={{ flex: 1 }}>
                                 <SafeAreaView style={{ flex: 1 }}>
-                                    <ScrollView>
-
+                                    {/* <ScrollView> */}
                                         <View style={{ marginTop: '25%', paddingBottom: 20 }}>
                                             <View style={styles.centerE}>
 
@@ -112,8 +113,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                     defaultValue='e.g "Hammer Curls"'
                                                     selectTextOnFocus={true}
                                                     onChangeText={(text) => this.setState({ exerciseName: text })} />
-                                            </View>
-                                            <View style={styles.centerE}>
                                                 <Text style={styles.centerText}> # of Warmup Sets</Text>
                                                 <TextInput
                                                     style={styles.input}
@@ -122,8 +121,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                     selectTextOnFocus={true}
                                                     keyboardType="number-pad"
                                                     onChangeText={(text) => this.setState({ warmupSets: parseInt(text) })} />
-                                            </View>
-                                            <View style={styles.centerE}>
                                                 <Text style={styles.centerText}> # of Sets</Text>
                                                 <TextInput
                                                     style={styles.input}
@@ -132,8 +129,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                     selectTextOnFocus={true}
                                                     keyboardType="number-pad"
                                                     onChangeText={(text) => this.setState({ sets: parseInt(text) })} />
-                                            </View>
-                                            <View style={styles.centerE}>
                                                 <Text style={styles.centerText}> # of Reps</Text>
                                                 <TextInput
                                                     style={styles.input}
@@ -151,7 +146,8 @@ export default class AddWorkoutScreen extends React.Component {
                                                     } />
                                             </View>
                                         </View>
-                                    </ScrollView>
+                                    {/* </ScrollView> */} 
+                                    {/*Cancel and Add buttons */}
                                     <View style={{ padding: '1%' }}>
                                         <Button
                                             style={{ paddingBottom: '1%' }}
@@ -230,17 +226,35 @@ export default class AddWorkoutScreen extends React.Component {
                                 }
                                 iconRight
                                 onPress={() => {
-                                    if (this.state.exercises.length > 0) {
-                                        postCustomWorkout(
+                                    if (this.state.workoutName == 'e.g "The Dorito"' || this.state.workoutName == ""){
+                                        Alert.alert(
+                                            'Error',
+                                            'You must have a name for your workout!',
                                             {
-                                                token: 'abcd',
-                                                uid: '104737446149074205541',
+                                                text: 'Ok',
+                                                style: 'cancel'
+                                            }
+                                        );
+                                    }
+                                    else if (this.state.exercises.length > 0) {
+                                        postWorkout(
+                                            {
+                                                token: '',
+                                                uid: '',
                                                 name: this.state.workoutName,
                                                 date: this.getCurrentDate(),
                                                 description: this.state.description,
                                                 exercises: this.state.exercises,
-                                                id: '5c6f63c51c9d440000000347',
+                                                id: '',
                                                 likes: 0
+                                            }
+                                        );
+                                        Alert.alert(
+                                            'Success',
+                                            'Workout has been added!',
+                                            {
+                                                text: 'Ok',
+                                                style: 'cancel'
                                             }
                                         );
                                         this.setState({ exercises: [] });

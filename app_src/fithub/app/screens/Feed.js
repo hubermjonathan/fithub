@@ -26,7 +26,7 @@ export default class FeedScreen extends React.Component {
 
 
     }
-    getSavedWorkouts() {
+    getLogWorkouts() {
         fetch('https://fithub-server.herokuapp.com/logs/5c6f8e6798100706844fa981', {
             method: 'GET',
             header: {
@@ -72,7 +72,7 @@ export default class FeedScreen extends React.Component {
 
     componentDidMount() {
         this.showSpinner();
-        this.getSavedWorkouts();
+        this.getLogWorkouts();
         setInterval(() => {
             this.setState({
                 spinner: false
@@ -131,6 +131,18 @@ export default class FeedScreen extends React.Component {
                             );
                         })}
                     </ScrollView>
+                    <Button
+                        title={'refresh'}
+                        onPress={()=>{
+                            this.setState({fetchedWorkouts:[]});
+                            this.getLogWorkouts();
+                            setInterval(() => {
+                                this.setState({
+                                    spinner: false
+                                });
+                            }, 3000);
+                        }}
+                    />
                 </SafeAreaView>
             );
         }
@@ -154,12 +166,12 @@ export default class FeedScreen extends React.Component {
                                             [{
                                                 text: 'Yes',
                                                 onPress: () => this.postWorkoutToLog({
-                                                    token: 'abcd',
-                                                    uid: '104737446149074205541',
+                                                    token: '',
+                                                    uid: '',
                                                     name: val.name,
                                                     date: val.date,
                                                     exercises: val.exercises,
-                                                    id: '5c6f63c51c9d440000000347',
+                                                    id: '',
                                                     likes: 0
                                                 }),
                                                 style: 'cancel'
