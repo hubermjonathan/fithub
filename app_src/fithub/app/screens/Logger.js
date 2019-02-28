@@ -6,18 +6,32 @@ import LogCard from '../components/LogCard';
 
 import { postLog } from '../lib/LogFunctions';
 
+import {
+    createStackNavigator,
+    createAppContainer
+  } from 'react-navigation';
+
+
 export default class LoggerScreen extends React.Component {
 
-    static navigationOptions = {
-        tabBarIcon: <Icon name="add" type="material" size={35} />
-    }
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: `Today's Workout`,
+            headerRight: <Icon name="add" type="material" size={35} onPress={ navigation.navigate('SelectExercises', {_handleAddExercisesButton: this._handleAddExercisesButton.bind(this) })}/>
+        }
+    };
 
     constructor(props) {
         super(props);
         this.state = {
-            uid: Workout.uid,
-            name: Workout.name,
-            exercises: Workout.exercises,
+            name: this.props.navigation.getParam('name', `Today's Workout`),
+
+            uid: 'temporaryUID',
+            name: "Today's Workout",
+            exercises: [],
+            // uid: Workout.uid,
+            // name: Workout.name,
+            // exercises: Workout.exercises,
 
             addSetModalIsVisible: false,
             modalReps: undefined,
@@ -28,7 +42,6 @@ export default class LoggerScreen extends React.Component {
     }
 
     render() {
-        //console.log(this.props.navigation);
         return(
             <View style={styles.page}>
                 <Modal
@@ -117,7 +130,7 @@ export default class LoggerScreen extends React.Component {
         });
     }
 
-     _modalOK = () => {
+    _modalOK = () => {
         if (this.state.modalReps !== undefined && this.state.modalWeight !== undefined) {
             this.setState(prevState => {
                 const updatedExercises = prevState.exercises;
@@ -127,10 +140,6 @@ export default class LoggerScreen extends React.Component {
             });
 
             var Workout = {
-                id: '5c6f8e6798100706844fa981',
-                uid: '108849574280224972689', //Should be this.state.uid (workout)
-                token: 'e498a0841ce3c3ed948e48e9b788dcf620742070304ea327b3bdb0a83d26f37065dac9e611ce0e2d51478655c4007cef',
-                description: 'log',
                 name: this.state.name,
                 exercises: this.state.exercises,
             }
@@ -141,6 +150,14 @@ export default class LoggerScreen extends React.Component {
             modalReps: undefined,
             modalWeight: undefined,
             addSetModalIsVisible: false
+        });
+    }
+
+    _handleAddExercisesButton(exercise) {
+        console.log(exercise);
+        this.setState(prevState => {
+            exersise.sets = [];
+            exercises: prevState.push(exercise)
         });
     }
 }
@@ -185,31 +202,31 @@ const styles = StyleSheet.create({
     },
 });
 
-const Workout = {
-    uid: '12345678910',
-    name: 'Chest Day Boi',
-    exercises: [
-      {name: 'Bench Press', muscle_group: 'Pectoralis', equipment_type: 'Barbell', sets: [
-        {weight: 135, reps: 15, warmup: true},
-        {weight: 155, reps: 12, warmup: true},
-        {weight: 185, reps: 8, warmup: false},
-        {weight: 215, reps: 6, warmup: false},
-        {weight: 225, reps: 4, warmup: false},
-      ]},
-      {name: 'Chest Pullovers', muscle_group: 'Pectoralis', equipment_type: 'Dumbbell', sets: [
-        {weight: 40, reps: 10, warmup: false},
-        {weight: 40, reps: 10, warmup: false},
-        {weight: 45, reps: 8, warmup: false},
-        {weight: 50, reps: 6, warmup: false},
-        {weight: 50, reps: 4, warmup: false},
-      ]},
-      {name: 'Flyes', muscle_group: 'Pectoralis', equipment_type: 'Cables', sets: [
-        {weight: 40, reps: 15, warmup: false},
-        {weight: 40, reps: 15, warmup: false},
-        {weight: 45, reps: 10, warmup: false},
-        {weight: 55, reps: 8, warmup: false},
-        {weight: 50, reps: 8, warmup: false},
-      ]}
-    ],
-  };
+// const Workout = {
+//     uid: '12345678910',
+//     name: 'Chest Day Boi',
+//     exercises: [
+//       {name: 'Bench Press', muscle_group: 'Pectoralis', equipment_type: 'Barbell', sets: [
+//         {weight: 135, reps: 15, warmup: true},
+//         {weight: 155, reps: 12, warmup: true},
+//         {weight: 185, reps: 8, warmup: false},
+//         {weight: 215, reps: 6, warmup: false},
+//         {weight: 225, reps: 4, warmup: false},
+//       ]},
+//       {name: 'Chest Pullovers', muscle_group: 'Pectoralis', equipment_type: 'Dumbbell', sets: [
+//         {weight: 40, reps: 10, warmup: false},
+//         {weight: 40, reps: 10, warmup: false},
+//         {weight: 45, reps: 8, warmup: false},
+//         {weight: 50, reps: 6, warmup: false},
+//         {weight: 50, reps: 4, warmup: false},
+//       ]},
+//       {name: 'Flyes', muscle_group: 'Pectoralis', equipment_type: 'Cables', sets: [
+//         {weight: 40, reps: 15, warmup: false},
+//         {weight: 40, reps: 15, warmup: false},
+//         {weight: 45, reps: 10, warmup: false},
+//         {weight: 55, reps: 8, warmup: false},
+//         {weight: 50, reps: 8, warmup: false},
+//       ]}
+//     ],
+//   };
 

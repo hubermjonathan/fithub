@@ -48,7 +48,7 @@ export default class SelectExercisesScreen extends React.Component {
                 <FlatList
                     data={this.state.exercises}
                     renderItem={({item, index}) => 
-                        <TouchableHighlight onPress={this._onExercisePress}>
+                        <TouchableHighlight onPress={() => this._onExercisePress(item)}>
                             <ExerciseCard
                                 exercise={item.exercise}
                                 equipment={item.equipment}
@@ -60,14 +60,18 @@ export default class SelectExercisesScreen extends React.Component {
         );
     }
 
-    _onExercisePress() {
+    _onExercisePress(item) {
+        // const onCallback = this.props.navigation.getParam('onCallback');
+         const onCallback = this.props.navigation.state.params._handleAddExercisesButton;
+        //console.log(onCallback(item));
+        console.log(this.props.navigation);
         Alert.alert(
             'Confirm:',
-            'Would you like to add {this.exercise} to {this.props.workout}?',
+            `Would you like to add this exercise to today's workout?`,
             [
                 //Buttons are in the order: (Neutral), Negative, Positive
                 {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-                {text: 'Yes', onPress: () => {/*{this.props.getExercise(this.item)}*/} },
+                {text: 'Yes', onPress: this.props.navigation.state.params._handleAddExercisesButton(item)},
             ]
         );
     }
