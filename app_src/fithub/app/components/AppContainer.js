@@ -6,7 +6,7 @@ import AddWorkoutScreen from '../screens/AddWorkout';
 import LoggerScreen from '../screens/Logger';
 import HomeScreen from '../screens/HomeScreen';
 import FeedScreen from '../screens/Feed';
-import ProfileScreen from '../screens/Profile';
+import ProfileScreen from '../screens/Prof';
 import CreateExercisesScreen from '../screens/CreateExercises';
 import CreateWorkoutScreen from '../screens/CreateWorkout';
 
