@@ -35,7 +35,7 @@ let Exercise = new Schema({
 let WorkoutPlan = new Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
-    exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise", required: true}]
+    exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise", required: true}],
     ownerUID : { type: String, required: true },
     gains : { type : Number }
 });
