@@ -10,7 +10,7 @@ let db = mongoose.connection;
 db.once('open', () => {
 });
 
-function isConnected() {
+function isConnected(req, res) {
   if (db.readystate == 0) {
     res.status(500).send({ error: "Error: Database connection is down"});
     return false;
@@ -20,7 +20,7 @@ function isConnected() {
   }
 }
 
-function isValidated(err, user) {
+function isValidated(req, res, err, user) {
   if (!user) 
   {
     res.status(404).send({ message: "User not found" });
@@ -59,16 +59,16 @@ let login = function login(req, res) {
 
 /*--------Functions for posting user information--------*/
 
-//Create a new workout for the master workout library
+//Create a new workout plan under a user
 let newWorkout = function newWorkout(req, res) {
-  if(!isConnected())
+  if(!isConnected(req, res))
   {
     console.log("DB Offline");
     return;
   }
   schemaCtrl.Profile.findById(req.body.id, (err, user) => 
   {
-    if(!isValidated){
+    if(!isValidated(req, res, err, user)){
       return;
     }
     //Construct the exercise documents and keep track of their IDs
@@ -94,9 +94,9 @@ let newWorkout = function newWorkout(req, res) {
       {
         //creating set data for the exercise
         let set_ids = [];
-        exercise.set_data.forEach(set =>
+        exercise.sets.forEach(set =>
         {
-          let new_set = new schemaCtrl.SetData(set);
+          let new_set = new schemaCtrl.Set(set);
           new_set.save(function (err, ret) 
           {
             if(err)
@@ -179,92 +179,109 @@ let newWorkout = function newWorkout(req, res) {
 
 //Log a user's workout into the DB
 let newLog = function newLog(req, res) {
-
-  if (db.readyState == 0) {
-    res.status(500).send({
-      error: "Database connection is down."
-    });
+  if(!isConnected(req, res)){
+    console.log("DB is offlne");
     return;
   }
-
-  schemaCtrl.Profile.findById(req.body.id, (err, user) => {
-    if (!user) {
-      res.status(404).send({
-        message: "User not found"
-      });
-      return;
-    }
-    if (user.uid != req.body.uid || user.token != req.body.token) {
-      res.status(401).send({
-        message: "Unauthorized"
-      });
+  schemaCtrl.Profile.findById(req.body.id, (err, user) => 
+  {
+    if(!isValidated(req, res, err, user)){
       return;
     }
 
-    let exercises = [];
-    //Construct the JSON exercise objects and push them to exercises
-    req.body.exercises.forEach(exercise => {
-      let newExercise = {
+    let exerciseData_ids = [];
+    //Construct the exerciseData objects
+    req.body.exercises.forEach(exercise => 
+    {
+      //build setData objects for the current exercise
+      let setData_ids = [];
+      exercise.sets.forEach(set =>
+      {
+        let newSetData = new schemaCtrl.SetData(set);
+        newSetData.save((err, newSetData) => 
+        {
+          if (err) 
+          {
+            console.log(err);
+            res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
+            return;
+          } 
+        }); //end save
+        setData_ids.push(mongoose.Types.ObjectId(newSetData._id));
+      }); //end forEach set
+
+      //build exerciseData objects for the workoutData
+      let newExerciseData = new schemaCtrl.ExerciseData
+      ({
         name: exercise.name,
-        reps: exercise.reps,
-        weight: exercise.weight,
-        isWarmup: exercise.isWarmup
-      };
-      exercises.push(newExercise);
-    });
+        muscle_groups: exercise.muscle_groups,
+        sets: setData_ids
+      });
 
-    //Construct the workout JSON object
-    let newWorkout = {
+      //save the exerciseData
+      newExerciseData.save((err, newExerciseData) => 
+      {
+        if (err) 
+        {
+          console.log(err);
+          res.status(500).send({ "message": "Database Error: Error while saving exercise log" });
+          return;
+        } 
+      }); //end save
+      exerciseData_ids.push(mongoose.Types.ObjectId(newExerciseData._id));
+    }); //end forEach exercise, all exerciseData documents have been built and saved
+
+    //Construct the workoutData object
+    let newWorkoutData = new schemaCtrl.WorkoutData(
+    {
       name: req.body.name,
       date: req.body.date,
-      exercises: req.body.exercises,
-    };
+      exercises: exerciseData_ids
+    });
+
+    newWorkoutData.save((err, newWorkoutData) => 
+    {
+      if (err) 
+      {
+        console.log(err);
+        res.status(500).send({ "message": "Database Error: Error while saving WorkoutData log" });
+        return;
+      } 
+    }); //end save
 
     //Push the newWorkout log to the user profile
-    user.updateOne({
-        $push: {
-          logs: newWorkout
-        }
-      }, {},
-      (err, raw) => {
-        if (err) {
-          res.status(500).send({
-            "message": " Error: Log addition unsuccessful"
-          });
-        } else {
-          res.status(200).send({
-            "message": " Log added successfully "
-          });
-        }
+    user.updateOne({$push: {logs: newWorkoutData}}, {},(err, raw) => 
+    {
+      if (err) 
+      {
+        res.status(500).send({"message": " Error: Log addition unsuccessful"});
+        return;
+      } 
+      else 
+      {
+        res.status(200).send({"message": " Log added successfully "});
+        return;
       }
-    );
-  });
-}
+    }); //end updateOne
+  }); //end findById
+} //end newLog
 
 let newExercise = function newExercise(req, res) {
-  if(!isConnected()){
+  if(!isConnected(req, res)){
     console.log("DB is offline");
     return;
   }
   //Find the user
   schemaCtrl.Profile.findById(req.body.id, (err, user) => 
   {
-    if (!user) 
-    {
-      res.status(404).send({ message: "User not found" });
+    if(!isValidated(req, res, err, user)){
       return;
     }
-    if (user.uid != req.body.uid || user.token != req.body.token) 
-    {
-      res.status(401).send({ message: "Unauthorized" });
-      return;
-    }
-
     //parse set_data array of JSON to build exercise object
     let set_ids= [];
-    req.body.set_data.forEach(set =>
+    req.body.sets.forEach(set =>
     {
-      let new_set = new schemaCtrl.SetData(set);
+      let new_set = new schemaCtrl.Set(set);
       new_set.save(function (err, ret) 
       {
         if(err)
