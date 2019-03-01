@@ -68,8 +68,9 @@ let SetData = new Schema({
 //map the schemas to mongo collections
 let schemaCtrl = {
     Profile: mongoose.model("Profile", Profile),
-    Exercise: mongoose.model("Exercise", Exercise),
     WorkoutPlan: mongoose.model("WorkoutPlan", WorkoutPlan),
+    Exercise: mongoose.model("Exercise", Exercise),
+    Set: mongoose.model("Set", Set),
     WorkoutData: mongoose.model("WorkoutData", WorkoutData),
     ExerciseData: mongoose.model("ExerciseData", ExerciseData),
     SetData: mongoose.model("SetData", SetData),
