@@ -3,13 +3,38 @@ const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
 
-
 mongoose.connect(url, {
   useNewUrlParser: true
 });
 let db = mongoose.connection;
 db.once('open', () => {
 });
+
+function isConnected() {
+  if (db.readystate == 0) {
+    res.status(500).send({ error: "Error: Database connection is down"});
+    return false;
+  }
+  else{
+    return true;
+  }
+}
+
+function isValidated(err, user) {
+  if (!user) 
+  {
+    res.status(404).send({ message: "User not found" });
+    return false;
+  }
+  else if (user.uid != req.body.uid || user.token != req.body.token) 
+  {
+    res.status(401).send({ message: "Unauthorized" });
+    return false;
+  }
+  else{
+    return true;
+  }
+}
 
 //Register a user
 let login = function login(req, res) {
@@ -36,81 +61,121 @@ let login = function login(req, res) {
 
 //Create a new workout for the master workout library
 let newWorkout = function newWorkout(req, res) {
-  if (db.readyState == 0) {
-    res.status(500).send({
-      error: "Database connection is down."
-    });
+  if(!isConnected())
+  {
+    console.log("DB Offline");
     return;
   }
-  schemaCtrl.Profile.findById(req.body.id, (err, user) => {
-
-    if (!user) {
-      res.status(404).send({
-        message: "User not found"
-      });
+  schemaCtrl.Profile.findById(req.body.id, (err, user) => 
+  {
+    if(!isValidated){
       return;
     }
-
-    if (user.uid != req.body.uid || user.token != req.body.token) {
-      res.status(401).send({
-        message: "Unauthorized"
-      });
-      return;
-    }
-
-    //Construct the JSON exercise objects and push them to exercises
-    let exercises = [];
-    req.body.exercises.forEach(exercise => {
-      let newExercise = {
-        name: exercise.name,
-        reps: exercise.reps,
-        isWarmup: exercise.isWarmup
-      };
-      exercises.push(newExercise);
-    });
+    //Construct the exercise documents and keep track of their IDs
+    let exercise_ids = [];
+    req.body.exercises.forEach(exercise => 
+    {
+      if(exercise.exists) //exercise exists
+      {
+        schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => 
+        {
+          if(!exercise) //couldn't find exercise?
+          {
+            res.status(404).send({ message: "Database Error: Exercise claimed to exist not found" });
+            return;
+          }
+          else //exercise confirmed to exist, push _id
+          {
+            exercise_ids.push(mongoose.Types.ObjectId(exercise._id));
+          }
+        });
+      }
+      else //create exercise on the fly
+      {
+        //creating set data for the exercise
+        let set_ids = [];
+        exercise.set_data.forEach(set =>
+        {
+          let new_set = new schemaCtrl.SetData(set);
+          new_set.save(function (err, ret) 
+          {
+            if(err)
+            {
+              res.status(500).send({ message: "Database error: unable to save set_data" });
+              return;
+            }
+          });
+          set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
+        }); //end forEach exercise.set
+        newExercise = new schemaCtrl.Exercise( //create new exercise
+        {
+          name: exercise.name,
+          muscle_groups: exercise.muscle_groups,
+          equipment_type: exercise.equipment_type,
+          sets: set_ids,
+        });
+        newExercise.save((err, newExercise) =>  //save new exercise
+        {
+          if (err) 
+          {
+            res.status(500).send({ "message": "Database error: Error saving exercise to database" });
+            return;
+          }
+          else
+          {
+            user.updateOne({$push: { exercises: newExercise._id }}, {}, (err, raw) => 
+            {
+              if (err) 
+              {
+                console.log(err);
+                res.status(500).send({ "message": "Database Error: Error while pushing exercise to user profile" });
+                return;
+              }
+            }); //end updateOne
+          }
+        }); //end save
+        exercise_ids.push(mongoose.Types.ObjectId(newExercise._id));
+      }
+    }); //end foreach exercise
 
     //Construct the workout JSON object
-    let newWorkout = new schemaCtrl.Workout({
+    let newWorkout = new schemaCtrl.WorkoutPlan({
       name: req.body.name,
-      date: req.body.date,
       description: req.body.description,
-      exercises: exercises,
+      date: req.body.date,
+      exercises: exercise_ids,
       ownerUID: req.body.id,
-      likes: 0,
     });
 
     //save the workout to the master workout collection
-    newWorkout.save((err, newWorkout) => {
-      if (err) {
+    newWorkout.save((err, newWorkout) => 
+    {
+      if (err) 
+      {
         console.log(err);
-        res.status(500).send({
-          "message": "Error"
-        });
+        res.status(500).send({ "message": "Database Error: Error while saving new workout plan" });
         return;
-      } else {
-        user.updateOne({
-            $push: {
-              workouts: newWorkout._id
-            }
-          }, {},
-          (err, raw) => {
-            if (err) {
-              console.log(err);
-              res.status(500).send({
-                "message": "Error"
-              });
-              return;
-            } else {
-              res.status(200).send({
-                "message": "Workout added successfully"
-              });
-            }
+      } 
+      else 
+      {
+        user.updateOne({$push: { workouts: newWorkout._id }}, {}, (err, raw) => 
+        {
+          if (err) 
+          {
+            console.log(err);
+            res.status(500).send({ "message": "Database Error: Error while pushing workout plan to user profile" });
+            return;
           }
-        );
-      };
-    });
-  });
-}
+          else 
+          {
+            res.status(200).send({ "message": "Workout added successfully" });
+            return;
+          }
+        }); //end updateOne
+      }
+    }); //end save
+  }); //end findbyId
+} //end newWorkout
 
 //Log a user's workout into the DB
 let newLog = function newLog(req, res) {
@@ -177,41 +242,8 @@ let newLog = function newLog(req, res) {
 }
 
 let newExercise = function newExercise(req, res) {
-  /*
-  JSON requests to create a new private exercise is as follows:
-  {
-    id: string
-    uid: string
-    token: string
-    name: string
-    muscle_groups: [string]
-    equipment_type: string
-    set_data: 
-    [
-      {
-        reps: number
-        weight: number
-        isWarmup: boolean
-      },
-
-      {
-        reps: number
-        weight: number
-        isWarmup: boolean
-      }
-
-      ...
-
-    ]
-  }
-  */
-
-  if (db.readyState == 0) //check db connection
-  {
-    res.status(500).send(
-    {
-      error: "Database connection is down."
-    });
+  if(!isConnected()){
+    console.log("DB is offline");
     return;
   }
   //Find the user
@@ -219,47 +251,30 @@ let newExercise = function newExercise(req, res) {
   {
     if (!user) 
     {
-      res.status(404).send(
-      {
-        message: "User not found"
-      });
+      res.status(404).send({ message: "User not found" });
       return;
     }
     if (user.uid != req.body.uid || user.token != req.body.token) 
     {
-      res.status(401).send(
-      {
-        message: "Unauthorized"
-      });
+      res.status(401).send({ message: "Unauthorized" });
       return;
     }
 
-    let set_ids= [];
-
     //parse set_data array of JSON to build exercise object
-     req.body.set_data.forEach(set =>
-     {
-      let new_set = new schemaCtrl.SetData
-      ({
-        weight: set.weight,
-        reps: set.reps,
-        isWarmup: set.isWarmup
-      });
-      let object = new_set.save(function (err, ret) 
+    let set_ids= [];
+    req.body.set_data.forEach(set =>
+    {
+      let new_set = new schemaCtrl.SetData(set);
+      new_set.save(function (err, ret) 
       {
         if(err)
         {
-          res.status(500).send
-          ({
-            message: "Database error: unable to save set_data"
-          });
+          res.status(500).send({ message: "Database error: unable to save set_data" });
           return;
         }
       });
-      //console.log(new_set._id);
-      set_ids.push(mongoose.Types.ObjectId(new_set._id)); //get the id of the newly saved object WIP
-
-   });
+      set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
+    });
     //construct exercise
     let new_exercise = new schemaCtrl.Exercise
     ({
@@ -272,32 +287,24 @@ let newExercise = function newExercise(req, res) {
     {
       if(err)
       {
-        res.status(500).send
-        ({
-          message: "Database error: unable to save set_data"
-        });
+        res.status(500).send({ message: "Database error: unable to save data" });
         return;
       }
     });
+    //push to user profile
     user.updateOne({$push: { exercises: new_exercise._id }}, {},(err, raw) => 
     {
       if (err) 
       {
-        res.status(500).send
-        ({
-          "message": " Error: Exercise addition unsuccessful"
-        });
-      } 
+        res.status(500).send({ "message": " Error: Exercise addition unsuccessful" });
+      }
       else 
       {
-        res.status(200).send
-        ({
-          "message": " Exercise added successfully "
-        });
+        res.status(200).send({ "message": " Exercise added successfully " });
       }
-     });
- });
-}
+    }); //end updateOne
+  }); //end findbyId
+} //end new exercise
 
 //Post an exercise to the standard library
 let devExercise = function devExercise(req, res) {
