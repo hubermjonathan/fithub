@@ -7,8 +7,18 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { getUserGivenName, getUserFamilyName, getUserPhotoUrl } from '../lib/AccountFunctions';
 
 export default class ProfileScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.loadUserData();
+    this.state = {
+      name: '',
+      photo: ''
+    }
+  }
+
   render() {
     if(Platform.OS === 'ios') {
       return (
@@ -17,11 +27,11 @@ export default class ProfileScreen extends React.Component {
             <View style={styles.profPicCol}>
               <Image
                 style={styles.profPic} 
-                source={{uri: 'https://lh6.googleusercontent.com/-_G95DQmH1dw/AAAAAAAAAAI/AAAAAAAADnI/enRDZICksZM/photo.jpg'}}
+                source={{uri: this.state.photo}}
               />
             </View>
             <View style={styles.infoCol}>
-              <Text style={styles.name}>Andy Plank</Text>
+              <Text style={styles.name}>{this.state.name}</Text>
             </View>
           </View>
           <View style={styles.body}>
@@ -36,6 +46,18 @@ export default class ProfileScreen extends React.Component {
         </View>
       );
     }
+  }
+
+  async loadUserData() {
+    let userGivenName = await getUserGivenName();
+    let userFamilyName = await getUserFamilyName();
+    let userFullName = userGivenName + ' ' + userFamilyName;
+    let userPhotoUrl = await getUserPhotoUrl();
+
+    this.setState({
+      name: userFullName,
+      photo: userPhotoUrl
+    });
   }
 }
 
@@ -54,7 +76,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     backgroundColor: '#fff',
-    marginLeft: 10,
+    marginLeft: 20,
   },
   profPicCol: {
     flex: 2,
@@ -70,9 +92,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
   profPic: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
   },
   name: {
     color: '#333',
