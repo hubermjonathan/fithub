@@ -180,10 +180,13 @@ let newExercise = function newExercise(req, res) {
   /*
   JSON requests to create a new private exercise is as follows:
   {
+    id: string
+    uid: string
+    token: string
     name: string
-    muscle_group: string
+    muscle_groups: [string]
     equipment_type: string
-    sets: 
+    set_data: 
     [
       {
         reps: number
@@ -203,7 +206,7 @@ let newExercise = function newExercise(req, res) {
   }
   */
 
-  if (db.readyState == 0) 
+  if (db.readyState == 0) //check db connection
   {
     res.status(500).send(
     {
@@ -211,7 +214,7 @@ let newExercise = function newExercise(req, res) {
     });
     return;
   }
-  //Push the newWorkout log to the user profile
+  //Find the user
   schemaCtrl.Profile.findById(req.body.id, (err, user) => 
   {
     if (!user) 
@@ -234,8 +237,8 @@ let newExercise = function newExercise(req, res) {
     let set_ids= [];
 
     //parse set_data array of JSON to build exercise object
-    req.body.set_data.forEach(set =>
-    {
+     req.body.set_data.forEach(set =>
+     {
       let new_set = new schemaCtrl.SetData
       ({
         weight: set.weight,
@@ -256,7 +259,7 @@ let newExercise = function newExercise(req, res) {
       //console.log(new_set._id);
       set_ids.push(mongoose.Types.ObjectId(new_set._id)); //get the id of the newly saved object WIP
 
-  });
+   });
     //construct exercise
     let new_exercise = new schemaCtrl.Exercise
     ({
@@ -276,7 +279,23 @@ let newExercise = function newExercise(req, res) {
         return;
       }
     });
-    res.status(200).send({ message: "Sucessfully added exercise"});
+    user.updateOne({$push: { exercises: new_exercise._id }}, {},(err, raw) => 
+    {
+      if (err) 
+      {
+        res.status(500).send
+        ({
+          "message": " Error: Exercise addition unsuccessful"
+        });
+      } 
+      else 
+      {
+        res.status(200).send
+        ({
+          "message": " Exercise added successfully "
+        });
+      }
+     });
  });
 }
 
