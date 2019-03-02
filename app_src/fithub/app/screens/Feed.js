@@ -35,12 +35,11 @@ export default class FeedScreen extends React.Component {
         }).then(res => res.json())
             .then((res) => {
                 let stringify = JSON.stringify(res);
-                console.log(stringify);
                 let parsed = JSON.parse(stringify);
-                for (let x = 0; x < parsed.logs.length; x++) {
-                    this.state.fetchedWorkouts.push(parsed.logs[x]);
+                for (let x = 0; x < parsed.data.logs.length; x++) {
+                    this.state.fetchedWorkouts.push(parsed.data.logs[x]);
                 }
-                console.log(this.state.fetchedWorkouts);
+               // console.log(this.state.fetchedWorkouts);
 
             })
             .catch(function (e) {
@@ -62,9 +61,6 @@ export default class FeedScreen extends React.Component {
             });
     }
 
-    showText = () => {
-        this.setState({ show: !this.state.show });
-    }
 
     showSpinner = () => {
         this.setState({ spinner: !this.state.spinner });
@@ -77,10 +73,8 @@ export default class FeedScreen extends React.Component {
             this.setState({
                 spinner: false
             });
-        }, 3000);
+        }, 800);
 
-        this.showText();
-        //this.showSpinner();
     }
     render() {
         if (Platform.OS == 'ios') {
@@ -90,7 +84,6 @@ export default class FeedScreen extends React.Component {
                     <Spinner
                         visible={this.state.spinner}
                         textContent={'Loading...'}
-
                     />
                     <ScrollView>
                         {this.state.fetchedWorkouts.map((val, index) => {
@@ -123,9 +116,7 @@ export default class FeedScreen extends React.Component {
                                     }}>
                                     <WorkoutCard
                                         name={val.name}
-                                        sets={val.exercises}
-                                        reps={val.exercises}
-                                        
+                                        exercises={val.exercises}
                                     />
                                 </TouchableOpacity>
                             );
@@ -135,12 +126,7 @@ export default class FeedScreen extends React.Component {
                         title={'refresh'}
                         onPress={()=>{
                             this.setState({fetchedWorkouts:[]});
-                            this.getLogWorkouts();
-                            setInterval(() => {
-                                this.setState({
-                                    spinner: false
-                                });
-                            }, 3000);
+                            this.componentDidMount();
                         }}
                     />
                 </SafeAreaView>
