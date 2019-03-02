@@ -269,7 +269,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                 style: 'cancel'
                                             }
                                         );
-                                        console.log(this.state.exerciseNames);
+                                        //console.log(this.state.exerciseNames);
                                     }
                                 }}
                             />
