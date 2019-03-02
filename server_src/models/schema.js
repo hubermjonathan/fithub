@@ -50,7 +50,7 @@ let Set = new Schema({
 //instantiated for each user
 let WorkoutData = new Schema({
   name: {type: String, required: true},
-  date : {type : Date, required: true},
+  date : {type : Date, /*default: Date.now,*/ required: true},
   exercises: [{ type: Schema.Types.ObjectId, ref: "ExerciseData", required: true}]
 });
 

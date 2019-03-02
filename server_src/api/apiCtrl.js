@@ -323,6 +323,16 @@ let newExercise = function newExercise(req, res) {
   }); //end findbyId
 } //end new exercise
 
+
+/*
+
+  Dev exercises no longer exist as a separate function. Instead, we will have a dev user
+  that can use the API like every other user. We will query this user every time we want to access
+  the standard library.
+
+*/
+
+/*
 //Post an exercise to the standard library
 let devExercise = function devExercise(req, res) {
   if (db.readyState == 0) {
@@ -364,45 +374,58 @@ let devExercise = function devExercise(req, res) {
   });
 
 }
+*/
 
 /*--------Functions for returning user information--------*/
 
 //Get a user's logs from the database
 let logs = function logs(req, res) {
-  if (db.readyState == 0) {
-    res.status(500).send({
-      error: "Database connection is down."
-    });
+  if(!isConnected(req, res))
+  {
     return;
   }
-
-  let errorNum = 0;
-  schemaCtrl.Profile.findById(req.params.id, (err, user) => {
-    if (err) {
-      errorNum = 1;
-    } else if (!user) {
-      errorNum = 2;
-    } else {
-      errorNum = 3;
+  
+  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
+  {
+    /*
+    if(!isValidated(req, res, err, user)){
+      return;
     }
-
-    if(errorNum == 1){
-      console.log(err);
-      res.status(500).send({
-        message: "Error"
-      });
+    */
+    if(err){
+      res.status(404).send({ "message": "Database Error: user not found" });
+      return
     }
-    else if(errorNum == 2){
-      console.log(err);
-      res.status(404).send({
-        message: "User not found"
-      })
+    else if(!user){
+      res.status(500).send({ "message": "Database Error: User not found" });
+      return
     }
-    else if(errorNum == 3){
-      console.log(err);
-      res.status(200).send({
-        "logs": user.logs
-      });
+  }) //end findById
+  .select("-email -workouts -exercises -avatar -__v -token")
+  .populate
+  ({
+    path: "logs",
+    select: "-__v",
+    populate:
+    {
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        select: "-__v",
+      }
+    }
+  }) //end populate
+  .exec((err, data) =>
+  {
+    if(err)
+    {
+      res.status(500).send({ "message": "Database Error: Populate query failed" });
+      return;
+    }
+    else{
+      res.status(200).send({ data });
     }
   });
 }
@@ -510,8 +533,7 @@ let apiCtrl = {
   logs: logs,
   newLog: newLog,
 
-  devExercise: devExercise
-
+  //devExercise: devExercise
 }
 
 module.exports = apiCtrl;
