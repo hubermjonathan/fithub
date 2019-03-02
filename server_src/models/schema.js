@@ -1,14 +1,20 @@
 const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
-function validator(exercise) {
-    if(exercise.reps.size()==exercise.weight.size() && exercise.weight.size()==exercise.isWarmup.size() && exercise.reps.size()==exercise.isWarmup.size()){
-        return true;
-    } else {
-        return false;
-    }
+function muslceGroupVal(muscle_groups) {
+  if(Array.isArray(muscle_groups)){
+    muscle_groups.forEach(muscle => {
+        if(muscle<0 || muscle > 18){
+            return false;
+        }
+    });
+    return true;
+  } else {
+    return false;
+  }
 }
-let err = [validator, 'Not all rep info logged'];
+
+let muscleGroup = [muslceGroupVal, 'Not all rep info logged'];
 
 //Schema for a user's profile, represents everything associated with a user
 let Profile = new Schema({
@@ -36,7 +42,7 @@ let WorkoutPlan = new Schema({
 //Schema for creating a new exercise (private)
 let Exercise = new Schema({
   name: {type: String, required: true},
-  muscle_groups: {type: [String], required: true},
+  muscle_groups: {type: [Number], validate: muscleGroup, required: true},
   equipment_type: {type: String, required: true},
   sets: [{ type: Schema.Types.ObjectId, ref: "SetData", required: true}]
 });
@@ -56,7 +62,7 @@ let WorkoutData = new Schema({
 
 let ExerciseData = new Schema({
   name: {type: String, required: true},
-  muscle_groups: {type: [String], required: true},
+  muscle_groups: {type: [Number], validate: muscleGroup, required: true},
   sets: [{ type: Schema.Types.ObjectId, ref: "SetData", required: true}]
 });
 

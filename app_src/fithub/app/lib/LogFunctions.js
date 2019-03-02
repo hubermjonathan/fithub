@@ -28,14 +28,20 @@ export async function validateLog(log) {
         return false;
     } 
     if (Array.isArray(log.exercises)){
-        log.exercises.forEach(element => {
-            if(typeof element !== Object){
+        log.exercises.forEach(exercise => {
+            if(typeof exercise !== Object){
                 return false;
             } else {
-                if(element.name===undefined){
+                if(exercise.name===undefined){
                     return false;
                 } 
-                if()         
+                if(Array.isArray(exercise.muscle_groups)){
+                    exercise.muscle_groups.forEach(muslce => {
+                        if(muslce<0 || muscle > 18){
+                            return false;
+                        }
+                    });
+                }         
             }
         });
     } else {
