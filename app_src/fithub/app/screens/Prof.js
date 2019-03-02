@@ -7,7 +7,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { getUserGivenName, getUserFamilyName, getUserPhotoUrl } from '../lib/AccountFunctions';
+import { getUserID } from '../lib/AccountFunctions';
 
 export default class ProfileScreen extends React.Component {
   constructor(props) {
@@ -49,14 +49,25 @@ export default class ProfileScreen extends React.Component {
   }
 
   async loadUserData() {
-    let userGivenName = await getUserGivenName();
-    let userFamilyName = await getUserFamilyName();
-    let userFullName = userGivenName + ' ' + userFamilyName;
-    let userPhotoUrl = await getUserPhotoUrl();
+    let userFullName = "";
+    let userPhotoUrl = "";
+    let id = await getUserID();
 
-    this.setState({
-      name: userFullName,
-      photo: userPhotoUrl
+    fetch('https://fithub-server.herokuapp.com/profile/'+id)
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      userFullName = data.data.name;
+      userPhotoUrl = data.data.avatar.substring(0, data.data.avatar.length-7);
+
+      this.setState({
+        name: userFullName,
+        photo: userPhotoUrl
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
   }
 }
