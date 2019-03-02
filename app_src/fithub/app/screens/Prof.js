@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { getUserID } from '../lib/AccountFunctions';
+import Swiper from 'react-native-swiper';
 
 export default class ProfileScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -62,7 +63,17 @@ export default class ProfileScreen extends React.Component {
             </View>
           </View>
           <View style={styles.body}>
-
+            <Swiper activeDotColor='#00adf5' loop={false}>
+              <View>
+                <Text>1</Text>
+              </View>
+              <View>
+                <Text>2</Text>
+              </View>
+              <View>
+                <Text>3</Text>
+              </View>
+            </Swiper>
           </View>
         </SafeAreaView>
       );
