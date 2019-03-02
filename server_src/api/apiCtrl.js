@@ -425,7 +425,7 @@ let logs = function logs(req, res) {
       return;
     }
     else{
-      res.status(200).send({ data });
+      res.status(200).send(data);
     }
   });
 }
@@ -478,7 +478,7 @@ let workouts = function workouts(req, res) {
       return;
     }
     else{
-      res.status(200).send({ data });
+      res.status(200).send(data);
     }
   });
 }
@@ -526,7 +526,7 @@ let uExercises = function uExercises(req, res) {
       return;
     }
     else{
-      res.status(200).send({ data });
+      res.status(200).send(data);
     }
   });
 }
@@ -563,7 +563,7 @@ let profile = function profile(req, res) {
       return;
     }
     else{
-      res.status(200).send({ data });
+      res.status(200).send(data);
     }
   });
 }
