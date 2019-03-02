@@ -591,6 +591,19 @@ let exercises = function exercises(req, res) {
 
 }
 
+let users = function users(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.Profile.find({}).select('pseudonym _id');
+  query.exec((err, users) => {
+    res.status(200).send(users);
+  });
+}
+
 let apiCtrl = {
   login: login,
 
@@ -604,6 +617,8 @@ let apiCtrl = {
 
   logs: logs,
   newLog: newLog,
+
+  users: users
 
   //devExercise: devExercise
 }

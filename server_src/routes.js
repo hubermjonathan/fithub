@@ -15,6 +15,7 @@ router.post('/users/login', apiCtrl.login);                 //Login a user
 router.get('/profile/:id', apiCtrl.profile);                //Get a users profile
 router.get('/profile/:id/stat')
 router.get('/profile/:id/dates')
+router.get('/users', apiCtrl.users);
 
 router.get('/workouts/:id', apiCtrl.workouts);             //Get a users workout plans
 router.post('/workouts/new', apiCtrl.newWorkout);           //Post a new workout plan
