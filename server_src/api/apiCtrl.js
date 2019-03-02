@@ -531,6 +531,43 @@ let uExercises = function uExercises(req, res) {
   });
 }
 
+//Return a users general profile information
+let profile = function profile(req, res) {
+  if(!isConnected(req, res))
+  {
+    return;
+  }
+
+  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
+  {
+    /*
+    if(!isValidated(req, res, err, user)){
+      return;
+    }
+    */
+    if(err){
+      res.status(404).send({ "message": "Database Error: error querying profile" });
+      return
+    }
+    else if(!user){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+  }) //end findById
+  .select("-__v -token -uid -_id -workouts -exercises -logs")
+  .exec((err, data) =>
+  {
+    if(err)
+    {
+      res.status(500).send({ "message": "Database Error: profile query failed" });
+      return;
+    }
+    else{
+      res.status(200).send({ data });
+    }
+  });
+}
+
 //Return all standard exercises
 let exercises = function exercises(req, res) {
   if (db.readyState == 0) {
@@ -562,6 +599,7 @@ let apiCtrl = {
 
   exercises: exercises,
   uExercises: uExercises,
+  profile: profile,
   newExercise: newExercise,
 
   logs: logs,
