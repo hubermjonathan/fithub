@@ -36,8 +36,8 @@ export async function validateLog(log) {
                     return false;
                 } 
                 if(Array.isArray(exercise.muscle_groups)){
-                    exercise.muscle_groups.forEach(muslce => {
-                        if(muslce<0 || muscle > 18){
+                    exercise.muscle_groups.forEach(muscle => {
+                        if(muscle<0 || muscle > 18){
                             return false;
                         }
                     });
@@ -85,35 +85,18 @@ export async function postLog(workout) {
     }
 }
 
+/*
+*/
 export async function getLogs(id) {
-    try {
-        const id = await getUserID();
 
-    const data = {
-        id: id,
-        uid: uid,
-        token: token,
-        date: workout.date,
-        name: workout.name,
-        exercises: workout.exercises,
-
-    }
-    console.log("DATA", data);
-    console.log(JSON.stringify(workout));
-    
-    fetch('https://fithub-server.herokuapp.com/logs/new', {
-        method: 'POST',
+    fetch(`https://fithub-server.herokuapp.com/logs/${id}`, {
+        method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
     }).then(res => res.json())
         .then((data) => console.log('Success', JSON.stringify(data)))
         .catch(function (e) {
             console.log('Error');
         });
-
-    } catch(e) {
-        console.log(e);
-    }
 }

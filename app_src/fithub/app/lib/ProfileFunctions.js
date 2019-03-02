@@ -43,7 +43,23 @@ export async function getProfile(id) {
 
 */
 export async function getProfileDates(id) {
-    fetch(`https://fithub-server.herokuapp.com/users/dates/${id}`, {
+    fetch(`https://fithub-server.herokuapp.com/profile/dates/${id}`, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then(res => res.json())
+        .then((res) => console.log('Success', JSON.stringify(res)))
+        .catch(function (e) {
+            console.log('Error');
+        });
+}
+
+/*
+
+*/
+export async function getProfileStats(id) {
+    fetch(`https://fithub-server.herokuapp.com/profile/stats/${id}`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
