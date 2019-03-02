@@ -7,9 +7,17 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { getUserID } from '../lib/AccountFunctions';
 
 export default class ProfileScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: 'Profile',
+      headerRight: <Icon name="settings" type="material" size={30} onPress={() => {navigation.push('Settings')}}/>
+    }
+  };
+
   constructor(props) {
     super(props);
     this.loadUserData();
@@ -31,7 +39,26 @@ export default class ProfileScreen extends React.Component {
               />
             </View>
             <View style={styles.infoCol}>
-              <Text style={styles.name}>{this.state.name}</Text>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>
+                  {this.state.name}
+                </Text>
+              </View>
+
+              <View style={styles.statsRow}>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+              </View>
             </View>
           </View>
           <View style={styles.body}>
@@ -87,15 +114,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     backgroundColor: '#fff',
-    marginLeft: 20,
   },
   profPicCol: {
     flex: 2,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   infoCol: {
-    flex: 3,
-    padding: 30,
+    flex: 4,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingBottom: 20,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  statsCol: {
+    flex: 1,
+    alignItems: 'center',
   },
   body: {
     flexDirection: 'row',
@@ -111,5 +153,9 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 36,
     fontWeight: 'bold',
+  },
+  stats: {
+    color: '#333',
+    fontSize: 20,
   },
 });
