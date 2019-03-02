@@ -23,6 +23,6 @@ router.post('/exercises/new', apiCtrl.newExercise);         //Post a custom exer
 router.get('/logs/:id', apiCtrl.logs);                     //Get a users workout logs
 router.post('/logs/new', apiCtrl.newLog);                   //Post a users workout
 
-router.post('/dev/exercises/new', apiCtrl.devExercise);     //Post a custom standard exercise (DEV ONLY)
+//router.post('/dev/exercises/new', apiCtrl.devExercise);     //Post a custom standard exercise (DEV ONLY)
 
 module.exports = router;
