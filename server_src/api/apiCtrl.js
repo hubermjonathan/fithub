@@ -432,41 +432,55 @@ let logs = function logs(req, res) {
 
 //Return a users workouts
 let workouts = function workouts(req, res) {
-  if (db.readyState == 0) {
-    res.status(500).send({
-      error: "Database connection is down."
-    });
+  if(!isConnected(req, res))
+  {
     return;
   }
 
-  //query profile collection
-  let error = false;
-  schemaCtrl.Profile
-    .findOne({
-      _id: req.params.id
-    }, (err, workouts) => {
-      if (err) {
-        error = true;
+  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
+  {
+    /*
+    if(!isValidated(req, res, err, user)){
+      return;
+    }
+    */
+    if(err){
+      res.status(404).send({ "message": "Database Error: user not found" });
+      return
+    }
+    else if(!user){
+      res.status(500).send({ "message": "Database Error: User not found" });
+      return
+    }
+  }) //end findById
+  .select("-email -logs -exercises -avatar -__v -token")
+  .populate
+  ({
+    path: "workouts",
+    select: "-__v",
+    populate:
+    {
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        model: "Set",
+        select: "-__v"
       }
-    })
-    .populate('workouts')
-    .exec((err, workouts) => {
-      if (err && err == false) {
-        console.log(err);
-        res.status(500).send({
-          "message": "Error querying profile collection in exec"
-        });
-      } 
-      else if (!err && error == true){
-        console.log(err);
-        res.status(500).send({
-          "message": "Error querying profile collection in findOne"
-        });
-      }
-      else {
-        res.send(workouts);
-      }
-    });
+    }
+  }) //end populate
+  .exec((err, data) =>
+  {
+    if(err)
+    {
+      res.status(500).send({ "message": "Database Error: Populate query failed" });
+      return;
+    }
+    else{
+      res.status(200).send({ data });
+    }
+  });
 }
 
 //Return a users custom exercises
