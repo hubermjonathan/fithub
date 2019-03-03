@@ -43,6 +43,7 @@ export function muscleToNum(muscleGroups){
         element = element.toUpperCase();
         enumGroup.push(muscleEnums[element]);
     });
+    return enumGroup;
 }
 
 export function numToMuscle(muscleGroups){
@@ -51,4 +52,5 @@ export function numToMuscle(muscleGroups){
         var key = Object.keys(muscleEnums)[element-1];
         enumGroup.push(key);
     });
+    return enumGroup;
 }
