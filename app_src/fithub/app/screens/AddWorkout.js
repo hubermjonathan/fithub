@@ -195,7 +195,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                         'Please try again',
                                                         {
                                                             text: 'Ok',
-                                                            onPress: () => console.log('alert Pressed'),
                                                             style: 'cancel'
                                                         }
                                                     );

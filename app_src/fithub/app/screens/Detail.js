@@ -63,7 +63,6 @@ export default class DetailScreen extends React.Component {
                       style: 'cancel'
                     },
                   ]
-
                 )
               }}
             />

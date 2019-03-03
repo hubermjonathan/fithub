@@ -14,6 +14,7 @@ import BottomBar from '../components/BottomBar';
 import { Button, Icon, Input } from 'react-native-elements';
 import WorkoutCard from '../components/WorkoutCard';
 import Spinner from 'react-native-loading-spinner-overlay';
+import {postLog} from '../lib/LogFunctions';
 
 export default class FeedScreen extends React.Component {
 
@@ -60,6 +61,10 @@ export default class FeedScreen extends React.Component {
                 console.log('Error');
             });
     }
+    getCurrentDate() {
+        let date = new Date();
+        return date.toJSON().slice(0, 10);
+      }
 
 
     showSpinner = () => {
@@ -96,13 +101,13 @@ export default class FeedScreen extends React.Component {
                                             'Are you sure you want to log this workout?',
                                             [{
                                                 text: 'Yes',
-                                                onPress: () => this.postWorkoutToLog({
-                                                    token: 'abcd',
-                                                    uid: '104737446149074205541',
+                                                onPress: () => postLog({
+                                                    token: '',
+                                                    uid: '',
                                                     name: val.name,
                                                     date: val.date,
                                                     exercises: val.exercises,
-                                                    id: '5c6f63c51c9d440000000347',
+                                                    id: '',
                                                     likes: 0
                                                 }),
                                                 style: 'cancel'
