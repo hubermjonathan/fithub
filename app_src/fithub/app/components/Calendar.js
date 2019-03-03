@@ -97,7 +97,7 @@ export default class Calendar extends React.Component {
         style={styles.item}
         underlayColor='#eee'
       >
-        <Text>{item.name}</Text>
+        <Text style={{fontWeight: 'bold', fontSize: 24}}>{item.name}</Text>
       </TouchableHighlight>
     );
   }
@@ -116,10 +116,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     borderRadius: 5,
-    padding: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
     marginRight: 10,
     marginTop: 17,
-    height: 15,
+    height: 75,
+    justifyContent: 'center',
   },
   empty: {
     flex: 1,
