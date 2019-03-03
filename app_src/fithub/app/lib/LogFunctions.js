@@ -1,6 +1,6 @@
 import { getUserToken, getUserID, getUserUID } from '../lib/AccountFunctions';
 
-export async function validateLog(log) {
+export function validateLog(log) {
     if (log.name === undefined) {
         return false;
     } else if (log.date === undefined) {
@@ -68,6 +68,7 @@ export async function postLog(workout) {
     } catch (e) {
         console.log(e);
     }
+
 }
 
 /*
