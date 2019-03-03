@@ -8,13 +8,14 @@ import {
     Platform,
     ScrollView,
     TouchableOpacity,
-    Alert
+    Alert,
+    RefreshControl
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
 import { Button, Icon, Input } from 'react-native-elements';
 import WorkoutCard from '../components/WorkoutCard';
 import Spinner from 'react-native-loading-spinner-overlay';
-import {postLog} from '../lib/LogFunctions';
+import { postLog, getLogs } from '../lib/LogFunctions';
 
 export default class FeedScreen extends React.Component {
 
@@ -22,65 +23,45 @@ export default class FeedScreen extends React.Component {
         show: false,
 
         fetchedWorkouts: [],
-        spinner: false
-
-
-
-    }
-    getLogWorkouts() {
-        fetch('https://fithub-server.herokuapp.com/logs/5c6f8e6798100706844fa981', {
-            method: 'GET',
-            header: {
-                "Content-Type": "application/json",
-            }
-        }).then(res => res.json())
-            .then((res) => {
-                let stringify = JSON.stringify(res);
-                let parsed = JSON.parse(stringify);
-                for (let x = 0; x < parsed.data.logs.length; x++) {
-                    this.state.fetchedWorkouts.push(parsed.data.logs[x]);
-                }
-               // console.log(this.state.fetchedWorkouts);
-
-            })
-            .catch(function (e) {
-                console.log(e);
-            });
+        spinner: false,
+        refresh: false
     }
 
-    postWorkoutToLog(workout) {
-        fetch('https://fithub-server.herokuapp.com/logs/new', {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(workout)
-        }).then(res => res.json())
-            .then((res) => console.log('Success', JSON.stringify(res)))
-            .catch(function (e) {
-                console.log('Error');
-            });
-    }
+
     getCurrentDate() {
         let date = new Date();
         return date.toJSON().slice(0, 10);
-      }
+    }
 
 
     showSpinner = () => {
         this.setState({ spinner: !this.state.spinner });
     }
 
+    hideRefresh = () => {
+        this.setState({ refresh: false });
+    }
+
     componentDidMount() {
         this.showSpinner();
-        this.getLogWorkouts();
-        setInterval(() => {
+        getLogs(this.state.fetchedWorkouts);
+        setTimeout(() => {
             this.setState({
                 spinner: false
             });
         }, 800);
-
     }
+
+    onRefresh = () => {
+        this.setState({ refresh: true });
+        this.state.fetchedWorkouts = [];
+        getLogs(this.state.fetchedWorkouts);
+        setTimeout(() => {
+            this.setState({refresh:false});
+        }, 800);
+        
+    }
+
     render() {
         if (Platform.OS == 'ios') {
             return (
@@ -90,7 +71,13 @@ export default class FeedScreen extends React.Component {
                         visible={this.state.spinner}
                         textContent={'Loading...'}
                     />
-                    <ScrollView>
+                    <ScrollView
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.refresh}
+                                onRefresh={this.onRefresh}
+                            />
+                        }>
                         {this.state.fetchedWorkouts.map((val, index) => {
                             //return (<Text key={index}>{val.name}</Text>);
                             return (
@@ -113,34 +100,28 @@ export default class FeedScreen extends React.Component {
                                                 style: 'cancel'
                                             },
                                             {
-                                                text:'No',
-                                                style:'cancel'
+                                                text: 'No',
+                                                style: 'cancel'
                                             }]
                                         );
-                                    
+
                                     }}>
                                     <WorkoutCard
                                         name={val.name}
                                         exercises={val.exercises}
+
                                     />
                                 </TouchableOpacity>
                             );
                         })}
                     </ScrollView>
-                    <Button
-                        title={'refresh'}
-                        onPress={()=>{
-                            this.setState({fetchedWorkouts:[]});
-                            this.componentDidMount();
-                        }}
-                    />
                 </SafeAreaView>
             );
         }
         else {
             return (
                 <View>
-                   <Spinner
+                    <Spinner
                         visible={this.state.spinner}
                         textContent={'Loading...'}
 
@@ -168,17 +149,17 @@ export default class FeedScreen extends React.Component {
                                                 style: 'cancel'
                                             },
                                             {
-                                                text:'No',
-                                                style:'cancel'
+                                                text: 'No',
+                                                style: 'cancel'
                                             }]
                                         );
-                                    
+
                                     }}>
                                     <WorkoutCard
                                         name={val.name}
                                         sets={val.exercises}
                                         reps={val.exercises}
-                                        
+
                                     />
                                 </TouchableOpacity>
                             );
