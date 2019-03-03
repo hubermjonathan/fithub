@@ -1,26 +1,5 @@
 import { getUserToken, getUserID, getUserUID } from '../lib/AccountFunctions';
 
-let muscleEnums = {
-    "NECK": 1,
-    "SHOULDERS": 2, 
-    "DELTOID": 3,
-    "TRICEPS": 4,
-    "BICEPS": 5,
-    "FOREARMS": 6,
-    "BACK": 7,
-    "LATS": 8,
-    "TRAPS": 9,
-    "CHEST": 10,
-    "WAIST": 11,
-    "OBLIQUES": 12,
-    "HIPS": 13,
-    "GLUTES": 14,
-    "THIGHS": 15,
-    "QUADS": 16,
-    "HAMSTRINGS": 17, 
-    "CALVES": 18
-}
-
 export async function validateLog(log) {
     if(log.name===undefined){
         return false;

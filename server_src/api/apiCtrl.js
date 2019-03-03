@@ -10,6 +10,27 @@ let db = mongoose.connection;
 db.once('open', () => {
 });
 
+let muscleEnums = {
+  "NECK": 1,
+  "SHOULDERS": 2, 
+  "DELTOID": 3,
+  "TRICEPS": 4,
+  "BICEPS": 5,
+  "FOREARMS": 6,
+  "BACK": 7,
+  "LATS": 8,
+  "TRAPS": 9,
+  "CHEST": 10,
+  "WAIST": 11,
+  "OBLIQUES": 12,
+  "HIPS": 13,
+  "GLUTES": 14,
+  "THIGHS": 15,
+  "QUADS": 16,
+  "HAMSTRINGS": 17, 
+  "CALVES": 18
+}
+
 function isConnected(req, res) {
   if (db.readystate == 0) {
     res.status(500).send({ error: "Error: Database connection is down"});
@@ -604,6 +625,28 @@ let users = function users(req, res){
   });
 }
 
+let publicWorkouts = function publicWorkouts(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.WorkoutPlan.find({}).select('-__v').populate({
+    path: "exercises",
+    select: "-__v",
+    populate:
+    {
+      path: "sets",
+      model: "Set",
+      select: "-__v",
+    }
+  });
+  query.exec((err, plans) => {
+    res.status(200).send(plans);
+  });
+}
+
 let apiCtrl = {
   login: login,
 
@@ -618,7 +661,8 @@ let apiCtrl = {
   logs: logs,
   newLog: newLog,
 
-  users: users
+  users: users,
+  publicWorkouts: publicWorkouts
 
   //devExercise: devExercise
 }

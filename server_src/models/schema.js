@@ -36,7 +36,8 @@ let WorkoutPlan = new Schema({
   date: { type: Date, required: true },
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise", required: true}],
   ownerUID : { type: String, required: true },
-  gains : { type : Number, default: 0, required: true }
+  gains : { type : Number, default: 0, required: true },
+  public : { type : Boolean, default: true, required: true}
 });
 
 //Schema for creating a new exercise (private)
