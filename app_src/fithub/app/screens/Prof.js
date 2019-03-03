@@ -96,8 +96,8 @@ export default class ProfileScreen extends React.Component {
       return res.json();
     })
     .then((data) => {
-      userFullName = data.data.name;
-      userPhotoUrl = data.data.avatar.substring(0, data.data.avatar.length-7);
+      userFullName = data.name;
+      userPhotoUrl = data.avatar.substring(0, data.avatar.length-7);
 
       this.setState({
         name: userFullName,

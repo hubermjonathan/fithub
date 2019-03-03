@@ -66,13 +66,13 @@ export default class Calendar extends React.Component {
           }
         }
 
-        for(let i = 0; i < data.data.logs.length; i++) {
-          let date = new Date(data.data.logs[i].date);
+        for(let i = 0; i < data.logs.length; i++) {
+          let date = new Date(data.logs[i].date);
           date = date.toJSON().slice(0, 10);
           if(loadedWorkouts[date] === undefined) {
             loadedWorkouts[date] = [];
           }
-          loadedWorkouts[date].push(data.data.logs[i]);
+          loadedWorkouts[date].push(data.logs[i]);
         }
 
         this.setState({
