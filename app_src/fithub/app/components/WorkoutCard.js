@@ -9,31 +9,31 @@ import {
     TouchableHighlight,
     FlatList,
     TouchableOpacity,
+    List
 } from 'react-native';
+import { ListItem } from 'react-native-elements';
 
 export default class WorkoutCard extends React.Component {
     constructor(props) {
         super(props);
     }
 
-
     render() {
         return (
             <SafeAreaView>
-                <View style={{paddingLeft:"5%",paddingRight:"5%",paddingBottom:"5%"}}>
+                <View style={{ padding: '5%' }}>
                     <View style={styles.border}>
-                        <Text style={styles.title}>Name: "{this.props.name}"</Text>
-                        <Text style={styles.title}> Exercises </Text>
-                        {this.props.sets.map((val,index)=>{
-                            return(
-                                <Text
-                                    key={index}
-                                    style={styles.title}> "{val.name}"/{val.reps.length}-sets/{val.reps[0]}-reps/{val.weight[0]}lb
-                                </Text>
-                            );
-                        })}
-                       
-                      
+                        <Text style={styles.title}>{this.props.name}</Text>
+                        {this.props.exercises.map((val, index) => {
+                            return (
+                                <View key={index}>
+                                    <Text
+                                        style={styles.exerciseText}>{val.name}
+                                    </Text>
+                                </View>
+                            )
+                        })
+                        }
                     </View>
                 </View>
             </SafeAreaView >
@@ -44,16 +44,21 @@ export default class WorkoutCard extends React.Component {
 const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
-        fontSize: 25,
-        paddingTop: "5%"
+        fontSize: 30,
+        paddingBottom: '5%'
 
     },
     border: {
         borderColor: 'gray',
         borderWidth: 5,
-        borderRadius: 20,
+        borderRadius: 25,
         padding: "5%",
-        backgroundColor:'#f7f8f9'
+        backgroundColor: '#f7f8f8'
+    },
+    exerciseText: {
+        fontSize: 25,
+        textAlign: 'center',
+        paddingBottom: '3%'
     }
 
 });

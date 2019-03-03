@@ -70,6 +70,7 @@ let ExerciseData = new Schema({
 let SetData = new Schema({
   weight: {type: Number, required: true},
   reps: {type: Number, required: true},
+  isWarmup: {type: Boolean, required: true} 
 });
 
 //map the schemas to mongo collections

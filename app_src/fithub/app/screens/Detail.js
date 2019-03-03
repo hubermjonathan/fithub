@@ -6,10 +6,11 @@ import {
   Text,
   StyleSheet,
   Platform,
-  Button
+  Alert
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
-import { Icon } from 'react-native-elements';
+import { Icon, Button } from 'react-native-elements';
+import { postLog } from '../lib/LogFunctions';
 
 export default class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -28,15 +29,45 @@ export default class DetailScreen extends React.Component {
     }
   }
 
+  getCurrentDate() {
+    let date = new Date();
+    return date.toJSON().slice(0, 10);
+  }
+
   render() {
-    if(Platform.OS === 'ios') {
+    if (Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.containerIOS}>
           <ScrollView style={styles.cardsContainer}>
             <SummaryCard exercises={this.state.exercises} />
             <Cards exercises={this.state.exercises} />
-            
+            <Button
+              style={{ paddingTop: '5%' }}
+              title={'Log this workout again?'}
+              onPress={() => {
+                Alert.alert(
+                  'Confirmation',
+                  'Are you sure you want to log this workout again?',
+                  [
+                    {
+                      text: 'yes',
+                      onPress: () => {postLog({
+                        name:this.state.name,
+                        exercises:this.state.exercises,
+                        date:this.getCurrentDate()
+                      })},
+                      style: 'cancel'
+                    },
+                    {
+                      text: 'no',
+                      style: 'cancel'
+                    },
+                  ]
+                )
+              }}
+            />
           </ScrollView>
+
         </SafeAreaView>
       );
     } else {
@@ -45,7 +76,7 @@ export default class DetailScreen extends React.Component {
           <ScrollView style={styles.cardsContainer}>
             <SummaryCard exercises={this.state.exercises} />
             <Cards exercises={this.state.exercises} />
-            
+
           </ScrollView>
         </View>
       );
@@ -59,11 +90,11 @@ class SummaryCard extends React.Component {
     let totalReps = 0;
     let totalVolume = 0;
 
-    for(let i = 0; i < this.props.exercises.length; i++) {
-      totalSets += this.props.exercises[i].reps.length;
-      for(let j = 0; j < this.props.exercises[i].reps.length; j++) {
-        totalReps += this.props.exercises[i].reps[j];
-        totalVolume += this.props.exercises[i].weight[j];
+    for (let i = 0; i < this.props.exercises.length; i++) {
+      totalSets += this.props.exercises[i].sets.length;
+      for (let j = 0; j < this.props.exercises[i].sets.length; j++) {
+        totalReps += this.props.exercises[i].sets[j].reps;
+        totalVolume += this.props.exercises[i].sets[j].weight;
       }
     }
 
@@ -85,9 +116,9 @@ class Cards extends React.Component {
   render() {
     let cards = [];
 
-    for(let i = 0; i < this.props.exercises.length; i++) {
+    for (let i = 0; i < this.props.exercises.length; i++) {
       cards.push(
-        <View style={styles.card} key={"card-"+i}>
+        <View style={styles.card} key={"card-" + i}>
           <View style={styles.cardTitle}>
             <Text style={styles.exerciseLabel}>{this.props.exercises[i].name}</Text>
             <View style={styles.badge}>
@@ -95,7 +126,7 @@ class Cards extends React.Component {
             </View>
           </View>
 
-          <Sets reps={this.props.exercises[i].reps} weight={this.props.exercises[i].weight} isWarmup={this.props.exercises[i].isWarmup} />
+          <Sets sets={this.props.exercises[i].sets} />
         </View>
       );
     }
@@ -111,30 +142,30 @@ class Sets extends React.Component {
 
   render() {
     let sets = [];
-    
-    let totalSets = this.props.reps.length;
+
+    let totalSets = this.props.sets.length;
     let totalReps = 0;
     let totalWeight = 0;
-    for(let i = 0; i < this.props.reps.length; i++) {
-      totalReps += this.props.reps[i];
-      totalWeight += this.props.weight[i];
+    for (let i = 0; i < this.props.sets.length; i++) {
+      totalReps += this.props.sets[i].reps;
+      totalWeight += this.props.sets[i].weight;
     }
 
-    for(let i = 0; i < this.props.reps.length; i++) {
-      if(this.props.isWarmup[i]) {
+    for (let i = 0; i < this.props.sets.length; i++) {
+      if (this.props.sets[i].isWarmup) {
         sets.push(
-          <View key={"set-"+i} style={styles.cardRow}>
-            <Text style={styles.warmupText}>Set {i+1}</Text>
+          <View key={"set-" + i} style={styles.cardRow}>
+            <Text style={styles.warmupText}>Set {i + 1}</Text>
             <Text style={styles.warmupText}>{this.props.reps[i]} reps</Text>
             <Text style={styles.warmupText}>{this.props.weight[i]} lbs</Text>
           </View>
         );
       } else {
         sets.push(
-          <View key={"set-"+i} style={styles.cardRow}>
-            <Text style={styles.exerciseText}>Set {i+1}</Text>
-            <Text style={styles.exerciseText}>{this.props.reps[i]} reps</Text>
-            <Text style={styles.exerciseText}>{this.props.weight[i]} lbs</Text>
+          <View key={"set-" + i} style={styles.cardRow}>
+            <Text style={styles.exerciseText}>Set {i + 1}</Text>
+            <Text style={styles.exerciseText}>{this.props.sets[i].reps} reps</Text>
+            <Text style={styles.exerciseText}>{this.props.sets[i].weight} lbs</Text>
           </View>
         );
       }

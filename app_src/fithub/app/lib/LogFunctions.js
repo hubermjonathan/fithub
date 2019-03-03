@@ -1,26 +1,26 @@
 import { getUserToken, getUserID, getUserUID } from '../lib/AccountFunctions';
 
 export async function validateLog(log) {
-    if(log.name===undefined){
+    if (log.name === undefined) {
         return false;
-    } else if (log.date===undefined){
+    } else if (log.date === undefined) {
         return false;
-    } 
-    if (Array.isArray(log.exercises)){
+    }
+    if (Array.isArray(log.exercises)) {
         log.exercises.forEach(exercise => {
-            if(typeof exercise !== Object){
+            if (typeof exercise !== Object) {
                 return false;
             } else {
-                if(exercise.name===undefined){
+                if (exercise.name === undefined) {
                     return false;
-                } 
-                if(Array.isArray(exercise.muscle_groups)){
+                }
+                if (Array.isArray(exercise.muscle_groups)) {
                     exercise.muscle_groups.forEach(muscle => {
-                        if(muscle<0 || muscle > 18){
+                        if (muscle < 0 || muscle > 18) {
                             return false;
                         }
                     });
-                }         
+                }
             }
         });
     } else {
@@ -36,30 +36,36 @@ export async function postLog(workout) {
         const token = await getUserToken();
         //const date = //Date
 
-    const data = {
-        id: id,
-        uid: uid,
-        token: token,
-        date: workout.date,
-        name: workout.name,
-        exercises: workout.exercises,
-    }
-    console.log("DATA", data);
-    console.log(JSON.stringify(workout));
-    
-    fetch('https://fithub-server.herokuapp.com/logs/new', {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data)
-    }).then(res => res.json())
-        .then((data) => console.log('Success', JSON.stringify(data)))
-        .catch(function (e) {
-            console.log('Error');
-        });
+        const data = {
+            id: id,
+            uid: uid,
+            token: token,
+            date: workout.date,
+            name: workout.name,
+            exercises: workout.exercises,
+        }
+        console.log("DATA", data);
+        console.log(JSON.stringify(workout));
 
-    } catch(e) {
+        fetch('https://fithub-server.herokuapp.com/logs/new', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json())
+            .then((data) => {
+                console.log('Success', JSON.stringify(data))
+                Alert.alert(
+                    'Success!',
+                    'Workout was logged!'
+                )
+            })
+            .catch(function (e) {
+                console.log('Error');
+            });
+
+    } catch (e) {
         console.log(e);
     }
 }

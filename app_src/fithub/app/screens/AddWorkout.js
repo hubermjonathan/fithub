@@ -195,7 +195,6 @@ export default class AddWorkoutScreen extends React.Component {
                                                         'Please try again',
                                                         {
                                                             text: 'Ok',
-                                                            onPress: () => console.log('alert Pressed'),
                                                             style: 'cancel'
                                                         }
                                                     );
@@ -269,7 +268,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                 style: 'cancel'
                                             }
                                         );
-                                        console.log(this.state.exerciseNames);
+                                        //console.log(this.state.exerciseNames);
                                     }
                                 }}
                             />

@@ -7,9 +7,18 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { getUserGivenName, getUserFamilyName, getUserPhotoUrl } from '../lib/AccountFunctions';
+import { Icon } from 'react-native-elements';
+import { getUserID } from '../lib/AccountFunctions';
+import Swiper from 'react-native-swiper';
 
 export default class ProfileScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: 'Profile',
+      headerRight: <Icon name="settings" type="material" size={30} onPress={() => {navigation.push('Settings')}}/>
+    }
+  };
+
   constructor(props) {
     super(props);
     this.loadUserData();
@@ -31,11 +40,40 @@ export default class ProfileScreen extends React.Component {
               />
             </View>
             <View style={styles.infoCol}>
-              <Text style={styles.name}>{this.state.name}</Text>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>
+                  {this.state.name}
+                </Text>
+              </View>
+
+              <View style={styles.statsRow}>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+              </View>
             </View>
           </View>
           <View style={styles.body}>
-
+            <Swiper activeDotColor='#00adf5' loop={false}>
+              <View>
+                <Text>1</Text>
+              </View>
+              <View>
+                <Text>2</Text>
+              </View>
+              <View>
+                <Text>3</Text>
+              </View>
+            </Swiper>
           </View>
         </SafeAreaView>
       );
@@ -49,14 +87,25 @@ export default class ProfileScreen extends React.Component {
   }
 
   async loadUserData() {
-    let userGivenName = await getUserGivenName();
-    let userFamilyName = await getUserFamilyName();
-    let userFullName = userGivenName + ' ' + userFamilyName;
-    let userPhotoUrl = await getUserPhotoUrl();
+    let userFullName = "";
+    let userPhotoUrl = "";
+    let id = await getUserID();
 
-    this.setState({
-      name: userFullName,
-      photo: userPhotoUrl
+    fetch('https://fithub-server.herokuapp.com/profile/'+id)
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      userFullName = data.data.name;
+      userPhotoUrl = data.data.avatar.substring(0, data.data.avatar.length-7);
+
+      this.setState({
+        name: userFullName,
+        photo: userPhotoUrl
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
   }
 }
@@ -76,15 +125,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     backgroundColor: '#fff',
-    marginLeft: 20,
   },
   profPicCol: {
     flex: 2,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   infoCol: {
-    flex: 3,
-    padding: 30,
+    flex: 4,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingBottom: 20,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  statsCol: {
+    flex: 1,
+    alignItems: 'center',
   },
   body: {
     flexDirection: 'row',
@@ -100,5 +164,9 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 36,
     fontWeight: 'bold',
+  },
+  stats: {
+    color: '#333',
+    fontSize: 20,
   },
 });

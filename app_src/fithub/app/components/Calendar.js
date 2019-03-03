@@ -52,7 +52,6 @@ export default class Calendar extends React.Component {
   async loadItems(month) {
     let id = await getUserID();
     setTimeout(() => {
-      console.log(id);
       loadedWorkouts = {};
       fetch('https://fithub-server.herokuapp.com/logs/'+id)
       .then((res) => {
@@ -67,13 +66,13 @@ export default class Calendar extends React.Component {
           }
         }
 
-        for(let i = 0; i < data.logs.length; i++) {
-          let date = new Date(data.logs[i].date);
+        for(let i = 0; i < data.data.logs.length; i++) {
+          let date = new Date(data.data.logs[i].date);
           date = date.toJSON().slice(0, 10);
           if(loadedWorkouts[date] === undefined) {
             loadedWorkouts[date] = [];
           }
-          loadedWorkouts[date].push(data.logs[i]);
+          loadedWorkouts[date].push(data.data.logs[i]);
         }
 
         this.setState({
@@ -124,6 +123,7 @@ const styles = StyleSheet.create({
   },
   empty: {
     flex: 1,
+    justifyContent: 'center',
     height: 15,
     paddingTop: 30
   },
