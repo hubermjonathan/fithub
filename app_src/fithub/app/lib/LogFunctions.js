@@ -44,8 +44,8 @@ export async function postLog(workout) {
             name: workout.name,
             exercises: workout.exercises,
         }
-        console.log("DATA", data);
-        console.log(JSON.stringify(workout));
+        //console.log("DATA", data);
+        //console.log(JSON.stringify(workout));
 
         fetch('https://fithub-server.herokuapp.com/logs/new', {
             method: 'POST',
@@ -73,15 +73,27 @@ export async function postLog(workout) {
 
 /*
 */
-export async function getLogs(id) {
+export async function getLogs(logsArray) {
 
+    const id = await getUserID();
+    //const date = //Date
+
+ 
     fetch(`https://fithub-server.herokuapp.com/logs/${id}`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
     }).then(res => res.json())
-        .then((data) => console.log('Success', JSON.stringify(data)))
+        .then((data) => {
+            //console.log('Success', JSON.stringify(data));
+            let stringify = JSON.stringify(data);
+            let parsed = JSON.parse(stringify);
+            for (let x = 0; x < parsed.logs.length; x++) {
+                logsArray.push(parsed.logs[x]);
+            }
+           
+        })
         .catch(function (e) {
             console.log('Error');
         });

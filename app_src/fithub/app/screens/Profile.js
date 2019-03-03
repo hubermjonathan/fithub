@@ -1,358 +1,172 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
-    StyleSheet,
-    Text,
-    SafeAreaView,
-    View,
-    StatusBar,
-    Platform,
-    TextInput,
-    Modal,
-    TouchableHighlight,
-    TouchableOpacity,
-    ScrollView,
-    Alert,
-    Switch
+  SafeAreaView,
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Image,
 } from 'react-native';
-import { Button, Icon, Input } from 'react-native-elements';
-import { InputAutoSuggest } from 'react-native-autocomplete-search';
-import BottomBar from '../components/BottomBar';
-import { postCustomWorkout } from '../lib/WorkoutFunctions'
-import WorkoutCard from '../components/WorkoutCard';
-import { postLog } from '../lib/LogFunctions';
+import { Icon } from 'react-native-elements';
+import { getUserID } from '../lib/AccountFunctions';
+import Swiper from 'react-native-swiper';
 
-class ProfileScreen extends React.Component {
-    state = {
-        modalVisible: false,
-        swmodalVisible: false,
-        workoutName: "",
-        description: "",
-        exercises: [],
-
-        exerciseName: "",
-        sets: 0,
-        warmupSets: 0,
-        reps: [],
-        warmup: [],
-        exerciseNames: [],
-
-        savedWorkouts: [],
-
-        show: false,
-
-        weights: [],
-        weight: 0,
-
-        date: ""
-
-
-
-    };
-
-    setModalVisible(visible) {
-        this.setState({ modalVisible: visible });
+export default class ProfileScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: 'Profile',
+      headerRight: <Icon name="settings" type="material" size={30} onPress={() => {navigation.push('Settings')}}/>
     }
-    setswModalVisible(visible) {
-        this.setState({ swmodalVisible: visible })
+  };
+
+  constructor(props) {
+    super(props);
+    this.loadUserData();
+    this.state = {
+      name: '',
+      photo: ''
     }
+  }
 
-    showText = () => {
-        this.setState({ show: true });
+  render() {
+    if(Platform.OS === 'ios') {
+      return (
+        <SafeAreaView style={styles.containerIOS}>
+          <View style={styles.header}>
+            <View style={styles.profPicCol}>
+              <Image
+                style={styles.profPic} 
+                source={{uri: this.state.photo}}
+              />
+            </View>
+            <View style={styles.infoCol}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>
+                  {this.state.name}
+                </Text>
+              </View>
+
+              <View style={styles.statsRow}>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+                <View style={styles.statsCol}>
+                  <Text style={styles.stats}>Volume:</Text>
+                  <Text style={styles.stats}>1000</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View style={styles.body}>
+            <Swiper activeDotColor='#00adf5' loop={false}>
+              <View>
+                <Text>1</Text>
+              </View>
+              <View>
+                <Text>2</Text>
+              </View>
+              <View>
+                <Text>3</Text>
+              </View>
+            </Swiper>
+          </View>
+        </SafeAreaView>
+      );
+    } else {
+      return(
+        <View style={styles.containerAND}>
+          <Text>PROFILE</Text>
+        </View>
+      );
     }
+  }
 
+  async loadUserData() {
+    let userFullName = "";
+    let userPhotoUrl = "";
+    let id = await getUserID();
 
+    fetch('https://fithub-server.herokuapp.com/profile/'+id)
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      userFullName = data.name;
+      userPhotoUrl = data.avatar.substring(0, data.avatar.length-7);
 
-    render() {
-
-
-        return (
-
-            <SafeAreaView style={{ flex: 1 }}>
-                <View style={{ flex: 1 }}>
-                    <ScrollView>
-                        <View style={{ padding: '15%', marginTop: '15%' }}>
-                            <View style={styles.center}>
-                                <Text style={styles.centerText}>Workout Name</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    clearButtonMode='while-editing'
-                                    defaultValue='e.g "The Dorito"'
-                                    selectTextOnFocus={true}
-                                    onChangeText={(text) => this.setState({ workoutName: text })} />
-                            </View>
-                            <View style={styles.center}>
-                                <Text style={styles.centerText}>Description</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    clearButtonMode='while-editing'
-                                    selectTextOnFocus={true}
-                                    onChangeText={(text) => this.setState({ description: text })} />
-                            </View>
-                            <View style={styles.center}>
-                                <Text style={styles.centerText}>Date</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    clearButtonMode='while-editing'
-                                    selectTextOnFocus={true}
-                                    onChangeText={(text) => this.setState({ date: text })} />
-                            </View>
-
-                            <Modal
-                                animationType="fade"
-                                transparent={false}
-                                visible={this.state.modalVisible}
-                                onRequestClose={() => {
-                                    Alert.alert('Modal has been closed.');
-                                }}
-                                style={{ flex: 1 }}>
-                                <SafeAreaView style={{ flex: 1 }}>
-                                    <ScrollView>
-
-                                        <View style={{ marginTop: '20%', paddingBottom: 20 }}>
-                                            <View style={styles.centerE}>
-
-                                                <Text style={styles.centerText}> Exercise Name</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "Hammer Curls"'
-                                                    selectTextOnFocus={true}
-                                                    onChangeText={(text) => this.setState({ exerciseName: text })} />
-                                            </View>
-                                            <View style={styles.centerE}>
-                                                <Text style={styles.centerText}> # of Warmup Sets</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "5"'
-                                                    selectTextOnFocus={true}
-                                                    keyboardType="number-pad"
-                                                    onChangeText={(text) => this.setState({ warmupSets: parseInt(text) })} />
-                                            </View>
-                                            <View style={styles.centerE}>
-                                                <Text style={styles.centerText}> # of Sets</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "5"'
-                                                    selectTextOnFocus={true}
-                                                    keyboardType="number-pad"
-                                                    onChangeText={(text) => this.setState({ sets: parseInt(text) })} />
-                                            </View>
-                                            <View style={styles.centerE}>
-                                                <Text style={styles.centerText}> # of Reps</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "5"'
-                                                    selectTextOnFocus={true}
-                                                    keyboardType="number-pad"
-                                                    onChangeText={(text) => {
-                                                        let repsArr = [];
-                                                        for (let x = 0; x < this.state.sets + this.state.warmupSets; x++) {
-                                                            repsArr.push(parseInt(text));
-                                                        }
-                                                        this.setState({ reps: repsArr })
-                                                    }
-                                                   
-                                                    } /> 
-                                            </View>
-                                            <View style={styles.centerE}>
-                                                <Text style={styles.centerText}> Weight </Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "5"'
-                                                    selectTextOnFocus={true}
-                                                    keyboardType="number-pad"
-                                                    onChangeText={(text) => {
-                                                        let weightArr = [];
-                                                        for (let x = 0; x < this.state.sets + this.state.warmupSets; x++) {
-                                                            weightArr.push(parseInt(text));
-                                                        }
-                                                        this.setState({ weights: weightArr })
-                                                    }
-                                                    } />
-                                            </View>
-                                        </View>
-                                    </ScrollView>
-                                    <View style={{ padding: '1%' }}>
-                                        <Button
-                                            style={{ paddingBottom: '1%' }}
-                                            buttonStyle={{ backgroundColor: '#e04a21' }}
-                                            title="Cancel"
-                                            onPress={() => {
-                                                this.setModalVisible(false);
-                                                this.setState({ exerciseName: "" });
-                                                this.setState({ sets: 0 });
-                                                this.setState({ warmpupSets: 0 });
-                                                this.setState({ reps: [] });
-                                                this.setState({ weight: 0 });
-                                                this.setState({ weights: [] });
-                                            }} />
-                                        <Button
-                                            style={{ paddingBottom: 5 }}
-                                            title='Add'
-                                            onPress={() => {
-                                              
-
-                                                if (typeof this.state.sets === "number" && this.state.reps.length > 0 && this.state.exerciseName.length > 0) {
-                                                    let warmupObj = [];
-                                                    
-                                                    for (let x = 0; x < this.state.warmupSets; x++) {
-                                                        warmupObj.push(true);
-                                                    }
-                                                    for (let x = this.state.warmupSets; x < this.state.warmupSets + this.state.sets; x++) {
-                                                        warmupObj.push(false);
-                                                    }
-                                                    
-                                                    let exerciseObj = {
-                                                        name: this.state.exerciseName,
-                                                        reps: this.state.reps,
-                                                        isWarmup: warmupObj,
-                                                        weight: this.state.weights
-                                                    }
-                                                    this.state.exercises.push(exerciseObj);
-                                                    this.setState({ name: "" });
-                                                    this.setState({ sets: 0 });
-                                                    this.setState({ warmpupSets: 0 });
-                                                    this.setState({ reps: [] });
-
-                                                
-
-                                                    this.setModalVisible(false);
-
-                                                }
-                                                else {
-                                                    Alert.alert(
-                                                        'Error',
-                                                        'Please try again',
-                                                        {
-                                                            text: 'Ok',
-                                                            onPress: () => console.log('alert Pressed'),
-                                                            style: 'cancel'
-                                                        }
-                                                    );
-                                                }
-                                            }} />
-                                    </View>
-                                </SafeAreaView>
-                            </Modal>
-
-
-                            <Button
-                                style={{ paddingBottom: 40 }}
-                                title="Add Exercise"
-                                color='blue'
-                                onPress={() => {
-                                    this.setModalVisible(true);
-                                    if (this.state.exerciseNames.length == 0) {
-                                        // this.getExercises();
-                                    }
-                                }} />
-                            <Button
-                                titleStyle={{ fontSize: 30, color: 'white' }}
-                                icon={
-                                    <Icon
-                                        name="check"
-                                        type="entypo"
-                                        size={40} />
-                                }
-                                iconRight
-                                onPress={() => {
-                                    let reg = /^\d{4}-\d{2}-\d{2}$/
-                                    if (!reg.test(this.state.date)){
-                                        Alert.alert(
-                                            'Error',
-                                            'Enter Date YYYY-MM-DD',
-                                            {
-                                                text: 'Ok',
-                                                style: 'cancel'
-                                            }
-                                        );
-                                    }
-                                    if (this.state.exercises.length > 0) {
-                                        postLog(
-                                            {
-                                                /*name: this.state.workoutName,
-                                                date: this.state.date,
-                                                description: this.state.description,
-                                                exercises: this.state.exercises,
-                                                likes: 0,
-                                                weight:this.state.weights,
-                                                warmup:this.state.warmup*/
-                                                name : this.state.workoutName,
-                                                date : this.state.date,
-                                                exercises : this.state.exercises
-                                            }
-                                        );
-                                        this.setState({
-                                            exercises: [],
-                                            date:"",
-                                            description:""
-                                        });
-
-                                    }
-                                    else {
-                                        Alert.alert(
-                                            'Error',
-                                            'You must add at least 1 exercise!',
-                                            {
-                                                text: 'Ok',
-                                                style: 'cancel'
-                                            }
-                                        );
-                                
-                                    }
-                                }}
-                            />
-                        </View>
-                    </ScrollView>
-                </View >
-            </SafeAreaView>
-        );
-    }
+      this.setState({
+        name: userFullName,
+        photo: userPhotoUrl
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
 }
 
-
 const styles = StyleSheet.create({
-    input: {
-        borderColor: 'grey',
-        borderWidth: 4,
-        borderRadius: 50,
-        width: 300,
-        textAlign: 'center',
-        fontFamily: 'System',
-        fontSize: 18,
-        padding: '2%',
-        color: 'grey'
-    },
-    center: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: '10%'
-    },
-    centerE: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: '10%',
-
-    },
-    centerText: {
-        textAlign: 'center',
-        fontFamily: 'System',
-        fontSize: 20,
-        color: 'grey'
-    },
-    buttonText: {
-        fontFamily: 'System'
-    },
-    cancel: {
-
-    },
-    bottomBar: {
-        justifyContent: 'flex-end',
-    }
+  containerIOS: {
+    flexDirection: 'column',
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  containerAND: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  profPicCol: {
+    flex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoCol: {
+    flex: 4,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingBottom: 20,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  statsCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  body: {
+    flexDirection: 'row',
+    flex: 3,
+    backgroundColor: '#eee',
+  },
+  profPic: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+  },
+  name: {
+    color: '#333',
+    fontSize: 36,
+    fontWeight: 'bold',
+  },
+  stats: {
+    color: '#333',
+    fontSize: 20,
+  },
 });
-
-export default ProfileScreen;
