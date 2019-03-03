@@ -88,8 +88,8 @@ export async function getLogs(logsArray) {
             //console.log('Success', JSON.stringify(data));
             let stringify = JSON.stringify(data);
             let parsed = JSON.parse(stringify);
-            for (let x = 0; x < parsed.data.logs.length; x++) {
-                logsArray.push(parsed.data.logs[x]);
+            for (let x = 0; x < parsed.logs.length; x++) {
+                logsArray.push(parsed.logs[x]);
             }
            
         })

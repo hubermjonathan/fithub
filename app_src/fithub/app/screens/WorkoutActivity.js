@@ -12,10 +12,15 @@ import {
     Switch,
 } from 'react-native';
 
-
+/*temporary location for now*/
 export default class WorkoutActivityScreen extends React.Component {
 
-
+    
+    render(){
+        return(
+            <Text>Hey</Text>
+        )
+    }
 
 }
 
