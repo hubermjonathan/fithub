@@ -14,22 +14,24 @@ import {
 
 export default class LoggerScreen extends React.Component {
 
-    // static navigationOptions = ({ navigation }) => {
-    //     return {
-    //         title: `Today's Workout`,
-    //         headerRight: <Icon name="add" type="material" size={35} onPress={ navigation.navigate('SelectExercises', {_handleAddSetButton: this._handleAddSetButton })}/>
-    //     }
-    // };
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: `Today's Workout`,
+            headerRight: <Icon name="add" type="material" size={35} onPress={ navigation.navigate('SelectExercises', {_handleAddExercisesButton: this._handleAddExercisesButton.bind(this) })}/>
+        }
+    };
 
     constructor(props) {
         super(props);
-        //this.props.navigation.getParam('workout', null);
-        const workout = Workout;
         this.state = {
-            workout: workout,
-            name: workout.name,
-            uid: workout.uid,
-            exercises: workout.exercises,
+            name: this.props.navigation.getParam('name', `Today's Workout`),
+
+            uid: 'temporaryUID',
+            name: "Today's Workout",
+            exercises: [],
+            // uid: Workout.uid,
+            // name: Workout.name,
+            // exercises: Workout.exercises,
 
             addSetModalIsVisible: false,
             modalReps: undefined,
@@ -42,57 +44,89 @@ export default class LoggerScreen extends React.Component {
     render() {
         return(
             <View style={styles.page}>
-                <View>
+                <Modal
+                    animationType='fade'
+                    transparent={false}
+                    visible={this.state.addSetModalIsVisible}
+                >   
+                    <SafeAreaView>
+                        <View style={styles.modal}>
+                            <View style={{alignContent: 'center'}}>
+                                <Text style={styles.modalText}>New Set</Text>
+                            </View>
+                            <View style={styles.modalRow}>
+                                <TextInput  
+                                    style={styles.modalTextInput}
+                                    clearButtonMode='while-editing'
+                                    placeholder='Reps'
+                                    placeholderTextColor='gray'
+                                    selectTextOnFocus={true}
+                                    keyboardType="number-pad"
+                                    onChangeText={(text) => this.setState({ modalReps: text })}
+                                />
+                                <TextInput  
+                                    style={styles.modalTextInput}
+                                    clearButtonMode='while-editing'
+                                    placeholder='Weight'
+                                    placeholderTextColor='gray'
+                                    selectTextOnFocus={true}
+                                    keyboardType="number-pad"
+                                    onChangeText={(text) => this.setState({ modalWeight: text })}
+                                />
+                            </View>
+                            <View style={{alignContent:'center'}}>
+                                <CheckBox
+                                center
+                                title='Warmup'
+                                checked={this.state.modalWarmup}
+                                onPress={() => this.setState({modalWarmup: !this.state.modalWarmup})}
+                                />
+                            </View>
+                            <View style={{alignContent:'center'}}>
+                                <Button
+                                onPress={this._modalOK}
+                                title="OK"
+                                color="#00adf5"
+                                />
+                            </View>
+                        </View>
+                    </SafeAreaView>
+                </Modal>
+
+                <View style={styles.list}>
                     <FlatList
                         data={this.state.exercises}
                         keyExtractor={(item, index) => index.toString()}
-                        contentContainerStyle={styles.list}
-                        renderItem={(item) => this.renderExerciseTable(item)}
+                        renderItem={({item, index}) => 
+                        
+                            <View style={styles.card}>
+                                <LogCard
+                                    uid={item.uid}
+                                    exercise={item.name}
+                                    equipmentType={item.equipment_type}
+                                    muscleGroup={item.muscle_group} 
+                                    sets={item.sets}
+                                    // addSet={() => this._addSet}
+                                    // editSet={this._editSet}
+                                    // editExercise={this._editExercise}
+                                />
+                                <Button
+                                    onPress={() => this._handleAddSetButton(index)}
+                                    title="Add Set!"
+                                    color="#00adf5"
+                                />
+                            </View>
+                        }       
                     />
                 </View>
             </View>
         );
     }
-    
 
-    renderExerciseTable(item, index) {
-//console.log("EXERCISE: ", item);
-        return(
-            <View style={styles.card}>
-                <LogCard
-                    exercise={item.item}
-                    index={item.index}
-                    addSet={this._addSet}
-                    duplicateSet={this._duplicateSet}
-                    deleteSet={this._deleteSet}
-                />
-            </View>
-        );
-    }
-
-    //Functions to be passed to children elements for logging modifications.
-    _addSet = (exercise, set) => {
-        const newExercises = this.state.exercises;
-        newExercises[exercise.index].sets.push(set);
+    _handleAddSetButton = (index) => {
         this.setState({
-            exercises: newExercises
-        });
-    }
-
-    _duplicateSet = (exercise, index) => {
-        const newSet = this.state.exercises[exercise.index].set[index];
-        const newExercises = this.state.exercises;
-        newExercises[exercise.index].sets.splice(index, 0, newSet);
-        this.setState({
-            exercises: newExercises
-        });
-    }
-
-    _deleteSet = (exerciseIndex, setIndex) => {
-        const newExercises = this.state.exercises;
-        newExercises[exerciseIndex].sets.splice(setIndex, 1);
-        this.setState({
-            exercises: newExercises
+            arrayIndex: index,
+            addSetModalIsVisible: true
         });
     }
 
@@ -131,14 +165,14 @@ export default class LoggerScreen extends React.Component {
 const styles = StyleSheet.create({
     page: {
         marginTop: '3%',
-        width: '100%',
         backgroundColor: '#f4f4f4',
-        alignItems: 'stretch',           
-        
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     list: {
-        //justifyContent: 'center',
-        //alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
     },
     modal: {
         marginTop: '5%',
@@ -168,31 +202,31 @@ const styles = StyleSheet.create({
     },
 });
 
-const Workout = {
-    uid: '12345678910',
-    name: 'Chest Day Boi',
-    exercises: [
-      {name: 'Bench Press', muscle_group: 'Pectoralis', equipment_type: 'Barbell', sets: [
-        {weight: 135, reps: 15, warmup: true},
-        {weight: 155, reps: 12, warmup: true},
-        {weight: 185, reps: 8, warmup: false},
-        {weight: 215, reps: 6, warmup: false},
-        {weight: 225, reps: 4, warmup: false},
-      ]},
-      {name: 'Chest Pullovers', muscle_group: 'Pectoralis', equipment_type: 'Dumbbell', sets: [
-        {weight: 40, reps: 10, warmup: false},
-        {weight: 40, reps: 10, warmup: false},
-        {weight: 45, reps: 8, warmup: false},
-        {weight: 50, reps: 6, warmup: false},
-        {weight: 50, reps: 4, warmup: false},
-      ]},
-      {name: 'Flyes', muscle_group: 'Pectoralis', equipment_type: 'Cables', sets: [
-        {weight: 40, reps: 15, warmup: false},
-        {weight: 40, reps: 15, warmup: false},
-        {weight: 45, reps: 10, warmup: false},
-        {weight: 55, reps: 8, warmup: false},
-        {weight: 50, reps: 8, warmup: false},
-      ]}
-    ],
-  };
+// const Workout = {
+//     uid: '12345678910',
+//     name: 'Chest Day Boi',
+//     exercises: [
+//       {name: 'Bench Press', muscle_group: 'Pectoralis', equipment_type: 'Barbell', sets: [
+//         {weight: 135, reps: 15, warmup: true},
+//         {weight: 155, reps: 12, warmup: true},
+//         {weight: 185, reps: 8, warmup: false},
+//         {weight: 215, reps: 6, warmup: false},
+//         {weight: 225, reps: 4, warmup: false},
+//       ]},
+//       {name: 'Chest Pullovers', muscle_group: 'Pectoralis', equipment_type: 'Dumbbell', sets: [
+//         {weight: 40, reps: 10, warmup: false},
+//         {weight: 40, reps: 10, warmup: false},
+//         {weight: 45, reps: 8, warmup: false},
+//         {weight: 50, reps: 6, warmup: false},
+//         {weight: 50, reps: 4, warmup: false},
+//       ]},
+//       {name: 'Flyes', muscle_group: 'Pectoralis', equipment_type: 'Cables', sets: [
+//         {weight: 40, reps: 15, warmup: false},
+//         {weight: 40, reps: 15, warmup: false},
+//         {weight: 45, reps: 10, warmup: false},
+//         {weight: 55, reps: 8, warmup: false},
+//         {weight: 50, reps: 8, warmup: false},
+//       ]}
+//     ],
+//   };
 
