@@ -6,16 +6,18 @@ import {
   Text,
   StyleSheet,
   Platform,
-  Alert
+  Alert,
+  TouchableOpacity
 } from 'react-native';
 import BottomBar from '../components/BottomBar';
 import { Icon, Button } from 'react-native-elements';
 import { postLog } from '../lib/LogFunctions';
+import Dialog from 'react-native-dialog';
 
-export default class DetailScreen extends React.Component {
+export default class WorkoutLogEditScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('name', 'Workout'),
+      title: "Log/Edit Workout",
       headerTintColor: '#00adf5',
     };
   };
@@ -26,7 +28,11 @@ export default class DetailScreen extends React.Component {
     this.state = {
       name: this.props.navigation.getParam('name', 'Workout'),
       exercises: this.props.navigation.getParam('exercises', []),
+      selectedRep: 0
+
     }
+
+
   }
 
   getCurrentDate() {
@@ -39,18 +45,15 @@ export default class DetailScreen extends React.Component {
       return (
         <SafeAreaView style={styles.containerIOS}>
           <ScrollView style={styles.cardsContainer}>
-            <SummaryCard exercises={this.state.exercises} />
             <Cards exercises={this.state.exercises} />
             <Button
-              style={{ paddingTop: '5%' }}
-              title={'Log this workout again?'}
+              style={{ paddingTop: '3%' }}
+              title={'Log this workout'}
               onPress={() => {
-
-                this.props.navigation.push('DetailsEdit', this.state)
+                console.log('pressed');
               }}
             />
           </ScrollView>
-
         </SafeAreaView>
       );
     } else {
@@ -121,6 +124,16 @@ class Cards extends React.Component {
 class Sets extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      editReps: false,
+      selectedRep: 0,
+      tempRep: 0,
+
+      tempWeight: 1,
+      editWeight: false,
+      selectedWeight: 0
+    }
   }
 
   render() {
@@ -146,9 +159,57 @@ class Sets extends React.Component {
       } else {
         sets.push(
           <View key={"set-" + i} style={styles.cardRow}>
+            {/* Edit reps dialog*/}
+            <Dialog.Container visible={this.state.editReps}>
+              <Dialog.Title>Edit Rep Count</Dialog.Title>
+              <Dialog.Input
+                keyboardType="number-pad"
+                onChangeText={(text) => {
+                  this.setState({ tempRep: parseInt(text) });
+                }}
+              />
+              <Dialog.Button label='Cancel' onPress={() => {
+                this.setState({ editReps: false })
+              }} />
+              <Dialog.Button label='Confirm' onPress={() => {
+                this.setState({ editReps: false });
+                this.props.sets[this.state.selectedRep].reps = this.state.tempRep;
+              }} />
+            </Dialog.Container>
+
+            {/* Edit Weight dialog*/}
+            <Dialog.Container visible={this.state.editWeight}>
+              <Dialog.Title>Edit Weight</Dialog.Title>
+              <Dialog.Input
+                keyboardType="number-pad"
+                onChangeText={(text) => {
+                  this.setState({ tempWeight: parseInt(text) });
+                }} />
+              <Dialog.Button label='Cancel' onPress={() => {
+                this.setState({ editWeight: false })
+              }} />
+              <Dialog.Button label='Confirm' onPress={() => {
+                this.setState({ editWeight: false });
+                this.props.sets[this.state.selectedWeight].weight = this.state.tempWeight;
+              }} />
+            </Dialog.Container>
+
             <Text style={styles.exerciseText}>Set {i + 1}</Text>
-            <Text style={styles.exerciseText}>{this.props.sets[i].reps} reps</Text>
-            <Text style={styles.exerciseText}>{this.props.sets[i].weight} lbs</Text>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({ editReps: true });
+                this.setState({ selectedRep: i });
+              }}
+            >
+              <Text style={styles.exerciseText}>{this.props.sets[i].reps} reps</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({ editWeight: true });
+                this.setState({ selectedWeight: i });
+              }}>
+              <Text style={styles.exerciseText}>{this.props.sets[i].weight} lbs</Text>
+            </TouchableOpacity>
           </View>
         );
       }
