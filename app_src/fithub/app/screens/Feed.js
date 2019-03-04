@@ -9,7 +9,9 @@ import {
     ScrollView,
     TouchableOpacity,
     Alert,
-    RefreshControl
+    RefreshControl,
+    FlatList,
+    ListItem
 } from 'react-native';
 import Dash from 'react-native-dash';
 import { Icon } from 'react-native-elements';
@@ -21,10 +23,17 @@ export default class FeedScreen extends React.Component {
     }
 
     state = {
+        //dummy workout cards to test look of UI
         workouts: [
-            {workout: "Dorito", equipment: "stuff"},
-            {workout: "Big Werk", equipment: "stuff"},
-            {workout: "The Grind", equipment: "stuff"},
+            {workout: "Dorito", user: "Brian", icon: "person"},
+            {workout: "Big Werk", user: "Andy", icon: "person"},
+            {workout: "The Grind", user: "Colin", icon: "person"},
+            {workout: "Dorito", user: "Brian", icon: "person"},
+            {workout: "Big Werk", user: "Andy", icon: "person"},
+            {workout: "The Grind", user: "Colin", icon: "person"},
+            {workout: "Dorito", user: "Brian", icon: "person"},
+            {workout: "Big Werk", user: "Andy", icon: "person"},
+            {workout: "The Grind", user: "Colin", icon: "person"},
         ]
     }
 
@@ -33,7 +42,7 @@ export default class FeedScreen extends React.Component {
         //let workouts = this.getWorkouts(/*put id here, idk how to get it for now */);
         return (
     
-          <View>
+          <View style={{flex: 1}}>
             <View>
               <Text style={styles.title}> Global Feed</Text>
               <Dash style={styles.line} />
@@ -47,22 +56,32 @@ export default class FeedScreen extends React.Component {
                 </TouchableOpacity>
               </View>
             </View>
-            <ScrollView>
-                <View style={{padding: '15%'}}>
-                    <Text> {this.state.workouts[0].workout} </Text>
-                    <Text> {this.state.workouts[1].workout} </Text>
-                    <Text> {this.state.workouts[2].workout} </Text>
-                </View>
-                {/* data={this.state.workouts}
-                renderItem={({item, index}) => 
-                    <TouchableHighlight>
-                        <ExerciseCard
-                            exercise={item.workout}
-                            equipment={item.equipment}
-                        />
-                    </TouchableHighlight>
-                } */}
-            </ScrollView>
+            <FlatList
+              // keyExtractor = {(item, index) => index}
+              data={this.state.workouts}
+              renderItem={({item}) => (
+                  <WorkoutCard
+                      workout={item.workout}
+                      user={item.user}
+                  />
+                  // <ListItem
+                  //   title={item.workout}
+                  //   leftIcon={item.icon}
+                  //   subtitle={item.user}
+                  // />
+              )}
+                    // <Text> {this.state.workouts[1].workout} </Text>
+                    // <Text> {this.state.workouts[2].workout} </Text>
+                // data={this.state.workouts}
+                // renderItem={({item, index}) => 
+                //     <TouchableHighlight>
+                //         <ExerciseCard
+                //             exercise={item.workout}
+                //             equipment={item.equipment}
+                //         />
+                //     </TouchableHighlight>
+                // }
+            />
           </View>
         )
       }
@@ -101,7 +120,4 @@ const styles = StyleSheet.create({
       fontSize: 20,
       paddingBottom: 25
     },
-    bottomBar: {
-      flex: 1,
-  }
 })
