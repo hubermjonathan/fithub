@@ -12,7 +12,7 @@ import CreateWorkoutScreen from '../screens/CreateWorkout';
 import DetailScreen from '../screens/Detail';
 import SelectExercisesScreen from '../screens/SelectExercises';
 import SettingsScreen from '../screens/Settings';
-import WorkoutActivityScreen from '../screens/WorkoutActivity'
+import WorkoutLogEditScreen from '../screens/WorkoutLogEdit'
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -21,7 +21,8 @@ const HomeStack = createStackNavigator({
       header: null
     }
   },
-  Details: DetailScreen
+  Details: DetailScreen,
+  DetailsEdit: WorkoutLogEditScreen
 });
 
 const ProfileStack = createStackNavigator({
@@ -59,7 +60,7 @@ const AppContainer = createAppContainer(createBottomTabNavigator(
       }
     },
     Feed: {
-      screen: WorkoutActivityScreen,
+      screen: FeedScreen,
       navigationOptions: {
         tabBarIcon: <Icon name="language" type="material" size={35} />
       }
