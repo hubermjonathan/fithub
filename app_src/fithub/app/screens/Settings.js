@@ -5,11 +5,24 @@ import {
   View,
   Text,
   StyleSheet,
+  TextInput,
+  Button,
 } from 'react-native';
+import { getUserID } from '../lib/AccountFunctions';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
     headerTintColor: '#00adf5',
+  }
+
+  constructor(props) {
+    super(props);
+    
+    this.loadUserData();
+    this.state = {
+      nameText: '',
+      disabled: false,
+    }
   }
 
   render() {
@@ -18,6 +31,18 @@ export default class SettingsScreen extends React.Component {
         <SafeAreaView style={styles.containerIOS}>
           <View style={styles.settingsContainer}>
             <Text style={styles.header}>Settings</Text>
+            <Text style={styles.subHeader}>Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => this.setState({nameText: text})}
+              value={this.state.nameText}
+            />
+            <Button
+              onPress={this.saveChanges.bind(this)}
+              title="Save Changes"
+              color="#00adf5"
+              disabled={this.state.nameText == "" ? true : false}
+            />
           </View>
         </SafeAreaView>
       );
@@ -28,6 +53,31 @@ export default class SettingsScreen extends React.Component {
         </View>
       );
     }
+  }
+
+  saveChanges() {
+    console.log(this.state.nameText);
+    this.props.navigation.goBack();
+  }
+
+  async loadUserData() {
+    let userFullName = "";
+    let id = await getUserID();
+
+    fetch('https://fithub-server.herokuapp.com/profile/'+id)
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      userFullName = data.name;
+
+      this.setState({
+        nameText: userFullName,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   }
 }
 
@@ -49,5 +99,20 @@ const styles = StyleSheet.create({
     fontSize: 36,
     color: '#333',
     fontWeight: 'bold',
+    paddingBottom: 20,
+  },
+  subHeader: {
+    fontSize: 28,
+    color: '#333',
+    fontWeight: 'bold',
+    paddingBottom: 10,
+  },
+  input: {
+    fontSize: 24,
+    color: '#999',
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 20,
   }
 });
