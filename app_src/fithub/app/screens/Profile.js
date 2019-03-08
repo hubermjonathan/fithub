@@ -33,6 +33,7 @@ export default class ProfileScreen extends React.Component {
     if(Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.containerIOS}>
+
           <View style={styles.header}>
             <View style={styles.profPicCol}>
               <Image
@@ -63,41 +64,14 @@ export default class ProfileScreen extends React.Component {
               </View>
             </View>
           </View>
+
           <View style={styles.body}>
             <Swiper activeDotColor='#00adf5' loop={false}>
               <View style={styles.subContainer}>
                 <ScrollView stickyHeaderIndices={[0]}>
-                  <View><Text style={styles.subHeader}>Records</Text></View>
-                  <View style={styles.record}>
-                    <Icon name="error" type="material" size={30} />
-                    <Text style={styles.recordText}>
-                      Andy hasn't done his part yet
-                    </Text>
-                  </View>
-                  <View style={styles.record}>
-                    <Icon name="error" type="material" size={30} />
-                    <Text style={styles.recordText}>
-                      Still waiting for Andy
-                    </Text>
-                  </View>
-                  <View style={styles.record}>
-                    <Icon name="error" type="material" size={30} />
-                    <Text style={styles.recordText}>
-                      Andy is not done yet
-                    </Text>
-                  </View>
-                  <View style={styles.record}>
-                    <Icon name="error" type="material" size={30} />
-                    <Text style={styles.recordText}>
-                      Maybe one day
-                    </Text>
-                  </View>
-                  <View style={styles.record}>
-                    <Icon name="error" type="material" size={30} />
-                    <Text style={styles.recordText}>
-                      Im going to die waiting
-                    </Text>
-                  </View>
+                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Records</Text></View>
+                  <Records />
+                  
                 </ScrollView>
               </View>
               <View>
@@ -108,6 +82,7 @@ export default class ProfileScreen extends React.Component {
               </View>
             </Swiper>
           </View>
+
         </SafeAreaView>
       );
     } else {
@@ -140,6 +115,39 @@ export default class ProfileScreen extends React.Component {
     .catch((err) => {
       console.log(err);
     });
+  }
+}
+
+class Records extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      algoData: [
+        { text: "Andy hasn't done his part yet" },
+        { text: "Still waiting for Andy" },
+        { text: "Andy is not done yet" },
+        { text: "Maybe one day" },
+        { text: "Im going to die waitinggg" },
+      ]
+    }
+  }
+
+  render() {
+    let records = [];
+
+    for(let i = 0; i < this.state.algoData.length; i++) {
+      records.push(
+        <View style={styles.record}>
+          <Icon name="error" type="material" size={30} />
+          <Text style={styles.recordText}>
+            {this.state.algoData[i].text}
+          </Text>
+        </View>
+      );
+    }
+
+    return records;
   }
 }
 
@@ -205,6 +213,9 @@ const styles = StyleSheet.create({
   subContainer: {
     flex: 1,
   },
+  subHeaderContainer: {
+    borderBottomWidth: 1,
+  },
   subHeader: {
     fontSize: 28,
     backgroundColor: '#fff',
@@ -214,7 +225,7 @@ const styles = StyleSheet.create({
   },
   record: {
     backgroundColor: '#fff',
-    borderTopWidth: 1,
+    borderBottomWidth: 1,
     flexDirection: 'row',
     height: 100,
     alignItems: 'center',
