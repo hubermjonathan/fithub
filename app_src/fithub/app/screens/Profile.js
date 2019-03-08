@@ -5,11 +5,12 @@ import {
   Text,
   StyleSheet,
   Platform,
+  ScrollView,
   Image,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { getUserID } from '../lib/AccountFunctions';
 import Swiper from 'react-native-swiper';
+import { getUserID } from '../lib/AccountFunctions';
 
 export default class ProfileScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -64,8 +65,40 @@ export default class ProfileScreen extends React.Component {
           </View>
           <View style={styles.body}>
             <Swiper activeDotColor='#00adf5' loop={false}>
-              <View>
-                <Text>1</Text>
+              <View style={styles.subContainer}>
+                <ScrollView stickyHeaderIndices={[0]}>
+                  <View><Text style={styles.subHeader}>Records</Text></View>
+                  <View style={styles.record}>
+                    <Icon name="error" type="material" size={30} />
+                    <Text style={styles.recordText}>
+                      Andy hasn't done his part yet
+                    </Text>
+                  </View>
+                  <View style={styles.record}>
+                    <Icon name="error" type="material" size={30} />
+                    <Text style={styles.recordText}>
+                      Still waiting for Andy
+                    </Text>
+                  </View>
+                  <View style={styles.record}>
+                    <Icon name="error" type="material" size={30} />
+                    <Text style={styles.recordText}>
+                      Andy is not done yet
+                    </Text>
+                  </View>
+                  <View style={styles.record}>
+                    <Icon name="error" type="material" size={30} />
+                    <Text style={styles.recordText}>
+                      Maybe one day
+                    </Text>
+                  </View>
+                  <View style={styles.record}>
+                    <Icon name="error" type="material" size={30} />
+                    <Text style={styles.recordText}>
+                      Im going to die waiting
+                    </Text>
+                  </View>
+                </ScrollView>
               </View>
               <View>
                 <Text>2</Text>
@@ -124,7 +157,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#eee',
   },
   profPicCol: {
     flex: 2,
@@ -153,7 +186,7 @@ const styles = StyleSheet.create({
   body: {
     flexDirection: 'row',
     flex: 3,
-    backgroundColor: '#eee',
+    backgroundColor: '#fff',
   },
   profPic: {
     width: 110,
@@ -168,5 +201,29 @@ const styles = StyleSheet.create({
   stats: {
     color: '#333',
     fontSize: 20,
+  },
+  subContainer: {
+    flex: 1,
+  },
+  subHeader: {
+    fontSize: 28,
+    backgroundColor: '#fff',
+    color: '#333',
+    fontWeight: 'bold',
+    padding: 20,
+  },
+  record: {
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    height: 100,
+    alignItems: 'center',
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  recordText: {
+    color: '#333',
+    fontSize: 24,
+    paddingLeft: 20,
   },
 });
