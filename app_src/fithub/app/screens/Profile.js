@@ -7,6 +7,7 @@ import {
   Platform,
   ScrollView,
   Image,
+  TouchableWithoutFeedbackBase,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
@@ -16,29 +17,32 @@ export default class ProfileScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: 'Profile',
-      headerRight: <Icon name="settings" type="material" size={30} onPress={() => {navigation.push('Settings')}}/>
+      headerRight: <Icon name="settings" type="material" size={30} onPress={() => { navigation.push('Settings') }} />
     }
   };
 
   constructor(props) {
     super(props);
+    this.loadWorkoutActivity();
     this.loadUserData();
+    
     this.state = {
       name: '',
-      photo: ''
+      photo: '',
+      activityInfo: []
     }
   }
 
   render() {
-    if(Platform.OS === 'ios') {
+    if (Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.containerIOS}>
 
           <View style={styles.header}>
             <View style={styles.profPicCol}>
               <Image
-                style={styles.profPic} 
-                source={{uri: this.state.photo}}
+                style={styles.profPic}
+                source={{ uri: this.state.photo }}
               />
             </View>
             <View style={styles.infoCol}>
@@ -71,11 +75,14 @@ export default class ProfileScreen extends React.Component {
                 <ScrollView stickyHeaderIndices={[0]}>
                   <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Records</Text></View>
                   <Records />
-                  
+
                 </ScrollView>
               </View>
               <View>
-                <Text>2</Text>
+                <Text>Workout Activity</Text>
+                <ActivityCard 
+                  data={this.state.activityInfo}
+                />
               </View>
               <View>
                 <Text>3</Text>
@@ -86,7 +93,7 @@ export default class ProfileScreen extends React.Component {
         </SafeAreaView>
       );
     } else {
-      return(
+      return (
         <View style={styles.containerAND}>
           <Text>PROFILE</Text>
         </View>
@@ -99,23 +106,43 @@ export default class ProfileScreen extends React.Component {
     let userPhotoUrl = "";
     let id = await getUserID();
 
-    fetch('https://fithub-server.herokuapp.com/profile/'+id)
-    .then((res) => {
-      return res.json();
-    })
-    .then((data) => {
-      userFullName = data.name;
-      userPhotoUrl = data.avatar.substring(0, data.avatar.length-7);
+    fetch('https://fithub-server.herokuapp.com/profile/' + id)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        userFullName = data.name;
+        userPhotoUrl = data.avatar.substring(0, data.avatar.length - 7);
 
-      this.setState({
-        name: userFullName,
-        photo: userPhotoUrl
+        this.setState({
+          name: userFullName,
+          photo: userPhotoUrl
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
   }
+
+  async loadWorkoutActivity() {
+    let id = await getUserID();
+
+    fetch('https://fithub-server.herokuapp.com/logs/' + id)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        data.logs.map((val, index) => {
+          console.log(val);
+          this.state.activityInfo.push({ name: val.name, date: val.date });
+          //console.log(val.name);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
 }
 
 class Records extends React.Component {
@@ -136,9 +163,9 @@ class Records extends React.Component {
   render() {
     let records = [];
 
-    for(let i = 0; i < this.state.algoData.length; i++) {
+    for (let i = 0; i < this.state.algoData.length; i++) {
       records.push(
-        <View style={styles.record}>
+        <View style={styles.record} key={i}>
           <Icon name="error" type="material" size={30} />
           <Text style={styles.recordText}>
             {this.state.algoData[i].text}
@@ -150,6 +177,35 @@ class Records extends React.Component {
     return records;
   }
 }
+
+class ActivityCard extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      activityInfo: []
+
+    }
+
+  }
+
+  render() {
+    let aCards = [];
+    for (let x = 0; x < this.props.data.length; x++) {
+      aCards.push(
+        <View style={styles.card} key={"card-" + x}>
+          <View>
+            <Text>ghughj</Text>
+          </View>
+        </View>
+      )
+    }
+    return aCards;
+  }
+
+
+}
+
 
 const styles = StyleSheet.create({
   containerIOS: {
@@ -236,5 +292,12 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 24,
     paddingLeft: 20,
+  },
+  card: {
+    flex: 0,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 17,
   },
 });
