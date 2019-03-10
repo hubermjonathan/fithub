@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   TouchableWithoutFeedbackBase,
+  TouchableOpacity,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
@@ -23,15 +24,15 @@ export default class ProfileScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.loadWorkoutActivity();
-    this.loadUserData();
-    
     this.state = {
       name: '',
       photo: '',
       activityInfo: []
     }
+    this.loadWorkoutActivity();
+    this.loadUserData();
   }
+
 
   render() {
     if (Platform.OS === 'ios') {
@@ -79,10 +80,13 @@ export default class ProfileScreen extends React.Component {
                 </ScrollView>
               </View>
               <View>
-                <Text>Workout Activity</Text>
-                <ActivityCard 
-                  data={this.state.activityInfo}
-                />
+                <ScrollView>
+                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
+                  <ActivityCard
+                    data={this.state.activityInfo}
+                  />
+                  <Text>{this.state.activityInfo.length}</Text>
+                </ScrollView>
               </View>
               <View>
                 <Text>3</Text>
@@ -132,11 +136,11 @@ export default class ProfileScreen extends React.Component {
         return res.json();
       })
       .then((data) => {
+        let info = [];
         data.logs.map((val, index) => {
-          console.log(val);
-          this.state.activityInfo.push({ name: val.name, date: val.date });
-          //console.log(val.name);
+          info.push({ name: val.name, date: val.date.slice(0, 10) });
         });
+        this.setState({ activityInfo: info });
       })
       .catch((err) => {
         console.log(err);
@@ -193,11 +197,17 @@ class ActivityCard extends React.Component {
     let aCards = [];
     for (let x = 0; x < this.props.data.length; x++) {
       aCards.push(
-        <View style={styles.card} key={"card-" + x}>
-          <View>
-            <Text>ghughj</Text>
+        <TouchableOpacity
+          key={x}
+          onPress={() => {/*do something here later*/ }}
+        >
+          <View style={styles.record}>
+            <Icon name="flash-outline" type="material-community" size={30} />
+            <Text style={styles.recordText}>
+              {this.props.data[x].name} - {this.props.data[x].date}
+            </Text>
           </View>
-        </View>
+        </TouchableOpacity>
       )
     }
     return aCards;
