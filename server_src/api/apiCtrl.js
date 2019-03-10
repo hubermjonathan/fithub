@@ -42,7 +42,7 @@ function isConnected(req, res) {
   }
 }
 
-function isValidated(req, res, err, user) {
+function isValidated(req, res, user) {
   if (!user) 
   {
     res.status(404).send({ message: "User not found" });
@@ -200,114 +200,101 @@ let newWorkout = function newWorkout(req, res) {
 } //end newWorkout
 
 //Log a user's workout into the DB
-let newLog = function newLog(req, res) {
-  if(!isConnected(req, res)){
-    console.log("DB is offlne");
-    return;
-  }
-  schemaCtrl.Profile.findById(req.body.id, (err, user) => 
-  {
-    if(!isValidated(req, res, err, user)){
-      return;
-    }
+let newLog = async function newLog(req, res) {
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
 
-    let exerciseData_ids = [];
-    //Construct the exerciseData objects
-    req.body.exercises.forEach(exercise => 
-    {
-      //build setData objects for the current exercise
-      let setData_ids = [];
-      exercise.sets.forEach(set =>
-      {
-        let newSetData = new schemaCtrl.SetData(set);
-        newSetData.save((err, newSetData) => 
-        {
-          if (err) 
-          {
-            console.log(err);
-            res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
-            return;
-          } 
-        }); //end save
-        setData_ids.push(mongoose.Types.ObjectId(newSetData._id));
-      }); //end forEach set
+  //validate setData json input
 
-      //build exerciseData objects for the workoutData
-      let newExerciseData = new schemaCtrl.ExerciseData
-      ({
-        name: exercise.name,
-        muscle_groups: exercise.muscle_groups,
-        sets: setData_ids
-      });
+  let exerciseData_ids = [];
+  //Construct the exerciseData objects
+  for(let i = 0; i < req.body.exercises.length; i++){
+    let exercise = req.body.exercises[i];
 
-      //save the exerciseData
-      newExerciseData.save((err, newExerciseData) => 
-      {
-        if (err) 
-        {
-          console.log(err);
-          res.status(500).send({ "message": "Database Error: Error while saving exercise log" });
-          return;
+    //build setData objects for the current exercise
+    let setData_ids = [];
+    for(let j = 0; j < exercise.sets.length; j++){
+      let set = exercise.sets[j];
+
+      let newSetData; 
+      try{
+      newSetData = await schemaCtrl.SetData.create(set);
+      }catch(validation_err){ console.log("Input Error: invalid json input at SetData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing setData" })};
+
+      newSetData.save((err, newSetData) => {
+        if (err) {
+          console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
         } 
       }); //end save
-      exerciseData_ids.push(mongoose.Types.ObjectId(newExerciseData._id));
-    }); //end forEach exercise, all exerciseData documents have been built and saved
+      setData_ids.push(mongoose.Types.ObjectId(newSetData._id));
+    }; //end forEach set
 
-    //Construct the workoutData object
-    let newWorkoutData = new schemaCtrl.WorkoutData(
-    {
-      name: req.body.name,
-      date: req.body.date,
-      exercises: exerciseData_ids
+    //build exerciseData objects for the workoutData
+    let newExerciseData;
+    try{
+      newExerciseData = await schemaCtrl.ExerciseData.create({
+      name: exercise.name,
+      muscle_groups: exercise.muscle_groups,
+      sets: setData_ids
     });
+    }catch(validation_err){ console.log("Input Error: validation error creating ExerciseData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exerciseData" })};
 
-    newWorkoutData.save((err, newWorkoutData) => 
-    {
-      if (err) 
-      {
-        console.log(err);
-        res.status(500).send({ "message": "Database Error: Error while saving workout log" });
-        return;
+    //save the exerciseData
+    newExerciseData.save((err, newExerciseData) => {
+      if (err) {
+        console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving exercise log" });
       } 
     }); //end save
+    exerciseData_ids.push(mongoose.Types.ObjectId(newExerciseData._id));
+  }; //end forEach exercise, all exerciseData documents have been built and saved
 
-    //Push the newWorkout log to the user profile
-    user.updateOne({$push: {logs: newWorkoutData}}, {},(err, raw) => 
-    {
-      if (err) 
-      {
-        res.status(500).send({"message": "Error: Log addition unsuccessful"});
-        return;
-      } 
-      else 
-      {
-        res.status(200).send({"message": "Log added successfully "});
-        return;
-      }
-    }); //end updateOne
-  }); //end findById
+  //Construct the workoutData object, catch validation error
+  let newWorkoutData;
+  try{
+    newWorkoutData = await schemaCtrl.WorkoutData.create({
+    name: req.body.name,
+    date: req.body.date,
+    exercises: exerciseData_ids
+  });
+  }catch(validation_err){ console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" })};
+
+  newWorkoutData.save((err, newWorkoutData) => {
+    if (err) {
+      console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving workout log" });
+    } 
+    else{
+      //Push the newWorkout log to the user profile
+      console.log(newWorkoutData._id);
+      user.updateOne({$push: {logs: newWorkoutData._id}}, (err) => {
+        if (err) {
+          res.status(500).send({"message": "Error: Log addition unsuccessful"});
+          return;
+        } 
+        else {
+          res.status(200).send({"message": "Log added successfully "});
+          return;
+        }
+      }); //end updateOne
+    }
+  }); //end save
+
+
 } //end newLog
 
 let newExercise = async function newExercise(req, res) {
-  if(!isConnected(req, res)){
-    console.log("DB is offline");
-    return;
-  }
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
   //Find the user
-  let user = await schemaCtrl.Profile.findById(req.body.id, (err, user) => 
-  {
-    if(!isValidated(req, res, err, user)){
-      return;
-    }
-  });
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
   //validate json synchronously
   try{
     for(let i = 0; i < req.body.sets.length; i++){
       set = req.body.sets[i];
       let validate = await schemaCtrl.Set.create(set);
-    }
-  }catch(validation_err){ res.status(500).send({ message: "Input error: validation failed for json set input" }); return console.log("validation error in creating sets"); }
+    };
+  }catch(validation_err){ res.status(500).send({ message: "Input error: validation failed for json set input" }); return console.log("validation error in creating sets"); };
 
   //validation successful, create the sets and save
   let set_ids= [];
