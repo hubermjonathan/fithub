@@ -609,17 +609,55 @@ let days = function days(req, res){
       res.status(500).send({ "message": "Database Error: user not found" });
       return
     }
-    let days = {};
+    let workoutDays = {};
     data.logs.forEach(day => {
-      if(days[day.date].exists){
-        days[day.date] += 1;
+      if(workoutDays[day.date].exists){
+        workoutDays[day.date] += 1;
       } else {
-        days[day.date] = 1;
+        workoutDays[day.date] = 1;
       }
     });
-    res.status(200).send(days);
+    res.status(200).send(workoutDays);
   });
 }
+
+let stats = function stats(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.Profile.findById(req.params.id).select("logs");
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    let max = {};
+    data.logs.forEach(day => {
+      day.exercises.forEach(exercise =>  {
+        if(max[exercise.name].exists){
+          exercise.sets.forEach(set => {
+            if(set.weight > max[exercise.name]){
+              max[exercise.name] = set.weight;
+            }
+          });
+        } else {
+          max[exercise.name] = exercise.set[0].weight;
+          exercise.sets.forEach(set => {
+            if(set.weight > max[exercise.name]){
+              max[exercise.name] = set.weight;
+            }
+          });
+        }
+      })
+    });
+    res.status(200).send(max);
+  });
+}
+
 
 let apiCtrl = {
   login: login,
