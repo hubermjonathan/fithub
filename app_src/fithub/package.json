@@ -17,6 +17,7 @@
     "react-native-autocomplete-search": "^1.0.8",
     "react-native-calendars": "^1.22.0",
     "react-native-dash": "0.0.9",
+    "react-native-datepicker": "^1.7.2",
     "react-native-dialog": "^5.5.0",
     "react-native-dropdown-autocomplete": "^1.0.10",
     "react-native-elements": "^1.0.0",
