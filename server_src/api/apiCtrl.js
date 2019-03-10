@@ -345,58 +345,6 @@ let newExercise = function newExercise(req, res) {
 } //end new exercise
 
 
-/*
-
-  Dev exercises no longer exist as a separate function. Instead, we will have a dev user
-  that can use the API like every other user. We will query this user every time we want to access
-  the standard library.
-
-*/
-
-/*
-//Post an exercise to the standard library
-let devExercise = function devExercise(req, res) {
-  if (db.readyState == 0) {
-    res.status(500).send({
-      error: "Database connection is down."
-    });
-    return;
-  }
-
-  if(req.body.authenticate!="e498a0841ce3c3ed948e48e9b788dcf620742070304ea327b3bdb0a83d26f37065dac9e611ce0e2d51478655c4007cef"){
-    res.status(401).send({message:"Unauthorized"});
-    return;
-  }
-
-  //Construct the exercise from the schema
-  let newExercise = new schemaCtrl.Exercise({
-    name: req.body.name,
-    description: req.body.description,
-    muscleGroups: req.body.muscleGroups,
-  });
-
-  //save the workout to the master workout collection
-  newExercise.save((err, newWorkout) => {
-    if (err) {
-      console.log(err);
-      if(err.name=='ValidationError'){
-        res.status(400).send({message: "Bad request"});
-        return;
-      }
-      res.status(500).send({
-        message: 'Workout unsuccessfully added'
-      });
-      return;
-    } else {
-      return res.status(200).send({
-        "message": "Workout added successfully"
-      })
-    }
-  });
-
-}
-*/
-
 /*--------Functions for returning user information--------*/
 
 //Get a user's logs from the database
@@ -647,6 +595,32 @@ let publicWorkouts = function publicWorkouts(req, res){
   });
 }
 
+let days = function days(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.Profile.findById(req.params.id).select("logs")
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    let days = {};
+    data.logs.forEach(day => {
+      if(days[day.date].exists){
+        days[day.date] += 1;
+      } else {
+        days[day.date] = 1;
+      }
+    });
+    res.status(200).send(days);
+  });
+}
+
 let apiCtrl = {
   login: login,
 
@@ -662,7 +636,10 @@ let apiCtrl = {
   newLog: newLog,
 
   users: users,
-  publicWorkouts: publicWorkouts
+  publicWorkouts: publicWorkouts,
+
+  dates = dates,
+  stats = stats
 
   //devExercise: devExercise
 }
