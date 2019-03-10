@@ -6,6 +6,7 @@ const passport = require('../config/passport');
 mongoose.connect(url, {
   useNewUrlParser: true
 });
+
 let db = mongoose.connection;
 db.once('open', () => {
 });
@@ -287,61 +288,72 @@ let newLog = function newLog(req, res) {
   }); //end findById
 } //end newLog
 
-let newExercise = function newExercise(req, res) {
+let newExercise = async function newExercise(req, res) {
   if(!isConnected(req, res)){
     console.log("DB is offline");
     return;
   }
   //Find the user
-  schemaCtrl.Profile.findById(req.body.id, (err, user) => 
+  let user = await schemaCtrl.Profile.findById(req.body.id, (err, user) => 
   {
     if(!isValidated(req, res, err, user)){
       return;
     }
-    //parse set_data array of JSON to build exercise object
-    let set_ids= [];
-    req.body.sets.forEach(set =>
-    {
-      let new_set = new schemaCtrl.Set(set);
-      new_set.save(function (err, ret) 
-      {
-        if(err)
-        {
-          res.status(500).send({ message: "Database error: unable to save set data" });
-          return;
-        }
-      });
-      set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
-    });
-    //construct exercise
-    let new_exercise = new schemaCtrl.Exercise
+  });
+
+  //validate json synchronously
+  try{
+    for(let i = 0; i < req.body.sets.length; i++){
+      set = req.body.sets[i];
+      let validate = await schemaCtrl.Set.create(set);
+    }
+  }catch(validation_err){ res.status(500).send({ message: "Input error: validation failed for json set input" }); return console.log("validation error in creating sets"); }
+
+  //validation successful, create the sets and save
+  let set_ids= [];
+  req.body.sets.forEach(set =>
+  {
+    let new_set = new schemaCtrl.Set(set);
+    new_set.save();
+    set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
+  });
+
+  //validate exercise input
+  try{
+    let new_exercise = await schemaCtrl.Exercise.create
     ({
       name: req.body.name, //string
       muscle_groups: req.body.muscle_groups, //array of strings
       equipment_type: req.body.equipment_type, //string
       sets: set_ids
     });
-    new_exercise.save(function (err, ret) 
-    {
-      if(err)
-      {
-        res.status(500).send({ message: "Database error: unable to save exercise data" });
-        return;
-      }
-    });
-    //push to user profile
-    user.updateOne({$push: { exercises: new_exercise._id }}, {},(err, raw) => 
-    {
-      if (err) 
-      {
-        res.status(500).send({ "message": " Error: Exercise addition unsuccessful" });
-      }
-      else 
-      {
-        res.status(200).send({ "message": " Exercise added successfully " });
-      }
-    }); //end updateOne
-  }); //end findbyId
+  }catch(validation_err){ res.status(500).send({ message: "Input error: validation failed for json exercise input" }); return console.log("validation error in creating exercise"); }
+
+  //validation successful, construct exercise
+  let new_exercise = new schemaCtrl.Exercise
+  ({
+    name: req.body.name, //string
+    muscle_groups: req.body.muscle_groups, //array of strings
+    equipment_type: req.body.equipment_type, //string
+    sets: set_ids
+  });
+
+  new_exercise.save(function (err, ret) {
+    if(err){
+      res.status(500).send({ message: "Database error: unable to save new exercise data" });
+      return;
+    }
+  });
+
+  //push to user profile
+  user.updateOne({$push: { exercises: new_exercise._id }}, {},(err, raw) => {
+    if (err) {
+      res.status(500).send({ "message": " Error: Exercise addition unsuccessful" });
+    }
+    else {
+      res.status(200).send({ "message": " Exercise added successfully " });
+    }
+  }); //end updateOne
 } //end new exercise
 
 
