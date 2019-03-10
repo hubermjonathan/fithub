@@ -218,7 +218,7 @@ let newLog = function newLog(req, res) {
       let setData_ids = [];
       exercise.sets.forEach(set =>
       {
-        
+
         //For keeping track of user maxes
         if(user.max[exercise.name].exists){
           if(user.max[exercise.name] < set.weight){
@@ -422,13 +422,35 @@ let workouts = function workouts(req, res) {
     return;
   }
 
-  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
-  {
-    /*
-    if(!isValidated(req, res, err, user)){
-      return;
+  let query = schemaCtrl.Profile.findById(req.params.id, 'workouts').populate
+  ({
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        model: "Set",
+        select: "-__v"
+      }
     }
-    */
+  );
+  let promise = query.exec();
+  promise.then((err, user) => {
+    if(err){
+      console.log(err.exercises);
+      console.log(err.exercises[0].sets)
+      res.status(404).send({ "message": "Database Error: error querying profile" });
+      return
+    }
+    else if(!user){
+      res.status(500).send({ "message": "Database Error: User not found" });
+      return
+    }
+  }) //end findById
+   //end populate
+
+  /*let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
+  {
     if(err){
       res.status(404).send({ "message": "Database Error: error querying profile" });
       return
@@ -465,7 +487,7 @@ let workouts = function workouts(req, res) {
     else{
       res.status(200).send(data);
     }
-  });
+  });*/
 }
 
 //Return a users custom private exercises
@@ -611,7 +633,7 @@ let publicWorkouts = function publicWorkouts(req, res){
   });
 }
 
-let days = function days(req, res){
+let dates = function dates(req, res){
   if(db.readyState==0){
     res.status(500).send({
       error: "Database connection is down."
@@ -717,8 +739,8 @@ let apiCtrl = {
   users: users,
   publicWorkouts: publicWorkouts,
 
-  dates = dates,
-  stats = stats
+  dates: dates,
+  stats: stats
 
   //devExercise: devExercise
 }
