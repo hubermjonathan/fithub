@@ -218,6 +218,22 @@ let newLog = function newLog(req, res) {
       let setData_ids = [];
       exercise.sets.forEach(set =>
       {
+        
+        //For keeping track of user maxes
+        if(user.max[exercise.name].exists){
+          if(user.max[exercise.name] < set.weight){
+            user.max[exercise.name] = set.weight;
+          }
+        } else {
+          user.max[exercise.name] = set.weight;
+        }
+        //For keeping track of user workout dates
+        if(user.dates[exercise.date].exists){
+          user.dates[exercise.date]++;
+        } else {
+          user.dates[exercise.date] = 1;
+        }
+
         let newSetData = new schemaCtrl.SetData(set);
         newSetData.save((err, newSetData) => 
         {
@@ -602,6 +618,17 @@ let days = function days(req, res){
     });
     return;
   }
+  let query = schemaCtrl.Profile.findById(req.params.id).select("dates")
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    res.status(200).send(data);
+  });
+
+  /*
   let query = schemaCtrl.Profile.findById(req.params.id).select("logs")
   let promise = query.exec();
   promise.then(data => {
@@ -619,6 +646,7 @@ let days = function days(req, res){
     });
     res.status(200).send(workoutDays);
   });
+  */
 }
 
 let stats = function stats(req, res){
@@ -628,6 +656,18 @@ let stats = function stats(req, res){
     });
     return;
   }
+
+  let query = schemaCtrl.Profile.findById(req.params.id).select("maxes")
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    res.status(200).send(data);
+  });
+  
+  /*
   let query = schemaCtrl.Profile.findById(req.params.id).select("logs");
   let promise = query.exec();
   promise.then(data => {
@@ -656,6 +696,7 @@ let stats = function stats(req, res){
     });
     res.status(200).send(max);
   });
+  */
 }
 
 
