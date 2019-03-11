@@ -105,206 +105,6 @@ let newWorkout = async function newWorkout(req, res) {
 } //end newWorkout
 
 //Log a user's workout into the DB
-let newLog = function newLog(req, res) {
-    /*
-    let exerciseData_ids = [];
-    let setData = [];
-    //Construct the exerciseData objects
-    req.body.exercises.forEach(exercise => 
-    {
-      //build setData objects for the current exercise
-      let setData_ids = [];
-      exercise.sets.forEach(set =>
-      {
-
-        //For keeping track of user maxes
-        if(user.max[exercise.name].exists){
-          if(user.max[exercise.name] < set.weight){
-            user.max[exercise.name] = set.weight;
-          }
-        } else {
-          user.max[exercise.name] = set.weight;
-        }
-        //For keeping track of user workout dates
-        if(user.dates[exercise.date].exists){
-          user.dates[exercise.date]++;
-        } else {
-          user.dates[exercise.date] = 1;
-        }
-
-        let newSetData = new schemaCtrl.SetData(set);
-        let dataQuery = newSetData.save(); 
-        let dataPromise = dataQuery.exec();
-        dataPromise.then((data) =>{
-          console.log(data);  
-          if (!data) 
-            {
-              console.log(err);
-              res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
-              return;
-            } 
-        });
-        setData_ids.push(mongoose.Types.ObjectId(newSetData._id));
-      }); //end forEach set
-
-      //build exerciseData objects for the workoutData
-      let newExerciseData = new schemaCtrl.ExerciseData
-      ({
-        name: exercise.name,
-        muscle_groups: exercise.muscle_groups,
-        sets: setData_ids
-      });
-
-      //save the exerciseData
-      newExerciseData.save((err, newExerciseData) => 
-      {
-        if (err) 
-        {
-          console.log(err);
-          res.status(500).send({ "message": "Database Error: Error while saving exercise log" });
-          return;
-        } 
-      }); //end save
-      exerciseData_ids.push(mongoose.Types.ObjectId(newExerciseData._id));
-    }); //end forEach exercise, all exerciseData documents have been built and saved
-
-    //Construct the workoutData object
-    let newWorkoutData = new schemaCtrl.WorkoutData(
-    {
-      name: req.body.name,
-      date: req.body.date,
-      exercises: exerciseData_ids
-    });
-
-    let workoutQuery = newWorkoutData.save();
-    let workoutPromise = workoutQuery.exec();
-    workoutPromise.then(data => {
-      console.log(data);
-      if (!data) 
-      {
-        res.status(500).send({ "message": "Database Error: Error while saving workout log" });
-        return;
-      }
-        //Push the newWorkout log to the user profile
-      let userWorkout = user.updateOne({$push: {logs: newWorkoutData}}, {});
-      let userPromise = userWorkout.exec();
-      userPromise.then(data => {
-        if (!data) 
-        {
-          res.status(500).send({"message": "Error: Log addition unsuccessful"});
-          return;
-        } 
-        else 
-        {
-          res.status(200).send({"message": "Log added successfully "});
-          return;
-        }
-      }); //end updateOne 
-    });
-
-    
-  }); //end findById
-*/
-if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
-  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
-
-  //Construct the exercise documents and keep track of their IDs
-  let exercise_ids = [];
-  for(let i = 0; i < req.body.exercises.length; i++){
-    let exercise = req.body.exercises[i];
-    if(exercise.exists) { //exercise exists
-      try{
-      let findExercise = await schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => {
-          //exercise confirmed to exist, push _id
-          exercise_ids.push(mongoose.Types.ObjectId(exercise._id));
-      });
-      }catch(err){
-        return res.status(404).send({ message: "Database Error: Exercise claimed to exist not found" });
-      }
-    }
-    else{ //create exercise on the fly
-      //creating set data for the exercise
-      let set_ids = [];
-      for(let j = 0; j < exercise.sets.length; j++){
-        let set = exercise.sets[j];
-        let new_set;
-        try{
-          new_set = await schemaCtrl.Set.create(set);
-        }catch(validation_err){ console.log("Input Error: invalid json input at Set"); return res.status(500).send({ "message": "Input Error: Validation error while constructing set" })};
-        new_set.save(function (err, ret) {
-          if(err){ return res.status(500).send({ message: "Database error: unable to save set data" });}
-        });
-        set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
-      }; //end forEach exercise.set
-
-      let newExercise;
-      try{
-      newExercise = await schemaCtrl.Exercise.create({ //create new exercise
-        name: exercise.name,
-        muscle_groups: exercise.muscle_groups,
-        equipment_type: exercise.equipment_type,
-        sets: set_ids,
-      });
-      }catch(validation_err){ console.log("Input Error: invalid json input at exercise"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exercise" })};
-
-      newExercise.save((err, newExercise) => { //save new exercise
-        if (err) {
-          console.log("error saving exercise");
-          res.status(500).send({ "message": "Database error: Error saving exercise to database" });
-          return false;
-        }
-        else{
-          user.updateOne({$push: { exercises: newExercise._id }}, {}, (err, raw) => {
-            if (err) {
-              console.log(err);
-              res.status(500).send({ "message": "Database Error: Error while pushing exercise to user profile" });
-              return true;
-            }
-          }); //end updateOne
-        }
-      }); //end save
-      exercise_ids.push(mongoose.Types.ObjectId(newExercise._id));
-    }
-  }; //end foreach exercise
-
-
-  //Construct the workout JSON object
-  let newWorkout;
-  try{
-  newWorkout = await schemaCtrl.WorkoutPlan.create({
-    name: req.body.name,
-    description: req.body.description,
-    date: req.body.date,
-    exercises: exercise_ids,
-    ownerUID: req.body.id,
-  });
-  }catch(validation_err){ console.log("Input Error: invalid json input at workout"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workout" })};
-
-  //save the workout to the master workout collection
-  newWorkout.save((err, newWorkout) => {
-    if (err) {
-      console.log("error saving workout");
-      res.status(500).send({ "message": "Database Error: Error while saving new workout plan" });
-      return;
-    } 
-    else {
-      user.updateOne({$push: { workouts: newWorkout._id }}, {}, (err, raw) => {
-        if (err) {
-        console.log("error pushing workout into profile");
-          res.status(500).send({ "message": "Database Error: Error while pushing workout plan to user profile" });
-          return;
-        }
-        else {
-          res.status(200).send({ "message": "Workout added successfully" });
-          return;
-        }
-      }); //end updateOne
-    }
-  }); //end save
-} //end newWorkout
-
-//Log a user's workout into the DB
 let newLog = async function newLog(req, res) {
   if(!isConnected(req, res)){ return console.log("DB is offline");}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
@@ -476,6 +276,8 @@ let logs = function logs(req, res) {
 
   let query = schemaCtrl.Profile.findById(req.params.id, 'logs').populate
   ({
+    path: "logs",
+    populate : {
       path: "exercises",
       select: "-__v",
       populate:
@@ -484,6 +286,7 @@ let logs = function logs(req, res) {
         model: "Set",
         select: "-__v"
       }
+    }
     }
   );
   let promise = query.exec();
@@ -496,49 +299,6 @@ let logs = function logs(req, res) {
     }
   }) //end findById
    //end populate
-
-
-  
-/*
-  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
-  {
-    if(err){
-      res.status(404).send({ "message": "Database Error: error querying profile" });
-      return
-    }
-    else if(!user){
-      res.status(500).send({ "message": "Database Error: User not found" });
-      return
-    }
-  }) //end findById
-  .select("-email -workouts -exercises -avatar -__v -token")
-  .populate
-  ({
-    path: "logs",
-    select: "-__v",
-    populate:
-    {
-      path: "exercises",
-      select: "-__v",
-      populate:
-      {
-        path: "sets",
-        select: "-__v",
-      }
-    }
-  }) //end populate
-  .exec((err, data) =>
-  {
-    if(err)
-    {
-      res.status(500).send({ "message": "Database Error: Populate query failed" });
-      return;
-    }
-    else{
-      res.status(200).send(data);
-    }
-  });
-  */
 }
 
 //Return a users workouts
