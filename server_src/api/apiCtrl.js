@@ -327,18 +327,17 @@ let newExercise = async function newExercise(req, res) {
 
   new_exercise.save(function (err, ret) {
     if(err){
-      res.status(500).send({ message: "Database error: unable to save new exercise data" });
-      return;
+      return res.status(500).send({ message: "Database error: unable to save new exercise data" });
     }
   });
 
   //push to user profile
   user.updateOne({$push: { exercises: new_exercise._id }}, {},(err, raw) => {
     if (err) {
-      res.status(500).send({ "message": " Error: Exercise addition unsuccessful" });
+      return res.status(500).send({ "message": " Error: Exercise addition unsuccessful" });
     }
     else {
-      res.status(200).send({ "message": " Exercise added successfully " });
+      return res.status(200).send({ "message": " Exercise added successfully " });
     }
   }); //end updateOne
 } //end new exercise
@@ -348,9 +347,9 @@ let newExercise = async function newExercise(req, res) {
 //delete exercise
 //TODO: look into deleting residual parent workouts
 let delExercise = async function delExercise(req, res) {
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
-  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
-  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  if(!isConnected(req, res)){ return console.log("delExercise: DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("delExercise: invalid id");});
+  if(!isValidated(req, res, user)){ return console.log("delExercise: Unauthorized request"); };
   
   let exercises = req.body.exercises;
   let exerciseIds = [];
@@ -362,7 +361,10 @@ let delExercise = async function delExercise(req, res) {
       path: "sets",
       model: "Set"
     },
-  }).select("_id").exec().catch(err => {console.log("error querying profile");});
+  })
+  .select("_id")
+  .exec()
+  .catch(err => {console.log("delExercise: error querying profile");});
 
   for(let i = 0; i < user_exercises.exercises.length; i++){
     let exercise = user_exercises.exercises[i];
@@ -370,13 +372,12 @@ let delExercise = async function delExercise(req, res) {
       exerciseIds.push(exercise._id); //push into deletion bin
       exercise.sets.forEach(set => {
           setIds.push(set._id); //push into deletion bin
-      }); //forEach set in exercise
-
+      }); //end forEach set in exercise
       //remove from profile
       user.exercises.remove(exercise._id);
-      user.save().catch(err => {console.log("error saving profile ");});
     }
-  }; //forEach exercise
+  }; //end forEach exercise
+  user.save().catch(err => {console.log("delExercise: error saving profile edits");});
 
   //begin deleting garbage
   if(exerciseIds.length == 0){
@@ -384,21 +385,21 @@ let delExercise = async function delExercise(req, res) {
   }
   else{
     exerciseIds.forEach(id => {
-      console.log("exercise: " + id);
-      schemaCtrl.Exercise.deleteOne({_id: id}).catch(err => {console.log("error deleting exercise: " + id);});
+      //console.log("exercise: " + id);
+      schemaCtrl.Exercise.deleteOne({_id: id}).catch(err => {return console.log("delExercise: error deleting exercise: " + id);});
     });
     setIds.forEach(id => {
-      console.log("set: " + id);
-      schemaCtrl.Set.deleteOne({_id: id}).catch(err => {console.log("error deleting set: " + id);});
+      //console.log("set: " + id);
+      schemaCtrl.Set.deleteOne({_id: id}).catch(err => {return console.log("delExercise: error deleting set: " + id);});
     });
     return res.status(200).send({ "message": "Successfully deleted exercises: " + exerciseIds });
   }
 }
 
 let delWorkout = async function delWorkout(req, res) {
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
-  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
-  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  if(!isConnected(req, res)){ return console.log("delWorkouts: DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {return console.log("delWorkouts: invalid id");});
+  if(!isValidated(req, res, user)){ return console.log("delWorkouts: Unauthorized request"); };
   
   let workouts = req.body.workouts;
   let workoutIds = [];
@@ -415,9 +416,8 @@ let delWorkout = async function delWorkout(req, res) {
         model: "Set"
       }
     },
-  }).select("_id").exec().catch(err => {return console.log("error querying init profile");});
+  }).select("_id").exec().catch(err => {return console.log("delWorkouts: error querying initial profile");});
 
-  //let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("error querying profile");});
   for(let i = 0; i < user_workouts.workouts.length; i++){
     let workout = user_workouts.workouts[i];
     if(workouts.includes(workout._id) || workouts.includes("drop_all")){
@@ -432,9 +432,9 @@ let delWorkout = async function delWorkout(req, res) {
 
       //remove from profile
       user.workouts.remove(workout._id);
-      user.save().catch(err => {console.log("error saving profile ");});
     }
   }; //forEach workout
+  user.save().catch(err => {console.log("delWorkouts: error saving exits to profile");});
 
   //begin deleting garbage
   if(workoutIds.length == 0){
@@ -442,16 +442,16 @@ let delWorkout = async function delWorkout(req, res) {
   }
   else{
     workoutIds.forEach(id => {
-      console.log("workout: " + id);
-      schemaCtrl.WorkoutPlan.deleteOne({_id: id}).catch(err => {console.log("error deleting workout: " + id);});
+      //console.log("workout: " + id);
+      schemaCtrl.WorkoutPlan.deleteOne({_id: id}).catch(err => {console.log("delWorkouts: error deleting workout: " + id);});
     });
     exerciseIds.forEach(id => {
-      console.log("exercise: " + id);
-      schemaCtrl.Exercise.deleteOne({_id: id}).catch(err => {console.log("error deleting exercise: " + id);});
+      //console.log("exercise: " + id);
+      schemaCtrl.Exercise.deleteOne({_id: id}).catch(err => {console.log("delWorkouts: error deleting exercise: " + id);});
     });
     setIds.forEach(id => {
-      console.log("set: " + id);
-      schemaCtrl.Set.deleteOne({_id: id}).catch(err => {console.log("error deleting set: " + id);});
+      //console.log("set: " + id);
+      schemaCtrl.Set.deleteOne({_id: id}).catch(err => {console.log("delWorkouts: error deleting set: " + id);});
     });
     return res.status(200).send({ "message": "Successfully deleted workouts: " + workoutIds });
   }

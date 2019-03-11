@@ -47,7 +47,7 @@ let Exercise = new Schema({
   name: {type: String, required: true},
   muscle_groups: {type: [Number], validate: muscleGroup, required: true},
   equipment_type: {type: String, required: true},
-  sets: [{ type: Schema.Types.ObjectId, ref: "SetData", required: true}]
+  sets: [{ type: Schema.Types.ObjectId, ref: "Set", required: true}]
 });
 
 let Set = new Schema({
