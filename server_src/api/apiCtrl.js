@@ -286,25 +286,30 @@ let delExercise = async function delExercise(req, res) {
   for(let i = 0; i < user_exercises.exercises.length; i++){
     let exercise = user_exercises.exercises[i];
     if(exercises.includes(exercise._id)){
-      exerciseIds.push(exercise._id);
+      exerciseIds.push(exercise._id); //push into deletion bin
       exercise.sets.forEach(set => {
-          setIds.push(set._id);
-          }); //forEach set in exercise
-      let rmExercise = await schemaCtrl.Profile.findByIdAndUpdate(req.body.id, {$pull: {exercises: { _id: exercise._id }}}, { new: true });
+          setIds.push(set._id); //push into deletion bin
+      }); //forEach set in exercise
+
+      //remove from profile
+      let user = await schemaCtrl.Profile.findById(req.body.id);
+      user.exercises.remove(exercise._id);
+      user.save();
     }
   }; //forEach exercise
-  //begin deleting garbage_bin
+
+  //begin deleting garbage
   if(exerciseIds.length == 0){
     return res.status(404).send({ "message": "Database Error: Exercise not found" });
   }
   else{
     exerciseIds.forEach(id => {
       console.log("exercise: " + id);
-      schemaCtrl.Exercise.deleteOne({_id: mongoose.Types.ObjectId(id)});
+      schemaCtrl.Exercise.deleteOne({_id: id});
     });
     setIds.forEach(id => {
       console.log("set: " + id);
-      schemaCtrl.Set.deleteOne({_id: mongoose.Types.ObjectId(id)});
+      schemaCtrl.Set.deleteOne({_id: id});
     });
     return res.status(200).send({ "message": "Successfully deleted exercises: " + exerciseIds });
   }

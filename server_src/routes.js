@@ -24,6 +24,7 @@ router.post('/workouts/new', apiCtrl.newWorkout);           //Post a new workout
 router.get('/exercises/', apiCtrl.exercises);               //Get the standard exercises
 router.get('/exercises/:id', apiCtrl.uExercises);          //Get a users CUSTOM exercises
 router.post('/exercises/new', apiCtrl.newExercise);         //Post a custom exercise to a user profile
+router.post('/exercises/delete', apiCtrl.delExercise);         //Post a custom exercise to a user profile
 
 router.get('/logs/:id', apiCtrl.logs);                     //Get a users workout logs
 router.post('/logs/new', apiCtrl.newLog);                   //Post a users workout
