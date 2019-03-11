@@ -1,17 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-//USAGE
-//For displaying exercises available to be added to a workout plan
-//Contains "exercise, equipment"
-
-//EXAMPLE
-// let exercise = "Bench Press";
-// let equipment = "Barbell";
-
-//Exercise title: this.props.exercise
-//Exercise equipment_type: this.props.equipment
-
 export default class ExerciseCard extends React.Component {
   constructor(props) {
     super(props);
@@ -20,13 +9,11 @@ export default class ExerciseCard extends React.Component {
     render() {
         return(
             <View style={styles.card}>
-                <View style={styles.row}>
-                    <Text style={styles.exerciseText}>
-                        {this.props.exercise}
-                    </Text>
-                    <Text style={styles.equipmentText}>
-                        {this.props.equipment}
-                    </Text>
+                <Text style={styles.exerciseLabel}>
+                    {this.props.name}
+                </Text>
+                <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{this.props.equipment_type}</Text>
                 </View>
             </View>
         );
@@ -35,20 +22,36 @@ export default class ExerciseCard extends React.Component {
 
 const styles = StyleSheet.create({
     card: {
-        flex: 0,
-        width: '100%',
-        height: 'auto',
+        width: '98%',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginTop: 5,
         marginBottom: 5,
         borderTopWidth: .5,
         borderTopColor: 'black',
     },
-    row: {
+    cardTitle: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingTop: 3,
-        paddingBottom: 3,
+        marginBottom: 10,
+    },
+    exerciseLabel: {
+        fontWeight: 'bold',
+        fontSize: 24,
+    },
+    badge: {
+        width: '35%',
+        height: 30,
+        backgroundColor: '#00adf5',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    badgeText: {
+        color: '#fff',
+        fontSize: 18,
+        paddingTop: 6,
     },
     exerciseText: {
         fontWeight: 'bold',

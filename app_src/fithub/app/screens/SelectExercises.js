@@ -15,10 +15,6 @@ import { getWorkouts } from '../lib/WorkoutFunctions';
 
 export default class SelectExercisesScreen extends React.Component {
 
- 
-
-    //PROPS SHOULD CONTAIN RELEVANT DATA IN ORDER TO ACCESS WORKOUT IN DATABASE.
-    //EXERCISES SELECTED HERE WILL BE SENT TO SERVER IN REAL TIME
     constructor(props) {
         super(props);
     }
@@ -32,12 +28,12 @@ export default class SelectExercisesScreen extends React.Component {
             
             //Dummy data for debugging purposes
             exercises: [
-                {exercise: "Bench Press", equipment: "Barbell", key: "1"},
-                {exercise: "Bicep Curls", equipment: "Dumbbells", key: "2"},
-                {exercise: "Front Squat", equipment: "Smith Machine", key: "3"},
-                {exercise: "Cardio", equipment: "Treadmill", key: "4"},
-                {exercise: "Weighted Crunches", equipment: "Plate", key: "5"},
-                {exercise: "Calf Raises", equipment: "Dumbbells", key: "6"},
+                {name: "Bench Press", equipment_type: "Barbell", key: "1"},
+                {name: "Bicep Curls", equipment_type: "Dumbbells", key: "2"},
+                {name: "Front Squat", equipment_type: "Smith Machine", key: "3"},
+                {name: "Cardio", equipment_type: "Treadmill", key: "4"},
+                {name: "Weighted Crunches", equipment_type: "Plate", key: "5"},
+                {name: "Calf Raises", equipment_type: "Dumbbells", key: "6"},
             ]
         });
     }
@@ -47,11 +43,13 @@ export default class SelectExercisesScreen extends React.Component {
             <View style={styles.page}>
                 <FlatList
                     data={this.state.exercises}
+                    contentContainerStyle={styles.list}
                     renderItem={({item, index}) => 
                         <TouchableHighlight onPress={() => this._onExercisePress(item)}>
                             <ExerciseCard
-                                exercise={item.exercise}
-                                equipment={item.equipment}
+                                name={item.name}
+                                muscle_group={item.muscle_group}
+                                equipment_type={item.equipment_type}
                             />
                         </TouchableHighlight>
                     }
@@ -60,18 +58,26 @@ export default class SelectExercisesScreen extends React.Component {
         );
     }
 
-    _onExercisePress(item) {
-        // const onCallback = this.props.navigation.getParam('onCallback');
-         const onCallback = this.props.navigation.state.params._handleAddExercisesButton;
-        //console.log(onCallback(item));
-        console.log(this.props.navigation);
+    _onExercisePress(exercise) {
+
         Alert.alert(
             'Confirm:',
             `Would you like to add this exercise to today's workout?`,
             [
                 //Buttons are in the order: (Neutral), Negative, Positive
                 {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-                {text: 'Yes', onPress: this.props.navigation.state.params._handleAddExercisesButton(item)},
+                {text: 'Yes', onPress: () => {
+                    const newExercise = 
+                        {name: exercise.name, 
+                        muscle_group: 
+                        exercise.muscle_group, 
+                        equipment_type: exercise.equipment_type, 
+                        sets: [],
+                        };
+                    console.log("New Exercise: ", newExercise);
+                    this.props.navigation.state.params.addExercise(newExercise);
+                    }
+                },
             ]
         );
     }
@@ -79,7 +85,7 @@ export default class SelectExercisesScreen extends React.Component {
 const styles = StyleSheet.create({
     input: {
         borderColor: 'grey',
-        borderWidth: 4,
+        borderWidth: 4, 
         borderRadius: 50,
         width: 300,
         textAlign: 'center',
@@ -87,6 +93,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         padding: 5,
         color: 'grey'
+    },
+    list: {
+        justifyContent: 'center',   
     },
     center: {
         justifyContent: 'center',

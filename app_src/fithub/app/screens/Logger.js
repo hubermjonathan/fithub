@@ -21,6 +21,14 @@ export default class LoggerScreen extends React.Component {
     //     }
     // };
 
+    static navigationOptions = ({ navigation }) => {
+        return {
+          title: 'Workout',
+          headerRight: <Icon name="add" type="material" size={35} onPress={() => {navigation.push('SelectExercises')} } />
+          //headerRight: <Icon name="add" type="material" size={35} onPress={() => {navigation.push('SelectExercises', {addExercise: (newExercise) => this._addExercise})} } />
+        }
+      };
+
     constructor(props) {
         super(props);
         //this.props.navigation.getParam('workout', null);
@@ -40,8 +48,9 @@ export default class LoggerScreen extends React.Component {
     }
 
     render() {
-        return(
-            <View style={styles.page}>
+        //this.props.navigation.setParams({addExercise: (newExercise) => this._addExercise});
+        return( 
+            <View style={styles.page}> 
                 <View>
                     <FlatList
                         data={this.state.exercises}
@@ -99,6 +108,15 @@ export default class LoggerScreen extends React.Component {
         // });
         const newExercises = JSON.parse(JSON.stringify(this.state.exercises));
         newExercises[exerciseIndex].sets.splice(setIndex, 1);
+        this.setState({
+            exercises: newExercises
+        });
+    }
+
+    _addExercise(newExercise) {
+        console.log("New exercise in logger: ", newExercise);
+        const newExercises = JSON.parse(JSON.stringify(this.state.exercises));
+        newExercises.push(newExercise);
         this.setState({
             exercises: newExercises
         });

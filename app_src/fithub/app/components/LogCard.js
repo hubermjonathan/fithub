@@ -97,6 +97,7 @@ export default class LogCard extends React.Component {
 
                         <TouchableOpacity 
                         onPress={() => this._modalOKButton() }
+                        style={styles.button}
                         >
                             <Text style={styles.buttonText}>
                                 OK
