@@ -9,10 +9,20 @@ import {
   Image,
   TouchableWithoutFeedbackBase,
   TouchableOpacity,
+  Dimensions
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 import { getUserID } from '../lib/AccountFunctions';
+import { ContributionGraph } from 'react-native-chart-kit';
+
+const chartConfig = {
+  backgroundGradientFrom: '#ffffff',
+  backgroundGradientTo: '#ffffff',
+  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  strokeWidth: 2 // optional, default 3
+}
+const screenWidth = Dimensions.get('window').width
 
 export default class ProfileScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -27,7 +37,8 @@ export default class ProfileScreen extends React.Component {
     this.state = {
       name: '',
       photo: '',
-      activityInfo: []
+      activityInfo: [],
+      dates:[]
     }
     this.loadWorkoutActivity();
     this.loadUserData();
@@ -82,6 +93,15 @@ export default class ProfileScreen extends React.Component {
               <View>
                 <ScrollView>
                   <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
+                  <ContributionGraph
+                    style={{borderBottomWidth:1}}
+                    values={this.state.dates}
+                    endDate={new Date('2019-06-01')}
+                    numDays={105}
+                    width={screenWidth}
+                    height={220}
+                    chartConfig={chartConfig}
+                  />
                   <ActivityCard
                     data={this.state.activityInfo}
                   />
@@ -137,10 +157,13 @@ export default class ProfileScreen extends React.Component {
       })
       .then((data) => {
         let info = [];
+        let dates = [];
         data.logs.map((val, index) => {
           info.push({ name: val.name, date: val.date.slice(0, 10) });
+          dates.push({date:val.date.slice(0,10), count: 3})
         });
         this.setState({ activityInfo: info });
+        this.setState({ dates: dates });
       })
       .catch((err) => {
         console.log(err);
@@ -190,11 +213,9 @@ class ActivityCard extends React.Component {
       activityInfo: []
 
     }
-
   }
-
   render() {
-    let aCards = [];
+    let aCards = []
     for (let x = 0; x < this.props.data.length; x++) {
       aCards.push(
         <TouchableOpacity
@@ -210,6 +231,8 @@ class ActivityCard extends React.Component {
         </TouchableOpacity>
       )
     }
+
+
     return aCards;
   }
 

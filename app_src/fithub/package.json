@@ -16,6 +16,7 @@
     "react-native-autocomplete-input": "github:l-urence/react-native-autocomplete-input",
     "react-native-autocomplete-search": "^1.0.8",
     "react-native-calendars": "^1.22.0",
+    "react-native-chart-kit": "^2.3.0",
     "react-native-dash": "0.0.9",
     "react-native-datepicker": "^1.7.2",
     "react-native-dialog": "^5.5.0",
