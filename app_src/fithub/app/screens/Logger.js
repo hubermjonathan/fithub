@@ -45,6 +45,7 @@ export default class LoggerScreen extends React.Component {
                 <View>
                     <FlatList
                         data={this.state.exercises}
+                        extraData={this.state.exercises}
                         keyExtractor={(item, index) => index.toString()}
                         contentContainerStyle={styles.list}
                         renderItem={(item) => this.renderExerciseTable(item)}
@@ -54,7 +55,7 @@ export default class LoggerScreen extends React.Component {
         );
     }
     
-
+    //RENDER FUNCTIONS
     renderExerciseTable(item, index) {
 //console.log("EXERCISE: ", item);
         return(
@@ -70,60 +71,36 @@ export default class LoggerScreen extends React.Component {
         );
     }
 
+    //MUTATOR FUNCTIONS 
     //Functions to be passed to children elements for logging modifications.
-    _addSet = (exercise, set) => {
+    _addSet = (exerciseIndex, set) => {
         const newExercises = this.state.exercises;
-        newExercises[exercise.index].sets.push(set);
+        newExercises[exerciseIndex].sets.push(set);
         this.setState({
             exercises: newExercises
         });
     }
 
-    _duplicateSet = (exercise, index) => {
-        const newSet = this.state.exercises[exercise.index].set[index];
-        const newExercises = this.state.exercises;
-        newExercises[exercise.index].sets.splice(index, 0, newSet);
+    _duplicateSet = (exerciseIndex, setIndex) => {
+        const newSet = this.state.exercises[exerciseIndex].sets[setIndex];
+        const newExercises = JSON.parse(JSON.stringify(this.state.exercises));
+        newExercises[exerciseIndex].sets.splice(setIndex, 0, newSet);
         this.setState({
             exercises: newExercises
         });
     }
 
     _deleteSet = (exerciseIndex, setIndex) => {
-        const newExercises = this.state.exercises;
+        // const stateCopy = Object.assign({}, this.state, {});
+        // const newExercises = stateCopy.exercises;
+        // newExercises[exerciseIndex].sets.splice(setIndex, 1);
+        // this.setState({
+        //     exercises: newExercises
+        // });
+        const newExercises = JSON.parse(JSON.stringify(this.state.exercises));
         newExercises[exerciseIndex].sets.splice(setIndex, 1);
         this.setState({
             exercises: newExercises
-        });
-    }
-
-    _modalOK = () => {
-        if (this.state.modalReps !== undefined && this.state.modalWeight !== undefined) {
-            this.setState(prevState => {
-                const updatedExercises = prevState.exercises;
-                updatedExercises[this.state.arrayIndex]
-                    .sets.push({"weight": this.state.modalWeight, "reps": this.state.modalReps, "warmup": this.state.modalWarmup});
-                exercises: updatedExercises
-            });
-
-            var Workout = {
-                name: this.state.name,
-                exercises: this.state.exercises,
-            }
-            console.log(Workout);
-            const result = postLog(Workout);
-        }
-        this.setState({
-            modalReps: undefined,
-            modalWeight: undefined,
-            addSetModalIsVisible: false
-        });
-    }
-
-    _handleAddExercisesButton(exercise) {
-        console.log(exercise);
-        this.setState(prevState => {
-            exersise.sets = [];
-            exercises: prevState.push(exercise)
         });
     }
 }

@@ -13,7 +13,7 @@ import BottomBar from '../components/BottomBar';
 import { Icon, Button } from 'react-native-elements';
 import { postLog } from '../lib/LogFunctions';
 import Dialog from 'react-native-dialog';
-
+import DatePicker from 'react-native-datepicker'
 export default class WorkoutLogEditScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -28,7 +28,8 @@ export default class WorkoutLogEditScreen extends React.Component {
     this.state = {
       name: this.props.navigation.getParam('name', 'Workout'),
       exercises: this.props.navigation.getParam('exercises', []),
-      selectedRep: 0
+      selectedRep: 0,
+      date: '01-01-2019'
 
     }
 
@@ -46,11 +47,33 @@ export default class WorkoutLogEditScreen extends React.Component {
         <SafeAreaView style={styles.containerIOS}>
           <ScrollView style={styles.cardsContainer}>
             <Cards exercises={this.state.exercises} />
+            <View style = {{alignItems:'center'}}>
+              <DatePicker
+                style={{ paddingTop: '3%' }}
+                date={this.state.date}
+                mode="date"
+                placeholder="select date"
+                format="YYYY-MM-DD"
+                minDate="2019-01-01"
+                confirmBtnText="Confirm"
+                cancelBtnText="Cancel"
+                onDateChange={(date) => { this.setState({ date: date }) }}
+              />
+            </View>
             <Button
               style={{ paddingTop: '3%' }}
               title={'Log this workout'}
               onPress={() => {
-                console.log('pressed');
+                /*
+                postLog({
+                  id: "",
+                  uid: "",
+                  token: "",
+                  date: this.state.date,
+                  name: this.state.name,
+                  exercises: this.state.exercises,
+                })*/
+                //postlog is broken for now. will crash the server
               }}
             />
           </ScrollView>
