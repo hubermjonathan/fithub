@@ -204,13 +204,16 @@ let newLog = function newLog(req, res) {
     console.log("DB is offlne");
     return;
   }
-  schemaCtrl.Profile.findById(req.body.id, (err, user) => 
+
+  let query = schemaCtrl.Profile.findById(req.body.id, (err, user) => 
   {
     if(!isValidated(req, res, err, user)){
       return;
     }
 
+    /*
     let exerciseData_ids = [];
+    let setData = [];
     //Construct the exerciseData objects
     req.body.exercises.forEach(exercise => 
     {
@@ -235,9 +238,116 @@ let newLog = function newLog(req, res) {
         }
 
         let newSetData = new schemaCtrl.SetData(set);
+        let dataQuery = newSetData.save(); 
+        let dataPromise = dataQuery.exec();
+        dataPromise.then((data) =>{
+          console.log(data);  
+          if (!data) 
+            {
+              console.log(err);
+              res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
+              return;
+            } 
+        });
+        setData_ids.push(mongoose.Types.ObjectId(newSetData._id));
+      }); //end forEach set
+
+      //build exerciseData objects for the workoutData
+      let newExerciseData = new schemaCtrl.ExerciseData
+      ({
+        name: exercise.name,
+        muscle_groups: exercise.muscle_groups,
+        sets: setData_ids
+      });
+
+      //save the exerciseData
+      newExerciseData.save((err, newExerciseData) => 
+      {
+        if (err) 
+        {
+          console.log(err);
+          res.status(500).send({ "message": "Database Error: Error while saving exercise log" });
+          return;
+        } 
+      }); //end save
+      exerciseData_ids.push(mongoose.Types.ObjectId(newExerciseData._id));
+    }); //end forEach exercise, all exerciseData documents have been built and saved
+
+    //Construct the workoutData object
+    let newWorkoutData = new schemaCtrl.WorkoutData(
+    {
+      name: req.body.name,
+      date: req.body.date,
+      exercises: exerciseData_ids
+    });
+
+    let workoutQuery = newWorkoutData.save();
+    let workoutPromise = workoutQuery.exec();
+    workoutPromise.then(data => {
+      console.log(data);
+      if (!data) 
+      {
+        res.status(500).send({ "message": "Database Error: Error while saving workout log" });
+        return;
+      }
+        //Push the newWorkout log to the user profile
+      let userWorkout = user.updateOne({$push: {logs: newWorkoutData}}, {});
+      let userPromise = userWorkout.exec();
+      userPromise.then(data => {
+        if (!data) 
+        {
+          res.status(500).send({"message": "Error: Log addition unsuccessful"});
+          return;
+        } 
+        else 
+        {
+          res.status(200).send({"message": "Log added successfully "});
+          return;
+        }
+      }); //end updateOne 
+    });
+
+    
+  }); //end findById
+*/
+
+  schemaCtrl.Profile.findById(req.body.id, (err, user) => 
+  {
+    if(!isValidated(req, res, err, user)){
+      return;
+    }
+
+    let exerciseData_ids = [];
+
+    if(req.body.date in user.dates){
+      user.dates[req.body.date]++;
+    } else {
+      user.dates[req.body.date] = 1;
+    }
+
+    //Construct the exerciseData objects
+    req.body.exercises.forEach(exercise => 
+    {
+      //build setData objects for the current exercise
+
+      let setData_ids = [];
+      exercise.sets.forEach(set =>
+      {
+
+        //For keeping track of user maxes
+        if(exercise.name in user.maxes){
+          if(user.maxes[exercise.name] < set.weight){
+            user.maxes[exercise.name] = set.weight;
+          }
+        } else {
+          user.maxes[exercise.name] = set.weight;
+        }
+        //For keeping track of user workout dates
+
+        let newSetData = new schemaCtrl.SetData(set);
         newSetData.save((err, newSetData) => 
         {
-          if (err) 
+          if (false) 
           {
             console.log(err);
             res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
@@ -286,6 +396,8 @@ let newLog = function newLog(req, res) {
       } 
     }); //end save
 
+    user.updateOne({$set: {maxes: user.maxes}}, {}, (err, raw) => {});
+    user.updateOne({$set: {dates: user.dates}}, {}, (err, raw) => {});
     //Push the newWorkout log to the user profile
     user.updateOne({$push: {logs: newWorkoutData}}, {},(err, raw) => 
     {
@@ -301,6 +413,7 @@ let newLog = function newLog(req, res) {
       }
     }); //end updateOne
   }); //end findById
+});
 } //end newLog
 
 let newExercise = function newExercise(req, res) {
@@ -369,14 +482,35 @@ let logs = function logs(req, res) {
   {
     return;
   }
+
+  let query = schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  ({
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        model: "Set",
+        select: "-__v"
+      }
+    }
+  );
+  let promise = query.exec();
+  promise.then((data) => {
+    if(!data){
+      res.status(404).send({ "message": "Database Error: User not found" });
+      return
+    } else {
+      res.status(200).send(data);
+    }
+  }) //end findById
+   //end populate
+
+
   
+/*
   let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
   {
-    /*
-    if(!isValidated(req, res, err, user)){
-      return;
-    }
-    */
     if(err){
       res.status(404).send({ "message": "Database Error: error querying profile" });
       return
@@ -413,6 +547,7 @@ let logs = function logs(req, res) {
       res.status(200).send(data);
     }
   });
+  */
 }
 
 //Return a users workouts
@@ -435,21 +570,17 @@ let workouts = function workouts(req, res) {
     }
   );
   let promise = query.exec();
-  promise.then((err, user) => {
-    if(err){
-      console.log(err.exercises);
-      console.log(err.exercises[0].sets)
-      res.status(404).send({ "message": "Database Error: error querying profile" });
+  promise.then((data) => {
+    if(!data){
+      res.status(404).send({ "message": "Database Error: User not found" });
       return
-    }
-    else if(!user){
-      res.status(500).send({ "message": "Database Error: User not found" });
-      return
+    } else {
+      res.status(200).send(data);
     }
   }) //end findById
    //end populate
-
-  /*let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
+/*
+  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
   {
     if(err){
       res.status(404).send({ "message": "Database Error: error querying profile" });
@@ -487,7 +618,8 @@ let workouts = function workouts(req, res) {
     else{
       res.status(200).send(data);
     }
-  });*/
+  });
+  */
 }
 
 //Return a users custom private exercises
@@ -649,26 +781,6 @@ let dates = function dates(req, res){
     }
     res.status(200).send(data);
   });
-
-  /*
-  let query = schemaCtrl.Profile.findById(req.params.id).select("logs")
-  let promise = query.exec();
-  promise.then(data => {
-    if(!data){
-      res.status(500).send({ "message": "Database Error: user not found" });
-      return
-    }
-    let workoutDays = {};
-    data.logs.forEach(day => {
-      if(workoutDays[day.date].exists){
-        workoutDays[day.date] += 1;
-      } else {
-        workoutDays[day.date] = 1;
-      }
-    });
-    res.status(200).send(workoutDays);
-  });
-  */
 }
 
 let stats = function stats(req, res){
@@ -688,37 +800,6 @@ let stats = function stats(req, res){
     }
     res.status(200).send(data);
   });
-  
-  /*
-  let query = schemaCtrl.Profile.findById(req.params.id).select("logs");
-  let promise = query.exec();
-  promise.then(data => {
-    if(!data){
-      res.status(500).send({ "message": "Database Error: user not found" });
-      return
-    }
-    let max = {};
-    data.logs.forEach(day => {
-      day.exercises.forEach(exercise =>  {
-        if(max[exercise.name].exists){
-          exercise.sets.forEach(set => {
-            if(set.weight > max[exercise.name]){
-              max[exercise.name] = set.weight;
-            }
-          });
-        } else {
-          max[exercise.name] = exercise.set[0].weight;
-          exercise.sets.forEach(set => {
-            if(set.weight > max[exercise.name]){
-              max[exercise.name] = set.weight;
-            }
-          });
-        }
-      })
-    });
-    res.status(200).send(max);
-  });
-  */
 }
 
 
