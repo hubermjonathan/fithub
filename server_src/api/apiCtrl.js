@@ -93,94 +93,15 @@ let newWorkout = async function newWorkout(req, res) {
     let exercise = req.body.exercises[i];
     if(exercise.exists) { //exercise exists
       try{
-      let findExercise = await schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => {
-          //exercise confirmed to exist, push _id
-          exercise_ids.push(mongoose.Types.ObjectId(exercise._id));
-      });
+        let findExercise = await schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => {
+            //exercise confirmed to exist, push _id
+            exercise_ids.push(mongoose.Types.ObjectId(exercise._id));
+        });
       }catch(err){
         return res.status(404).send({ message: "Database Error: Exercise claimed to exist not found" });
       }
     }
-    else{ //create exercise on the fly
-      //creating set data for the exercise
-      let set_ids = [];
-      for(let j = 0; j < exercise.sets.length; j++){
-        let set = exercise.sets[j];
-        let new_set;
-        try{
-          new_set = await schemaCtrl.Set.create(set);
-        }catch(validation_err){ console.log("Input Error: invalid json input at Set"); return res.status(500).send({ "message": "Input Error: Validation error while constructing set" })};
-        new_set.save(function (err, ret) {
-          if(err){ return res.status(500).send({ message: "Database error: unable to save set data" });}
-        });
-        set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
-      }; //end forEach exercise.set
-
-      let newExercise;
-      try{
-      newExercise = await schemaCtrl.Exercise.create({ //create new exercise
-        name: exercise.name,
-        muscle_groups: exercise.muscle_groups,
-        equipment_type: exercise.equipment_type,
-        sets: set_ids,
-      });
-      }catch(validation_err){ console.log("Input Error: invalid json input at exercise"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exercise" })};
-
-      newExercise.save((err, newExercise) => { //save new exercise
-        if (err) {
-          console.log("error saving exercise");
-          res.status(500).send({ "message": "Database error: Error saving exercise to database" });
-          return false;
-        }
-        else{
-          user.updateOne({$push: { exercises: newExercise._id }}, {}, (err, raw) => {
-            if (err) {
-              console.log(err);
-              res.status(500).send({ "message": "Database Error: Error while pushing exercise to user profile" });
-              return true;
-            }
-          }); //end updateOne
-        }
-      }); //end save
-      exercise_ids.push(mongoose.Types.ObjectId(newExercise._id));
-    }
-  }; //end foreach exercise
-
-
-  //Construct the workout JSON object
-  let newWorkout;
-  try{
-  newWorkout = await schemaCtrl.WorkoutPlan.create({
-    name: req.body.name,
-    description: req.body.description,
-    date: req.body.date,
-    exercises: exercise_ids,
-    ownerUID: req.body.id,
-  });
-  }catch(validation_err){ console.log("Input Error: invalid json input at workout"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workout" })};
-
-  //save the workout to the master workout collection
-  newWorkout.save((err, newWorkout) => {
-    if (err) {
-      console.log("error saving workout");
-      res.status(500).send({ "message": "Database Error: Error while saving new workout plan" });
-      return;
-    } 
-    else {
-      user.updateOne({$push: { workouts: newWorkout._id }}, {}, (err, raw) => {
-        if (err) {
-        console.log("error pushing workout into profile");
-          res.status(500).send({ "message": "Database Error: Error while pushing workout plan to user profile" });
-          return;
-        }
-        else {
-          res.status(200).send({ "message": "Workout added successfully" });
-          return;
-        }
-      }); //end updateOne
-    }
-  }); //end save
-  //console.log(newWorkout);
+  } //end findbyId
 } //end newWorkout
 
 //Log a user's workout into the DB
@@ -218,10 +139,10 @@ let newLog = async function newLog(req, res) {
     let newExerciseData;
     try{
       newExerciseData = await schemaCtrl.ExerciseData.create({
-      name: exercise.name,
-      muscle_groups: exercise.muscle_groups,
-      sets: setData_ids
-    });
+        name: exercise.name,
+        muscle_groups: exercise.muscle_groups,
+        sets: setData_ids
+      });
     }catch(validation_err){ console.log("Input Error: validation error creating ExerciseData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exerciseData" })};
 
     //save the exerciseData
@@ -240,7 +161,7 @@ let newLog = async function newLog(req, res) {
     name: req.body.name,
     date: req.body.date,
     exercises: exerciseData_ids
-  });
+    });
   }catch(validation_err){ console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" })};
 
   newWorkoutData.save((err, newWorkoutData) => {
@@ -264,6 +185,22 @@ let newLog = async function newLog(req, res) {
   }); //end save
 
 
+    user.updateOne({$set: {maxes: user.maxes}}, {}, (err, raw) => {});
+    user.updateOne({$set: {dates: user.dates}}, {}, (err, raw) => {});
+    //Push the newWorkout log to the user profile
+    user.updateOne({$push: {logs: newWorkoutData}}, {},(err, raw) => 
+    {
+      if (err) 
+      {
+        res.status(500).send({"message": "Error: Log addition unsuccessful"});
+        return;
+      } 
+      else 
+      {
+        res.status(200).send({"message": "Log added successfully "});
+        return;
+      }
+    }); //end updateOne
 } //end newLog
 
 let newExercise = async function newExercise(req, res) {
@@ -328,58 +265,6 @@ let newExercise = async function newExercise(req, res) {
 } //end new exercise
 
 
-/*
-
-  Dev exercises no longer exist as a separate function. Instead, we will have a dev user
-  that can use the API like every other user. We will query this user every time we want to access
-  the standard library.
-
-*/
-
-/*
-//Post an exercise to the standard library
-let devExercise = function devExercise(req, res) {
-  if (db.readyState == 0) {
-    res.status(500).send({
-      error: "Database connection is down."
-    });
-    return;
-  }
-
-  if(req.body.authenticate!="e498a0841ce3c3ed948e48e9b788dcf620742070304ea327b3bdb0a83d26f37065dac9e611ce0e2d51478655c4007cef"){
-    res.status(401).send({message:"Unauthorized"});
-    return;
-  }
-
-  //Construct the exercise from the schema
-  let newExercise = new schemaCtrl.Exercise({
-    name: req.body.name,
-    description: req.body.description,
-    muscleGroups: req.body.muscleGroups,
-  });
-
-  //save the workout to the master workout collection
-  newExercise.save((err, newWorkout) => {
-    if (err) {
-      console.log(err);
-      if(err.name=='ValidationError'){
-        res.status(400).send({message: "Bad request"});
-        return;
-      }
-      res.status(500).send({
-        message: 'Workout unsuccessfully added'
-      });
-      return;
-    } else {
-      return res.status(200).send({
-        "message": "Workout added successfully"
-      })
-    }
-  });
-
-}
-*/
-
 /*--------Functions for returning user information--------*/
 
 //Get a user's logs from the database
@@ -388,50 +273,32 @@ let logs = function logs(req, res) {
   {
     return;
   }
-  
-  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
-  {
-    /*
-    if(!isValidated(req, res, err, user)){
-      return;
-    }
-    */
-    if(err){
-      res.status(404).send({ "message": "Database Error: error querying profile" });
-      return
-    }
-    else if(!user){
-      res.status(500).send({ "message": "Database Error: User not found" });
-      return
-    }
-  }) //end findById
-  .select("-email -workouts -exercises -avatar -__v -token")
-  .populate
+
+  let query = schemaCtrl.Profile.findById(req.params.id, 'logs').populate
   ({
     path: "logs",
-    select: "-__v",
-    populate:
-    {
+    populate : {
       path: "exercises",
       select: "-__v",
       populate:
       {
         path: "sets",
-        select: "-__v",
+        model: "Set",
+        select: "-__v"
       }
     }
-  }) //end populate
-  .exec((err, data) =>
-  {
-    if(err)
-    {
-      res.status(500).send({ "message": "Database Error: Populate query failed" });
-      return;
     }
-    else{
+  );
+  let promise = query.exec();
+  promise.then((data) => {
+    if(!data){
+      res.status(404).send({ "message": "Database Error: User not found" });
+      return
+    } else {
       res.status(200).send(data);
     }
-  });
+  }) //end findById
+   //end populate
 }
 
 //Return a users workouts
@@ -441,13 +308,31 @@ let workouts = function workouts(req, res) {
     return;
   }
 
+  let query = schemaCtrl.Profile.findById(req.params.id, 'workouts').populate
+  ({
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        model: "Set",
+        select: "-__v"
+      }
+    }
+  );
+  let promise = query.exec();
+  promise.then((data) => {
+    if(!data){
+      res.status(404).send({ "message": "Database Error: User not found" });
+      return
+    } else {
+      res.status(200).send(data);
+    }
+  }) //end findById
+   //end populate
+/*
   let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
   {
-    /*
-    if(!isValidated(req, res, err, user)){
-      return;
-    }
-    */
     if(err){
       res.status(404).send({ "message": "Database Error: error querying profile" });
       return
@@ -485,6 +370,7 @@ let workouts = function workouts(req, res) {
       res.status(200).send(data);
     }
   });
+  */
 }
 
 //Return a users custom private exercises
@@ -630,6 +516,44 @@ let publicWorkouts = function publicWorkouts(req, res){
   });
 }
 
+let dates = function dates(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.Profile.findById(req.params.id).select("dates")
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    res.status(200).send(data);
+  });
+}
+
+let stats = function stats(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+
+  let query = schemaCtrl.Profile.findById(req.params.id).select("maxes")
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    res.status(200).send(data);
+  });
+}
+
+
 let apiCtrl = {
   login: login,
 
@@ -645,9 +569,12 @@ let apiCtrl = {
   newLog: newLog,
 
   users: users,
-  publicWorkouts: publicWorkouts
+  publicWorkouts: publicWorkouts,
+
+  dates: dates,
+  stats: stats
 
   //devExercise: devExercise
-}
+};
 
 module.exports = apiCtrl;

@@ -24,6 +24,8 @@ let Profile = new Schema({
   avatar: { type: String, required: true },                           //User profile picture
   uid: { type: String, required: true },                              //Google unique user id
   token : { type: String, required: true },
+  maxes : { type : Object },
+  dates : { type : Object },
   workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutPlan"}],         //Workout plans the user has submitted to the master list
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],         //Private exercises
   logs: [{ type: Schema.Types.ObjectId, ref: "WorkoutData"}],         //Workout data
