@@ -93,15 +93,94 @@ let newWorkout = async function newWorkout(req, res) {
     let exercise = req.body.exercises[i];
     if(exercise.exists) { //exercise exists
       try{
-        let findExercise = await schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => {
-            //exercise confirmed to exist, push _id
-            exercise_ids.push(mongoose.Types.ObjectId(exercise._id));
-        });
+      let findExercise = await schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => {
+          //exercise confirmed to exist, push _id
+          exercise_ids.push(mongoose.Types.ObjectId(exercise._id));
+      });
       }catch(err){
         return res.status(404).send({ message: "Database Error: Exercise claimed to exist not found" });
       }
     }
-  } //end findbyId
+    else{ //create exercise on the fly
+      //creating set data for the exercise
+      let set_ids = [];
+      for(let j = 0; j < exercise.sets.length; j++){
+        let set = exercise.sets[j];
+        let new_set;
+        try{
+          new_set = await schemaCtrl.Set.create(set);
+        }catch(validation_err){ console.log("Input Error: invalid json input at Set"); return res.status(500).send({ "message": "Input Error: Validation error while constructing set" })};
+        new_set.save(function (err, ret) {
+          if(err){ return res.status(500).send({ message: "Database error: unable to save set data" });}
+        });
+        set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
+      }; //end forEach exercise.set
+
+      let newExercise;
+      try{
+      newExercise = await schemaCtrl.Exercise.create({ //create new exercise
+        name: exercise.name,
+        muscle_groups: exercise.muscle_groups,
+        equipment_type: exercise.equipment_type,
+        sets: set_ids,
+      });
+      }catch(validation_err){ console.log("Input Error: invalid json input at exercise"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exercise" })};
+
+      newExercise.save((err, newExercise) => { //save new exercise
+        if (err) {
+          console.log("error saving exercise");
+          res.status(500).send({ "message": "Database error: Error saving exercise to database" });
+          return false;
+        }
+        else{
+          user.updateOne({$push: { exercises: newExercise._id }}, {}, (err, raw) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send({ "message": "Database Error: Error while pushing exercise to user profile" });
+              return true;
+            }
+          }); //end updateOne
+        }
+      }); //end save
+      exercise_ids.push(mongoose.Types.ObjectId(newExercise._id));
+    }
+  }; //end foreach exercise
+
+
+  //Construct the workout JSON object
+  let newWorkout;
+  try{
+  newWorkout = await schemaCtrl.WorkoutPlan.create({
+    name: req.body.name,
+    description: req.body.description,
+    date: req.body.date,
+    exercises: exercise_ids,
+    ownerUID: req.body.id,
+  });
+  }catch(validation_err){ console.log("Input Error: invalid json input at workout"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workout" })};
+
+  //save the workout to the master workout collection
+  newWorkout.save((err, newWorkout) => {
+    if (err) {
+      console.log("error saving workout");
+      res.status(500).send({ "message": "Database Error: Error while saving new workout plan" });
+      return;
+    }
+    else {
+      user.updateOne({$push: { workouts: newWorkout._id }}, {}, (err, raw) => {
+        if (err) {
+        console.log("error pushing workout into profile");
+          res.status(500).send({ "message": "Database Error: Error while pushing workout plan to user profile" });
+          return;
+        }
+        else {
+          res.status(200).send({ "message": "Workout added successfully" });
+          return;
+        }
+      }); //end updateOne
+    }
+  }); //end save
+  //console.log(newWorkout);
 } //end newWorkout
 
 //Log a user's workout into the DB
@@ -266,6 +345,8 @@ let newExercise = async function newExercise(req, res) {
 
 
 /*--------Functions for deleting information--------*/
+//delete exercise
+//TODO: look into deleting residual parent workouts
 let delExercise = async function delExercise(req, res) {
   if(!isConnected(req, res)){ return console.log("DB is offline"); };
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
@@ -281,20 +362,19 @@ let delExercise = async function delExercise(req, res) {
       path: "sets",
       model: "Set"
     },
-  }).select("_id").exec();
+  }).select("_id").exec().catch(err => {console.log("error querying profile");});
 
   for(let i = 0; i < user_exercises.exercises.length; i++){
     let exercise = user_exercises.exercises[i];
-    if(exercises.includes(exercise._id)){
+    if(exercises.includes(exercise._id) || exercises.includes("drop_all")){
       exerciseIds.push(exercise._id); //push into deletion bin
       exercise.sets.forEach(set => {
           setIds.push(set._id); //push into deletion bin
       }); //forEach set in exercise
 
       //remove from profile
-      let user = await schemaCtrl.Profile.findById(req.body.id);
       user.exercises.remove(exercise._id);
-      user.save();
+      user.save().catch(err => {console.log("error saving profile ");});
     }
   }; //forEach exercise
 
@@ -305,13 +385,75 @@ let delExercise = async function delExercise(req, res) {
   else{
     exerciseIds.forEach(id => {
       console.log("exercise: " + id);
-      schemaCtrl.Exercise.deleteOne({_id: id});
+      schemaCtrl.Exercise.deleteOne({_id: id}).catch(err => {console.log("error deleting exercise: " + id);});
     });
     setIds.forEach(id => {
       console.log("set: " + id);
-      schemaCtrl.Set.deleteOne({_id: id});
+      schemaCtrl.Set.deleteOne({_id: id}).catch(err => {console.log("error deleting set: " + id);});
     });
     return res.status(200).send({ "message": "Successfully deleted exercises: " + exerciseIds });
+  }
+}
+
+let delWorkout = async function delWorkout(req, res) {
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  
+  let workouts = req.body.workouts;
+  let workoutIds = [];
+  let exerciseIds = [];
+  let setIds = [];
+  let user_workouts = await schemaCtrl.Profile.findById(req.body.id).populate({
+    path: "workouts",
+    model: "WorkoutPlan",
+    populate: {
+      path: "exercises",
+      model: "Exercise",
+      populate: {
+        path: "sets",
+        model: "Set"
+      }
+    },
+  }).select("_id").exec().catch(err => {return console.log("error querying init profile");});
+
+  //let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("error querying profile");});
+  for(let i = 0; i < user_workouts.workouts.length; i++){
+    let workout = user_workouts.workouts[i];
+    if(workouts.includes(workout._id) || workouts.includes("drop_all")){
+      workoutIds.push(workout._id); //push workout into deletion bin
+      workout.exercises.forEach(exercise => {
+          exerciseIds.push(exercise._id); //push into exercise deletion bin
+          exercise.sets.forEach(set => {
+            setIds.push(set._id); //push set into deletion bin
+          }); //forEach set in exercise
+          user.exercises.remove(exercise._id);
+      }); //forEach exercise in workout
+
+      //remove from profile
+      user.workouts.remove(workout._id);
+      user.save().catch(err => {console.log("error saving profile ");});
+    }
+  }; //forEach workout
+
+  //begin deleting garbage
+  if(workoutIds.length == 0){
+    return res.status(404).send({ "message": "Database Error: Workout not found" });
+  }
+  else{
+    workoutIds.forEach(id => {
+      console.log("workout: " + id);
+      schemaCtrl.WorkoutPlan.deleteOne({_id: id}).catch(err => {console.log("error deleting workout: " + id);});
+    });
+    exerciseIds.forEach(id => {
+      console.log("exercise: " + id);
+      schemaCtrl.Exercise.deleteOne({_id: id}).catch(err => {console.log("error deleting exercise: " + id);});
+    });
+    setIds.forEach(id => {
+      console.log("set: " + id);
+      schemaCtrl.Set.deleteOne({_id: id}).catch(err => {console.log("error deleting set: " + id);});
+    });
+    return res.status(200).send({ "message": "Successfully deleted workouts: " + workoutIds });
   }
 }
 
@@ -361,13 +503,20 @@ let workouts = function workouts(req, res) {
 
   let query = schemaCtrl.Profile.findById(req.params.id, 'workouts').populate
   ({
-      path: "exercises",
+      path: "workouts",
+      model: "WorkoutPlan",
       select: "-__v",
       populate:
       {
-        path: "sets",
-        model: "Set",
-        select: "-__v"
+        path: "exercises",
+        model: "Exercise",
+        select: "-__v",
+        populate:
+        {
+          path: "sets",
+          model: "Set",
+          select: "-__v"
+        }
       }
     }
   );
@@ -607,6 +756,7 @@ let apiCtrl = {
   newWorkout: newWorkout,
 
   delExercise: delExercise,
+  delWorkout: delWorkout,
 
   exercises: exercises,
   uExercises: uExercises,
