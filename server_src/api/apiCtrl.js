@@ -265,6 +265,52 @@ let newExercise = async function newExercise(req, res) {
 } //end new exercise
 
 
+/*--------Functions for deleting information--------*/
+let delExercise = async function delExercise(req, res) {
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  
+  let exercises = req.body.exercises;
+  let exerciseIds = [];
+  let setIds = [];
+  let user_exercises = await schemaCtrl.Profile.findById(req.body.id).populate({
+    path: "exercises",
+    model: "Exercise",
+    populate: {
+      path: "sets",
+      model: "Set"
+    },
+  }).select("_id").exec();
+
+  for(let i = 0; i < user_exercises.exercises.length; i++){
+    let exercise = user_exercises.exercises[i];
+    if(exercises.includes(exercise._id)){
+      exerciseIds.push(exercise._id);
+      exercise.sets.forEach(set => {
+          setIds.push(set._id);
+          }); //forEach set in exercise
+      let rmExercise = await schemaCtrl.Profile.findByIdAndUpdate(req.body.id, {$pull: {exercises: { _id: exercise._id }}}, { new: true });
+    }
+  }; //forEach exercise
+  //begin deleting garbage_bin
+  if(exerciseIds.length == 0){
+    return res.status(404).send({ "message": "Database Error: Exercise not found" });
+  }
+  else{
+    exerciseIds.forEach(id => {
+      console.log("exercise: " + id);
+      schemaCtrl.Exercise.deleteOne({_id: mongoose.Types.ObjectId(id)});
+    });
+    setIds.forEach(id => {
+      console.log("set: " + id);
+      schemaCtrl.Set.deleteOne({_id: mongoose.Types.ObjectId(id)});
+    });
+    return res.status(200).send({ "message": "Successfully deleted exercises: " + exerciseIds });
+  }
+}
+
+
 /*--------Functions for returning user information--------*/
 
 //Get a user's logs from the database
@@ -382,11 +428,6 @@ let uExercises = function uExercises(req, res) {
 
   let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
   {
-    /*
-    if(!isValidated(req, res, err, user)){
-      return;
-    }
-    */
     if(err){
       res.status(404).send({ "message": "Database Error: error querying profile" });
       return
@@ -559,6 +600,8 @@ let apiCtrl = {
 
   workouts: workouts,
   newWorkout: newWorkout,
+
+  delExercise: delExercise,
 
   exercises: exercises,
   uExercises: uExercises,
