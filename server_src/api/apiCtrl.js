@@ -7,6 +7,58 @@ mongoose.connect(url, {
   useNewUrlParser: true
 });
 
+async function recalc(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  ({
+    path: "logs",
+    populate : {
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        model: "SetData",
+        select: "-__v"
+      }
+    }
+    }
+  ).sort({"logs.date":-1}).catch(err => {console.log("invalid id");});
+  user.maxes = {};
+  user.dates = {};
+  user.volumes = {};
+  user.logs.forEach(log => {
+    if(log.date in user.dates) {
+      user.dates[log.date]++; 
+    } else {
+      user.dates[log.date] = 1;
+    }
+    log.exercises.forEach(exercise => {
+      let vol = 0;
+      exercise.sets.forEach(set => { 
+        vol += set.reps * set.weight;
+        if(exercise.name in user.maxes){
+          if(user.maxes[exercise.name] < set.weight){
+            user.maxes[exercise.name] = set.weight;
+          }
+        } else {
+          user.maxes[exercise.name] = set.weight;
+        }
+      });
+      if(exercise.name in user.volumes){
+        if(user.volumes[exercise.name] < vol){
+          user.volumes[exercise.name] = vol;
+        }
+      } else {
+        user.volumes[exercise.name] = vol;
+      }
+    });
+  });
+  user.updateOne({$set: {maxes: user.maxes, dates: user.dates, volumes: user.volumes}}, {}, (err, raw) => {});
+  res.send({dates : user.dates, maxes: user.maxes, volumes : user.volumes});
+   //end populate
+}
+
 let db = mongoose.connection;
 db.once('open', () => {
 });
@@ -192,9 +244,33 @@ let newLog = async function newLog(req, res) {
   //validate setData json input
 
   let exerciseData_ids = [];
+  let newActivity;
+  if(req.body.date in user.dates) {
+    user.dates[req.body.date]++; 
+  } else {
+    user.dates[req.body.date] = 1;
+  }
   //Construct the exerciseData objects
   for(let i = 0; i < req.body.exercises.length; i++){
     let exercise = req.body.exercises[i];
+
+    exercise.sets.forEach(set =>
+    {
+       //For keeping track of user maxes
+      if(exercise.name in user.maxes){
+        if(user.maxes[exercise.name] < set.weight){
+          newActivity = `${user.name} has achieved a new max of ${set.weight}`;
+          user.maxes[exercise.name] = set.weight;
+        }
+      } else {
+        user.maxes[exercise.name] = set.weight;
+        newActivity = `${user.name} has done ${exercise.name} for the first time!`;
+      }
+    });
+    
+    if(newActivity==null){
+      newActivity = `${user.name} worked out on ${req.body.date}!`
+    }
 
     //build setData objects for the current exercise
     let setData_ids = [];
@@ -250,15 +326,15 @@ let newLog = async function newLog(req, res) {
     else{
       //Push the newWorkout log to the user profile
       console.log(newWorkoutData._id);
-      user.updateOne({$push: {logs: newWorkoutData._id}}, (err) => {
+      user.updateOne({$push: {logs: newWorkoutData._id, activity: newActivity}}, (err) => {
         if (err) {
           res.status(500).send({"message": "Error: Log addition unsuccessful"});
           return;
         } 
-        else {
+/*        else {
           res.status(200).send({"message": "Log added successfully "});
           return;
-        }
+        }*/
       }); //end updateOne
     }
   }); //end save
@@ -267,7 +343,7 @@ let newLog = async function newLog(req, res) {
     user.updateOne({$set: {maxes: user.maxes}}, {}, (err, raw) => {});
     user.updateOne({$set: {dates: user.dates}}, {}, (err, raw) => {});
     //Push the newWorkout log to the user profile
-    user.updateOne({$push: {logs: newWorkoutData}}, {},(err, raw) => 
+    user.updateOne({$push: {logs: newWorkoutData, activity: newActivity}}, {},(err, raw) => 
     {
       if (err) 
       {
@@ -476,7 +552,7 @@ let logs = function logs(req, res) {
       populate:
       {
         path: "sets",
-        model: "Set",
+        model: "SetData",
         select: "-__v"
       }
     }
@@ -730,7 +806,8 @@ let dates = function dates(req, res){
 }
 
 let stats = function stats(req, res){
-  if(db.readyState==0){
+  recalc(req, res);
+  /*if(db.readyState==0){
     res.status(500).send({
       error: "Database connection is down."
     });
@@ -746,6 +823,7 @@ let stats = function stats(req, res){
     }
     res.status(200).send(data);
   });
+  */
 }
 
 
