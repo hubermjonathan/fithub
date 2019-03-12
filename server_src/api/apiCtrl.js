@@ -143,6 +143,12 @@ let newWorkout = async function newWorkout(req, res) {
   let exercise_ids = [];
   for(let i = 0; i < req.body.exercises.length; i++){
     let exercise = req.body.exercises[i];
+    let muscles = [];
+    exercise.muscle_groups.forEach(muscle => {
+      if(muscles.find(muscle) == undefined){
+        muscles.push(muscle);
+      }
+    });
     if(exercise.exists) { //exercise exists
       try{
       let findExercise = await schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => {
@@ -205,6 +211,7 @@ let newWorkout = async function newWorkout(req, res) {
   newWorkout = await schemaCtrl.WorkoutPlan.create({
     name: req.body.name,
     description: req.body.description,
+    muscle_groups : muscles,
     date: req.body.date,
     exercises: exercise_ids,
     ownerUID: req.body.id,
@@ -606,47 +613,6 @@ let workouts = function workouts(req, res) {
     }
   }) //end findById
    //end populate
-/*
-  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
-  {
-    if(err){
-      res.status(404).send({ "message": "Database Error: error querying profile" });
-      return
-    }
-    else if(!user){
-      res.status(500).send({ "message": "Database Error: User not found" });
-      return
-    }
-  }) //end findById
-  .select("-email -logs -exercises -avatar -__v -token")
-  .populate
-  ({
-    path: "workouts",
-    select: "-__v",
-    populate:
-    {
-      path: "exercises",
-      select: "-__v",
-      populate:
-      {
-        path: "sets",
-        model: "Set",
-        select: "-__v"
-      }
-    }
-  }) //end populate
-  .exec((err, data) =>
-  {
-    if(err)
-    {
-      res.status(500).send({ "message": "Database Error: Populate query failed" });
-      return;
-    }
-    else{
-      res.status(200).send(data);
-    }
-  });
-  */
 }
 
 //Return a users custom private exercises
@@ -784,6 +750,37 @@ let publicWorkouts = function publicWorkouts(req, res){
   });
   query.exec((err, plans) => {
     res.status(200).send(plans);
+  });
+}
+
+let filterPublicWorkouts = function filterPublicWorkouts(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.WorkoutPlan.find({}).select('-__v').populate({
+    path: "exercises",
+    select: "-__v",
+    populate:
+    {
+      path: "sets",
+      model: "Set",
+      select: "-__v",
+    }
+  });
+  let suggestions = [];
+  query.exec((err, plans) => {
+    plans.forEach( plan => {
+      req.body.muscles.forEach( muscle => {
+        if(plans.muscle_groups.find(muscle)){
+          suggestions.push(plan);
+          break;
+        }
+      });
+    });
+    res.status(200).send(suggestions);
   });
 }
 

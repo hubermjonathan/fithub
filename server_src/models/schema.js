@@ -27,7 +27,7 @@ let Profile = new Schema({
   maxes : { type : Object },
   dates : { type : Object },
   volumes : { type : Object },  
-  activity : [{ type : String}],
+  activity : { type : Object},
   workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutPlan"}],         //Workout plans the user has submitted to the master list
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],         //Private exercises
   logs: [{ type: Schema.Types.ObjectId, ref: "WorkoutData"}],         //Workout data
@@ -37,6 +37,7 @@ let Profile = new Schema({
 let WorkoutPlan = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
+  muscle_groups: {type: [Number], validate: muscleGroup, required: true},
   date: { type: Date, required: true },
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise", required: true}],
   ownerUID : { type: String, required: true },

@@ -23,3 +23,12 @@ log:
 
 
 ]
+
+
+activity {
+  newMax:
+  mostRecent:
+  daysInARow:
+
+
+}
