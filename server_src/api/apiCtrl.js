@@ -828,13 +828,12 @@ let apiCtrl = {
   logs: logs,
   newLog: newLog,
 
-  users: users,
-  publicWorkouts: publicWorkouts,
+  users: users,                     //Returns all users
+  publicWorkouts: publicWorkouts,   //Returns all public workouts and filters
 
-  dates: dates,
-  stats: stats
+  dates: dates,                     //Returns all the dates a user has worked out
+  stats: stats                      //Returns the max weights lifted by a user
 
-  //devExercise: devExercise
 };
 
 module.exports = apiCtrl;
