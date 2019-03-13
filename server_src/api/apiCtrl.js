@@ -139,13 +139,13 @@ let newWorkout = async function newWorkout(req, res) {
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
 
+  let muscles = [];
   //Construct the exercise documents and keep track of their IDs
   let exercise_ids = [];
   for(let i = 0; i < req.body.exercises.length; i++){
     let exercise = req.body.exercises[i];
-    let muscles = [];
     exercise.muscle_groups.forEach(muscle => {
-      if(muscles.find(muscle) == undefined){
+      if(muscles.find( all => all == muscle) == undefined){
         muscles.push(muscle);
       }
     });
@@ -167,7 +167,9 @@ let newWorkout = async function newWorkout(req, res) {
         let new_set;
         try{
           new_set = await schemaCtrl.Set.create(set);
-        }catch(validation_err){ console.log("Input Error: invalid json input at Set"); return res.status(500).send({ "message": "Input Error: Validation error while constructing set" })};
+        }catch(validation_err){ 
+          console.log("Input Error: invalid json input at Set"); 
+          return res.status(500).send({ "message": "Input Error: Validation error while constructing set" })};
         new_set.save(function (err, ret) {
           if(err){ return res.status(500).send({ message: "Database error: unable to save set data" });}
         });
@@ -182,7 +184,9 @@ let newWorkout = async function newWorkout(req, res) {
         equipment_type: exercise.equipment_type,
         sets: set_ids,
       });
-      }catch(validation_err){ console.log("Input Error: invalid json input at exercise"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exercise" })};
+      }catch(validation_err){ 
+        console.log("Input Error: invalid json input at exercise"); 
+        return res.status(500).send({ "message": "Input Error: Validation error while constructing exercise" })};
 
       newExercise.save((err, newExercise) => { //save new exercise
         if (err) {
@@ -215,8 +219,11 @@ let newWorkout = async function newWorkout(req, res) {
     date: req.body.date,
     exercises: exercise_ids,
     ownerUID: req.body.id,
+    gains: 0,
+    public: req.body.public
   });
-  }catch(validation_err){ console.log("Input Error: invalid json input at workout"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workout" })};
+  }catch(validation_err){ 
+    console.log("Input Error: invalid json input at workout"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workout" })};
 
   //save the workout to the master workout collection
   newWorkout.save((err, newWorkout) => {
@@ -544,13 +551,13 @@ let delWorkout = async function delWorkout(req, res) {
 /*--------Functions for returning user information--------*/
 
 //Get a user's logs from the database
-let logs = function logs(req, res) {
+let logs = async function logs(req, res) {
   if(!isConnected(req, res))
   {
     return;
   }
 
-  let query = schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  let logs = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
   ({
     path: "logs",
     populate : {
@@ -564,27 +571,26 @@ let logs = function logs(req, res) {
       }
     }
     }
-  );
-  let promise = query.exec();
-  promise.then((data) => {
-    if(!data){
-      res.status(404).send({ "message": "Database Error: User not found" });
-      return
-    } else {
-      res.status(200).send(data);
-    }
-  }) //end findById
-   //end populate
+  ).sort({"logs.date":-1}).catch(err => {
+    return console.log("logs: invalid id");
+  });
+  if(!logs){
+    res.status(404).send({ "message": "Database Error: User not found" });
+    return
+  } else {
+    res.status(200).send(logs);
+  }
+  //end populate
 }
 
 //Return a users workouts
-let workouts = function workouts(req, res) {
+let workouts = async function workouts(req, res) {
   if(!isConnected(req, res))
   {
     return;
   }
 
-  let query = schemaCtrl.Profile.findById(req.params.id, 'workouts').populate
+  let workouts = await schemaCtrl.Profile.findById(req.params.id, 'workouts').populate
   ({
       path: "workouts",
       model: "WorkoutPlan",
@@ -602,16 +608,15 @@ let workouts = function workouts(req, res) {
         }
       }
     }
-  );
-  let promise = query.exec();
-  promise.then((data) => {
-    if(!data){
-      res.status(404).send({ "message": "Database Error: User not found" });
-      return
-    } else {
-      res.status(200).send(data);
-    }
-  }) //end findById
+  ).catch(err => {
+    return console.log("workouts: invalid id");
+  });
+  if(!workouts){
+    res.status(404).send({ "message": "Database Error: User not found" });
+    return
+  } else {
+    res.status(200).send(workouts);
+  }
    //end populate
 }
 
@@ -748,35 +753,17 @@ let publicWorkouts = function publicWorkouts(req, res){
       select: "-__v",
     }
   });
-  query.exec((err, plans) => {
-    res.status(200).send(plans);
-  });
-}
-
-let filterPublicWorkouts = function filterPublicWorkouts(req, res){
-  if(db.readyState==0){
-    res.status(500).send({
-      error: "Database connection is down."
-    });
-    return;
-  }
-  let query = schemaCtrl.WorkoutPlan.find({}).select('-__v').populate({
-    path: "exercises",
-    select: "-__v",
-    populate:
-    {
-      path: "sets",
-      model: "Set",
-      select: "-__v",
-    }
-  });
   let suggestions = [];
   query.exec((err, plans) => {
-    plans.forEach( plan => {
+    if(req.body.muscles === undefined || !Array.isArray(req.body.muslces) || req.body.muscles.length===0) {
+      res.status(200).send(plans);
+      return;
+    }
+    plans.forEach( plan => {  
       req.body.muscles.forEach( muscle => {
-        if(plans.muscle_groups.find(muscle)){
+        if(plan.muscle_groups.find( wktMuscles => wktMuscles == muscle)){
           suggestions.push(plan);
-          break;
+          return;
         }
       });
     });
