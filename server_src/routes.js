@@ -13,8 +13,9 @@ const apiCtrl = require('./api/apiCtrl');
 
 router.post('/users/login', apiCtrl.login);                 //Login a user
 router.get('/profile/:id/', apiCtrl.profile);                //Get a users profile
-router.get('/profile/:id/stat', apiCtrl.stats);
+router.get('/profile/:id/stats', apiCtrl.stats);
 router.get('/profile/:id/dates', apiCtrl.dates);
+router.get('/profile/:id/activity', apiCtrl.activity);
 router.get('/users', apiCtrl.users);
 
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans

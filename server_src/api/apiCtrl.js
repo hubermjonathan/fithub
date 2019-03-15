@@ -270,10 +270,10 @@ let newLog = async function newLog(req, res) {
 
     exercise.sets.forEach(set =>
     {
-       //For keeping track of user maxes
+      //For keeping track of user maxes
       if(exercise.name in user.maxes){
         if(user.maxes[exercise.name] < set.weight){
-          newActivity = `${user.name} has achieved a new max of ${set.weight}`;
+          newActivity = `${user.name} has achieved a new max of ${set.weight} on ${exercise.name}`;
           user.maxes[exercise.name] = set.weight;
         }
       } else {
@@ -333,7 +333,7 @@ let newLog = async function newLog(req, res) {
     });
   }catch(validation_err){ console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" })};
 
-  newWorkoutData.save((err, newWorkoutData) => {
+  /*newWorkoutData.save((err, newWorkoutData) => {
     if (err) {
       console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving workout log" });
     } 
@@ -345,17 +345,16 @@ let newLog = async function newLog(req, res) {
           res.status(500).send({"message": "Error: Log addition unsuccessful"});
           return;
         } 
-/*        else {
+        else {
           res.status(200).send({"message": "Log added successfully "});
           return;
-        }*/
+        }
       }); //end updateOne
     }
   }); //end save
+*/
 
-
-    user.updateOne({$set: {maxes: user.maxes}}, {}, (err, raw) => {});
-    user.updateOne({$set: {dates: user.dates}}, {}, (err, raw) => {});
+    user.updateOne({$set: {maxes: user.maxes, dates: user.dates}}, {}, (err, raw) => {});
     //Push the newWorkout log to the user profile
     user.updateOne({$push: {logs: newWorkoutData, activity: newActivity}}, {},(err, raw) => 
     {
@@ -369,7 +368,7 @@ let newLog = async function newLog(req, res) {
         res.status(200).send({"message": "Log added successfully "});
         return;
       }
-    }); //end updateOne
+    }); //end updateOne*/
 } //end newLog
 
 let newExercise = async function newExercise(req, res) {
@@ -752,22 +751,44 @@ let publicWorkouts = function publicWorkouts(req, res){
       model: "Set",
       select: "-__v",
     }
-  });
+  }).sort({"date":-1});
   let suggestions = [];
   query.exec((err, plans) => {
-    if(req.body.muscles === undefined || !Array.isArray(req.body.muslces) || req.body.muscles.length===0) {
+    if(req.body.muscles == undefined  || req.body.muscles.length===0) {
       res.status(200).send(plans);
       return;
     }
     plans.forEach( plan => {  
+      let add = true;
       req.body.muscles.forEach( muscle => {
-        if(plan.muscle_groups.find( wktMuscles => wktMuscles == muscle)){
-          suggestions.push(plan);
+        if(plan.muscle_groups.find( wktMuscles => wktMuscles == muscle)==undefined){
+          add = false;
           return;
         }
       });
+      if(add){
+        suggestions.push(plan);
+      }
     });
     res.status(200).send(suggestions);
+  });
+}
+
+let activity = function activity(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.Profile.findById(req.params.id).select("activity");
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    res.status(200).send(data);
   });
 }
 
@@ -831,6 +852,7 @@ let apiCtrl = {
   users: users,                     //Returns all users
   publicWorkouts: publicWorkouts,   //Returns all public workouts and filters
 
+  activity: activity,
   dates: dates,                     //Returns all the dates a user has worked out
   stats: stats                      //Returns the max weights lifted by a user
 
