@@ -71,15 +71,6 @@ class ContextProvider extends React.Component {
 class Logger extends React.Component {
     constructor(props) {
         super(props);
-        //this.props.navigation.getParam('workout', null);
-        //const workout = Workout;
-        this.state = {
-            addSetModalIsVisible: false,
-            modalReps: undefined,
-            modalWeight: undefined,
-            modalWarmup: false,
-            arrayIndex: undefined,
-        }
     }
     
     render() {
