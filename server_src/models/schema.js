@@ -26,6 +26,8 @@ let Profile = new Schema({
   token : { type: String, required: true },
   maxes : { type : Object },
   dates : { type : Object },
+  volumes : { type : Object },  
+  activity : { type : Object},
   workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutPlan"}],         //Workout plans the user has submitted to the master list
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],         //Private exercises
   logs: [{ type: Schema.Types.ObjectId, ref: "WorkoutData"}],         //Workout data
@@ -35,6 +37,7 @@ let Profile = new Schema({
 let WorkoutPlan = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
+  muscle_groups: {type: [Number], validate: muscleGroup, required: true},
   date: { type: Date, required: true },
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise", required: true}],
   ownerUID : { type: String, required: true },
@@ -47,7 +50,7 @@ let Exercise = new Schema({
   name: {type: String, required: true},
   muscle_groups: {type: [Number], validate: muscleGroup, required: true},
   equipment_type: {type: String, required: true},
-  sets: [{ type: Schema.Types.ObjectId, ref: "SetData", required: true}]
+  sets: [{ type: Schema.Types.ObjectId, ref: "Set", required: true}]
 });
 
 let Set = new Schema({
