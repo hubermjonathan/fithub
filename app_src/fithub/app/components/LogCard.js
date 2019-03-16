@@ -37,11 +37,9 @@ export default class LogCard extends React.Component {
     }
 
     render() {
-        console.log("Render child was called");
         var totalSets;
         var totalReps = 0;
         var totalWeight = 0;
-        //console.log("PROPS: ", this.props);
         totalSets = this.props.exercise.sets.length;
 
         for(var i = 0; i < totalSets; i++) {
@@ -221,8 +219,10 @@ const styles = StyleSheet.create({
     
     //LogCard
     card: {
-        flex: 0,
-        width: '90%',
+        flex: 1,
+        width: '95%',
+        minWidth: '95%',
+        maxWidth: '95%',
         alignContent: 'stretch',
         backgroundColor: '#fff',
         borderRadius: 5,
