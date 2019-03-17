@@ -89,14 +89,14 @@ export default class ProfileScreen extends React.Component {
             <Swiper activeDotColor='#00adf5' loop={false}>
               <View style={styles.subContainer}>
                 <ScrollView stickyHeaderIndices={[0]}>
-                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Records</Text></View>
+                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
                   <Records />
 
                 </ScrollView>
               </View>
               <View>
                 <ScrollView>
-                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
+                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Workouts</Text></View>
                   <ContributionGraph
                     style={{borderBottomWidth:1}}
                     values={this.state.dates}
@@ -111,9 +111,6 @@ export default class ProfileScreen extends React.Component {
                   />
                   <Text>{this.state.activityInfo.length}</Text>
                 </ScrollView>
-              </View>
-              <View>
-                <Text>3</Text>
               </View>
             </Swiper>
           </View>
