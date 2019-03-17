@@ -546,6 +546,23 @@ let delWorkout = async function delWorkout(req, res) {
   }
 }
 
+/*--------Functions for editing user information--------*/
+let editUsername = async function editUsername(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  let new_name = req.body.name;
+  if(new_name.length > 32 || new_name.match(/^[a-z0-9]+$/i)){
+    user.set('name', req.body.name);
+    user.save().catch(err => {console.log(err);});
+    return res.status(200).send({ "message": "Successfully changed name to " + new_name });
+  }
+  else{
+    return res.status(500).send({ "message": "Invalid name: name must be 32 alphanumeric characters or less"});
+  }
+}
+
 
 /*--------Functions for returning user information--------*/
 
@@ -834,6 +851,7 @@ let stats = function stats(req, res){
 
 let apiCtrl = {
   login: login,
+  editUsername: editUsername,
 
   workouts: workouts,
   newWorkout: newWorkout,
