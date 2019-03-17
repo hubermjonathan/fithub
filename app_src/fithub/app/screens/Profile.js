@@ -14,6 +14,7 @@ import {
 import { Icon } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 import { getUserID } from '../lib/AccountFunctions';
+import { getProfileStats } from '../lib/ProfileFunctions';
 import { ContributionGraph } from 'react-native-chart-kit';
 
 const chartConfig = {
@@ -38,12 +39,15 @@ export default class ProfileScreen extends React.Component {
       name: '',
       photo: '',
       activityInfo: [],
-      dates:[]
+      dates:[],
+      volume: 0,
+      bench: 0,
     }
     const didFocusListener = this.props.navigation.addListener(
       'didFocus',
       () => {
         this.loadUserData();
+        this.loadUserStats();
       }
     );
     this.loadWorkoutActivity();
@@ -71,15 +75,11 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.statsRow}>
                 <View style={styles.statsCol}>
                   <Text style={styles.stats}>Volume:</Text>
-                  <Text style={styles.stats}>1000</Text>
+                  <Text style={styles.stats}>{this.state.volume}</Text>
                 </View>
                 <View style={styles.statsCol}>
-                  <Text style={styles.stats}>Volume:</Text>
-                  <Text style={styles.stats}>1000</Text>
-                </View>
-                <View style={styles.statsCol}>
-                  <Text style={styles.stats}>Volume:</Text>
-                  <Text style={styles.stats}>1000</Text>
+                  <Text style={styles.stats}>Bench:</Text>
+                  <Text style={styles.stats}>{this.state.bench}</Text>
                 </View>
               </View>
             </View>
@@ -127,6 +127,25 @@ export default class ProfileScreen extends React.Component {
         </View>
       );
     }
+  }
+  
+  loadUserStats() {
+    // let stats = await getProfileStats();
+    let stats = {
+      maxes: {"Bench Press":135},
+      volumes: {"Bench Press":2370,"Squat":2370},
+    }
+    let totalVolume = 0;
+    let maxBench = stats.maxes["Bench Press"] === undefined ? 0 : stats.maxes["Bench Press"];
+   
+    for(let key in stats.volumes) {
+      totalVolume += stats.volumes[key];
+    }
+
+    this.setState({
+      volume: totalVolume,
+      bench: maxBench
+    });
   }
 
   async loadUserData() {
