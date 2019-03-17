@@ -25,9 +25,24 @@ export default class FeedScreen extends React.Component {
     state = {
         //dummy workout cards to test look of UI
         workouts: [
-            {workout: "Dorito", user: "Brian", icon: "person"},
-            {workout: "Big Werk", user: "Andy", icon: "person"},
-            {workout: "The Grind", user: "Colin", icon: "person"},
+            {workout: "Dorito", user: "Brian", icon: "person",
+              exercises: [
+                {name: "Bench Press"},
+                {name: "Bicep Curls"},
+                {name: "Front Squat"},
+              ]},
+            {workout: "Big Werk", user: "Andy", icon: "person",
+                exercises: [
+                  {name: "Cardio"},
+                  {name: "Lat Pulldown"},
+                  {name: "Curls"},
+            ]},
+            {workout: "The Grind", user: "Colin", icon: "person",
+                exercises: [
+                  {name: "Bench Press"},
+                  {name: "Bicep Curls"},
+                  {name: "Front Squat"},
+            ]},
             {workout: "Dorito", user: "Brian", icon: "person"},
             {workout: "Big Werk", user: "Andy", icon: "person"},
             {workout: "The Grind", user: "Colin", icon: "person"},
@@ -57,30 +72,16 @@ export default class FeedScreen extends React.Component {
               </View>
             </View>
             <FlatList
-              // keyExtractor = {(item, index) => index}
+              keyExtractor = {(item, index) => index.toString()}
               data={this.state.workouts}
               renderItem={({item}) => (
                   <WorkoutCard
                       workout={item.workout}
                       user={item.user}
+                      userPhoto={item.icon}
+                      exercises={item.exercises}
                   />
-                  // <ListItem
-                  //   title={item.workout}
-                  //   leftIcon={item.icon}
-                  //   subtitle={item.user}
-                  // />
               )}
-                    // <Text> {this.state.workouts[1].workout} </Text>
-                    // <Text> {this.state.workouts[2].workout} </Text>
-                // data={this.state.workouts}
-                // renderItem={({item, index}) => 
-                //     <TouchableHighlight>
-                //         <ExerciseCard
-                //             exercise={item.workout}
-                //             equipment={item.equipment}
-                //         />
-                //     </TouchableHighlight>
-                // }
             />
           </View>
         )
