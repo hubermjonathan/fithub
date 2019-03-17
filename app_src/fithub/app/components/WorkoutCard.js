@@ -38,7 +38,13 @@ export default class WorkoutCard extends React.Component {
                             source={{ uri: this.state.userPhoto }}
                         /> */}
                         {/* print user of workout */}
-                        <Text style={styles.userName}>{this.props.user}</Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                //link to user's profile
+                            }}
+                        >
+                            <Text style={styles.userName}>{this.props.user}</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {/* show workout */}
@@ -60,17 +66,17 @@ export default class WorkoutCard extends React.Component {
                             scrollEnabled={false}
                             data={this.props.exercises}
                             keyExtractor={(item, index) => index.toString()}
-                            renderItem={(exercise) =>  this.renderExercises(exercise)}
-                        /> 
+                            renderItem={(exercise) => this.renderExercises(exercise)}
+                        />
                     </View>
                 </View>
             </SafeAreaView >
         );
     }
 
-    renderExercises(exercise){
+    renderExercises(exercise) {
         //console.log("exercise in renderExercises: ", exercise)
-        return(
+        return (
             <View style={styles.exercise}>
                 <Text>{exercise.item.name}</Text>
             </View>
@@ -110,6 +116,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     workoutTitle: {
+        paddingTop: 10,
         fontSize: 30,
         textAlign: 'center',
     },
@@ -119,7 +126,8 @@ const styles = StyleSheet.create({
         bottom: 30,
     },
     exerciseList: {
-        bottom: 10
+        paddingBottom: 10,
+        paddingTop: 10
     },
     exercise: {
         padding: 2,
