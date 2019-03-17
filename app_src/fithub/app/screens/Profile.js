@@ -40,10 +40,14 @@ export default class ProfileScreen extends React.Component {
       activityInfo: [],
       dates:[]
     }
+    const didFocusListener = this.props.navigation.addListener(
+      'didFocus',
+      () => {
+        this.loadUserData();
+      }
+    );
     this.loadWorkoutActivity();
-    this.loadUserData();
   }
-
 
   render() {
     if (Platform.OS === 'ios') {
