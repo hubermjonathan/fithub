@@ -15,6 +15,7 @@ import SettingsScreen from '../screens/Settings';
 import WorkoutLogEditScreen from '../screens/WorkoutLogEdit'
 import SearchScreen from '../screens/Search';
 
+
 const HomeStack = createStackNavigator({
   Home: {
     screen: HomeScreen,
@@ -48,6 +49,7 @@ const FeedStack = createStackNavigator({
     }
   },
   Search: SearchScreen,
+  otherUserProfile: ProfileScreen
 });
 
 const AppContainer = createAppContainer(createBottomTabNavigator(

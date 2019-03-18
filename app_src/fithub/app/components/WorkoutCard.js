@@ -38,14 +38,22 @@ export default class WorkoutCard extends React.Component {
                             source={{ uri: this.state.userPhoto }}
                         /> */}
                         {/* print user of workout */}
-                        <Text style={styles.userName}>{this.props.user}</Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                //figure how to navigate to profile
+                            }}>
+                            <Text style={styles.userName}>{this.props.user}</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {/* show workout */}
                     <View style={styles.workoutHeader}>
                         {/* title of workout with plus icon*/}
                         <Text style={styles.workoutTitle}>{this.props.workout}</Text>
-                        <TouchableOpacity style={styles.add}>
+                        <TouchableOpacity style={styles.add}
+                            onPress={()=>{
+                                //add to workouts
+                            }}>
                             <Icon
                                 name="plus"
                                 type="entypo"
@@ -60,17 +68,17 @@ export default class WorkoutCard extends React.Component {
                             scrollEnabled={false}
                             data={this.props.exercises}
                             keyExtractor={(item, index) => index.toString()}
-                            renderItem={(exercise) =>  this.renderExercises(exercise)}
-                        /> 
+                            renderItem={(exercise) => this.renderExercises(exercise)}
+                        />
                     </View>
                 </View>
             </SafeAreaView >
         );
     }
 
-    renderExercises(exercise){
+    renderExercises(exercise) {
         //console.log("exercise in renderExercises: ", exercise)
-        return(
+        return (
             <View style={styles.exercise}>
                 <Text>{exercise.item.name}</Text>
             </View>
@@ -85,10 +93,8 @@ const styles = StyleSheet.create({
         flex: 0,
         height: 'auto',
         margin: 10,
-        padding: 15,
+        padding: 5,
         backgroundColor: 'lightgrey',
-        // borderWidth: 1.5,
-        // borderColor: 'black',
     },
     user: {
         padding: 0,
@@ -110,6 +116,7 @@ const styles = StyleSheet.create({
         //borderBottomWidth: 1,
     },
     workoutTitle: {
+        paddingTop: 10,
         fontSize: 30,
         textAlign: 'center',
     },
@@ -119,7 +126,8 @@ const styles = StyleSheet.create({
         bottom: 30,
     },
     exerciseList: {
-        bottom: 10
+        paddingBottom: 10,
+        paddingTop: 10
     },
     exercise: {
         padding: 2,
