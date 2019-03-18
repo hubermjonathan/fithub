@@ -26,14 +26,17 @@ export async function editProfile(profile) {
 /*
 
 */
-export async function getProfile(id) {
+export async function getProfile(id, store) {
     fetch(`https://fithub-server.herokuapp.com/users/${id}`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
     }).then(res => res.json())
-        .then((res) => console.log('Success', JSON.stringify(res)))
+        .then((res) => {
+            store=JSON.stringify(res);
+            return console.log('Success', JSON.stringify(res)); 
+        })
         .catch(function (e) {
             console.log('Error');
         });
@@ -42,15 +45,17 @@ export async function getProfile(id) {
 /*
 
 */
-export async function getProfileDates(id) {
+export async function getProfileDates(id, store) {
     fetch(`https://fithub-server.herokuapp.com/profile/dates/${id}`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
     }).then(res => res.json())
-        .then((res) => console.log('Success', JSON.stringify(res)))
-        .catch(function (e) {
+        .then((res) => {
+            store=JSON.stringify(res);
+            return console.log('Success', JSON.stringify(res)); 
+        }).catch(function (e) {
             console.log('Error');
         });
 }
@@ -58,15 +63,32 @@ export async function getProfileDates(id) {
 /*
 
 */
-export async function getProfileStats(id) {
-    fetch(`https://fithub-server.herokuapp.com/profile/stats/${id}`, {
+export async function getProfileStats(id, store) {
+    fetch(`https://fithub-server.herokuapp.com/profile/${id}/stats`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
     }).then(res => res.json())
-        .then((res) => console.log('Success', JSON.stringify(res)))
-        .catch(function (e) {
+        .then((res) => {
+            store=JSON.stringify(res);
+            return console.log('Success', JSON.stringify(res)); 
+        }).catch(function (e) {
+            console.log('Error');
+        });
+}
+
+export async function getProfileActivity(id, store) {
+    fetch(`https://fithub-server.herokuapp.com/profile/${id}/activity`, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then(res => res.json())
+        .then((res) => {
+            store=JSON.stringify(res);
+            return console.log('Success', JSON.stringify(res)); 
+        }).catch(function (e) {
             console.log('Error');
         });
 }

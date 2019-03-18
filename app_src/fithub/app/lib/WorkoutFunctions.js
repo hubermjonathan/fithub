@@ -3,7 +3,6 @@ import { Alert } from 'react-native';
 import { getUserToken, getUserID, getUserUID } from '../lib/AccountFunctions';
 
 
-
 export async function postWorkout(workout) {
     const id = await getUserID();
     const uid = await getUserUID();
@@ -27,6 +26,23 @@ export async function postWorkout(workout) {
 export function getWorkouts(uid) {
     fetch(`/users/${uid}/workouts`, {
         method: 'GET'
+    }).then(res => res.json())
+        .then(res => console.log(res))
+        .catch(function (e) {
+            console.log("User not found");
+        });
+}
+
+// Get the public workouts where muscles is an array of muscle
+// that the user wants. Leave empty if you want all public
+// workouts returned. Usage : muscles = [4, 3, 10]
+export function getPublicWorkouts(muscles) {
+    fetch(`/users/${uid}/workouts`, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(workout)
     }).then(res => res.json())
         .then(res => console.log(res))
         .catch(function (e) {
