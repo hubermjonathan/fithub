@@ -40,9 +40,8 @@ export default class WorkoutCard extends React.Component {
                         {/* print user of workout */}
                         <TouchableOpacity
                             onPress={() => {
-                                //link to user's profile
-                            }}
-                        >
+                                //figure how to navigate to profile
+                            }}>
                             <Text style={styles.userName}>{this.props.user}</Text>
                         </TouchableOpacity>
                     </View>
@@ -51,7 +50,10 @@ export default class WorkoutCard extends React.Component {
                     <View style={styles.workoutHeader}>
                         {/* title of workout with plus icon*/}
                         <Text style={styles.workoutTitle}>{this.props.workout}</Text>
-                        <TouchableOpacity style={styles.add}>
+                        <TouchableOpacity style={styles.add}
+                            onPress={()=>{
+                                //add to workouts
+                            }}>
                             <Icon
                                 name="plus"
                                 type="entypo"
@@ -91,10 +93,8 @@ const styles = StyleSheet.create({
         flex: 0,
         height: 'auto',
         margin: 10,
-        padding: 15,
+        padding: 5,
         backgroundColor: 'lightgrey',
-        // borderWidth: 1.5,
-        // borderColor: 'black',
     },
     user: {
         padding: 0,

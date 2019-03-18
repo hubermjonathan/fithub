@@ -18,6 +18,17 @@ import { Icon, Button } from 'react-native-elements';
 import WorkoutCard from '../components/WorkoutCard';
 
 export default class FeedScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: 'Feed',
+      headerRight: <Icon
+        name="magnifying-glass"
+        type="entypo"
+        size={30}
+        onPress={() => { navigation.push('otherUserProfile') }} />
+    }
+  };
+
   constructor(props) {
     super(props);
   }
@@ -79,17 +90,17 @@ export default class FeedScreen extends React.Component {
           let exercises = [];
           let workouts = [];
           for (let y = 0; y < array[x].exercises.length; y++) {
-            exercises.push({name:array[x].exercises[y].name});
+            exercises.push({ name: array[x].exercises[y].name });
           }//for
           builtWorkouts.push({
             workout: array[x].name,
             user: array[x]._id, //replace with user's profile name later
             icon: "person",
-            exercises:exercises
+            exercises: exercises
           })
         }//for
 
-        this.setState({workouts:builtWorkouts})
+        this.setState({ workouts: builtWorkouts })
 
 
       })
@@ -99,69 +110,41 @@ export default class FeedScreen extends React.Component {
   }
   render() {
     return (
-
-      <View style={{ flex: 1 }}>
-        <View>
-          <Text style={styles.title}> Global Feed</Text>
-          <Dash style={styles.line} />
-          <View style={styles.search}>
-            <TouchableOpacity>
-              <Icon
-                name="magnifying-glass"
-                type="entypo"
-                size={30}
-              />
-            </TouchableOpacity>
-          </View>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.search}>
+          <TouchableOpacity>
+            <Icon
+              name="magnifying-glass"
+              type="entypo"
+              size={30}
+            />
+          </TouchableOpacity>
         </View>
+
         <FlatList
           keyExtractor={(item, index) => index.toString()}
           data={this.state.workouts}
           renderItem={({ item }) => (
-            <WorkoutCard
-              workout={item.workout}
-              user={item.user}
-              userPhoto={item.icon}
-              exercises={item.exercises}
-            />
+            <TouchableOpacity onPress={()=>this.props.navigation.push('otherUserProfile')}>
+              <WorkoutCard
+                workout={item.workout}
+                user={item.user}
+                userPhoto={item.icon}
+                exercises={item.exercises}
+              />
+            </TouchableOpacity>
+
           )}
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  title: {
-    textAlign: 'center',
-    fontSize: 20,
-    top: 35
-  },
-  addSpace: {
-
-  },
-  line: {
-    width: 1000,
-    height: 1,
-    top: 50,
-    paddingBottom: 30,
-
-  },
   search: {
     flexDirection: 'row-reverse',
     right: 15,
     bottom: 30,
-
-  },
-  group: {
-    textAlign: 'center',
-    fontSize: 25,
-    paddingTop: 15,
-    paddingBottom: 15
-  },
-  large: {
-    textAlign: 'center',
-    fontSize: 20,
-    paddingBottom: 25
   },
 })
