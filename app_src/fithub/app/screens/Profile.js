@@ -14,7 +14,7 @@ import {
 import { Icon } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 import { getUserID } from '../lib/AccountFunctions';
-import { getProfileStats } from '../lib/ProfileFunctions';
+import { getProfileStats, getProfileActivity } from '../lib/ProfileFunctions';
 import { ContributionGraph } from 'react-native-chart-kit';
 
 const chartConfig = {
@@ -90,7 +90,7 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.subContainer}>
                 <ScrollView stickyHeaderIndices={[0]}>
                   <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
-                  <Records />
+                  <Activity />
 
                 </ScrollView>
               </View>
@@ -192,28 +192,22 @@ export default class ProfileScreen extends React.Component {
 
 }
 
-class Records extends React.Component {
+class Activity extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      algoData: [
-        { text: "Andy hasn't done his part yet" },
-        { text: "Still waiting for Andy" },
-        { text: "Andy is not done yet" },
-        { text: "Maybe one day" },
-        { text: "Im going to die waitinggg" },
-      ]
+      algoData: this.loadActivities()
     }
   }
 
   render() {
-    let records = [];
+    let activities = [];
 
     for (let i = 0; i < this.state.algoData.length; i++) {
-      records.push(
+      activities.push(
         <View style={styles.record} key={i}>
-          <Icon name="error" type="material" size={30} />
+          <Icon name={this.state.algoData[i].icon} type="material" size={30} />
           <Text style={styles.recordText}>
             {this.state.algoData[i].text}
           </Text>
@@ -221,7 +215,31 @@ class Records extends React.Component {
       );
     }
 
-    return records;
+    return activities;
+  }
+
+  loadActivities() {
+    // let activities = await getProfileActivities();
+    let activities = [
+      "FitHub Tester 307 has achieved a new max of 135",
+      "Short Name worked out on 3-1-19!",
+    ];
+    let parsedActivities = [];
+
+    for(let i = 0; i < activities.length; i++) {
+      let icon = "";
+      if(activities[i].includes("new max of")) {
+        icon = "star";
+      } else if(activities[i].includes("worked out on")) {
+        icon = "today";
+      } else {
+        icon = "error";
+      }
+
+      parsedActivities[i] = { text: activities[i], icon: icon }
+    }
+
+    return parsedActivities;
   }
 }
 
