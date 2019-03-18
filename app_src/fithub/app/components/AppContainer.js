@@ -13,6 +13,7 @@ import DetailScreen from '../screens/Detail';
 import { SelectExercisesScreen } from '../screens/Logger';
 import SettingsScreen from '../screens/Settings';
 import WorkoutLogEditScreen from '../screens/WorkoutLogEdit'
+import SearchScreen from '../screens/Search';
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -39,6 +40,16 @@ const LoggerStack = createStackNavigator({
   SelectExercises: SelectExercisesScreen
 });
 
+const FeedStack = createStackNavigator({
+  Feed: {
+    screen: FeedScreen,
+    navigationOptions: {
+      header: null,
+    }
+  },
+  Search: SearchScreen,
+});
+
 const AppContainer = createAppContainer(createBottomTabNavigator(
   {
     Logger: {
@@ -60,7 +71,7 @@ const AppContainer = createAppContainer(createBottomTabNavigator(
       }
     },
     Feed: {
-      screen: FeedScreen,
+      screen: FeedStack,
       navigationOptions: {
         tabBarIcon: <Icon name="language" type="material" size={35} />
       }

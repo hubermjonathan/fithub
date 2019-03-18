@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     },
     workoutHeader: {
         flex: 1,
-        borderBottomWidth: 1,
+        //borderBottomWidth: 1,
     },
     workoutTitle: {
         fontSize: 30,

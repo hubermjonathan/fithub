@@ -67,6 +67,7 @@ export default class FeedScreen extends React.Component {
                     name="magnifying-glass"
                     type="entypo"
                     size={30}
+                    onPress={() => this.props.navigation.navigate('Search')}
                   />
                 </TouchableOpacity>
               </View>
