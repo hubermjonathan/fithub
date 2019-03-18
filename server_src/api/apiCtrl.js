@@ -597,14 +597,14 @@ let editExercise = async function editExercise(req, res){ //deletes old exercise
       //purge old sets
       for(let j = 0; j < curr_exercise.sets.length; j++){
         let curr_set = curr_exercise.sets[j];
-        await schemaCtrl.Set.deleteOne({_id: curr_set.id}).catch(err => {return console.log("editExercise: error deleting set: " + curr_set._id);});
+        await schemaCtrl.Set.deleteOne({_id: curr_set.id}).catch(err => {res.status(500).send({ "message": "editExercise: error deleting set: " + curr_set._id }); return console.log("editExercise: error deleting set: " + curr_set._id);});
       }
       //update fields of the exercise
       curr_exercise.set('name', req.body.name);
-      curr_exercise.set('muscle_groups', req.body.id.muscle_groups);
+      curr_exercise.set('muscle_groups', req.body.muscle_groups);
       curr_exercise.set('equipment_type', req.body.equipment_type);
       curr_exercise.set('sets', updated_set_ids);
-      curr_exercise.save().catch(err => {res.status(200).send({ "message": "editExercise: Failed to update exercise" }); return console.log(err);});
+      curr_exercise.save().catch(err => {res.status(500).send({ "message": "editExercise: Failed to update exercise" }); return console.log(err);});
       return res.status(200).send({ "message": "Successfully updated exercise " + req.body.old_exercise_id });
     }
   }
