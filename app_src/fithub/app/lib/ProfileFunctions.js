@@ -64,18 +64,19 @@ export async function getProfileDates(id, store) {
 
 */
 export async function getProfileStats(id, store) {
-    fetch(`https://fithub-server.herokuapp.com/profile/${id}/stats`, {
+    let promise = fetch(`https://fithub-server.herokuapp.com/profile/${id}/stats`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
-    }).then(res => res.json())
-        .then((res) => {
+    }).then(res => res.json());
+    return promise;
+/*        .then((res) => {
             store=JSON.stringify(res);
             return console.log('Success', JSON.stringify(res)); 
         }).catch(function (e) {
             console.log('Error');
-        });
+        });*/
 }
 
 export async function getProfileActivity(id, store) {
