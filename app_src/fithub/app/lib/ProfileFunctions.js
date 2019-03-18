@@ -71,3 +71,17 @@ export async function getProfileStats(id) {
             console.log('Error');
         });
 }
+
+export async function getProfileActivity(id) {
+    const userId = await getUserID();
+    fetch('https://fithub-server.herokuapp.com/profile/'+userId+'/activity/', {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then(res => res.json())
+        .then((res) => console.log('Success', JSON.stringify(res)))
+        .catch(function (e) {
+            console.log('Error');
+        });
+}
