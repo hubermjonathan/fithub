@@ -126,12 +126,10 @@ export default class ProfileScreen extends React.Component {
     }
   }
   
-  loadUserStats() {
-    // let stats = await getProfileStats();
-    let stats = {
-      maxes: {"Bench Press":135},
-      volumes: {"Bench Press":2370,"Squat":2370},
-    }
+  async loadUserStats() {
+    let id = await getUserID();
+    let stats = await getProfileStats(id);
+
     let totalVolume = 0;
     let maxBench = stats.maxes["Bench Press"] === undefined ? 0 : stats.maxes["Bench Press"];
    
@@ -197,8 +195,10 @@ class Activity extends React.Component {
     super(props);
 
     this.state = {
-      algoData: this.loadActivities()
+      algoData: []
     }
+
+    this.loadActivities();
   }
 
   render() {
@@ -218,12 +218,10 @@ class Activity extends React.Component {
     return activities;
   }
 
-  loadActivities() {
-    // let activities = await getProfileActivities();
-    let activities = [
-      "FitHub Tester 307 has achieved a new max of 135",
-      "Short Name worked out on 3-1-19!",
-    ];
+  async loadActivities() {
+    let id = await getUserID();
+    let activities = await getProfileActivity(id);
+    activities = activities.activity;
     let parsedActivities = [];
 
     for(let i = 0; i < activities.length; i++) {
@@ -239,7 +237,9 @@ class Activity extends React.Component {
       parsedActivities[i] = { text: activities[i], icon: icon }
     }
 
-    return parsedActivities;
+    this.setState({
+      algoData: parsedActivities
+    });
   }
 }
 
