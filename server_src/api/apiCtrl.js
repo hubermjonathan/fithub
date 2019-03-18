@@ -505,7 +505,10 @@ let delWorkout = async function delWorkout(req, res) {
         model: "Set"
       }
     },
-  }).select("_id").exec().catch(err => {return console.log("delWorkouts: error querying initial profile");});
+  })
+  .select("_id")
+  .exec()
+  .catch(err => {return console.log("delWorkouts: error querying initial profile");});
 
   for(let i = 0; i < user_workouts.workouts.length; i++){
     let workout = user_workouts.workouts[i];
@@ -560,6 +563,50 @@ let editUsername = async function editUsername(req, res){
     user.set('name', req.body.name);
     user.save().catch(err => {console.log(err);});
     return res.status(200).send({ "message": "Successfully changed name to " + new_name });
+  }
+}
+
+let editExercise = async function editExercise(req, res){ //deletes old exercise data and replaces it with new exercise data passed in
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+
+  user = await schemaCtrl.Profile.findById(req.body.id).populate({
+    path: "exercises",
+    model: "Exercise",
+    populate: {
+      path: "sets",
+      model: "Set"
+    }
+  })
+  .exec()
+  .catch(err => {return console.log("editExercise: error querying initial profile");});
+  
+  let updated_set_ids = [];
+  for(let i = 0; i < req.body.sets.length; i++){
+    let set = req.body.sets[i];
+    updated_set = await schemaCtrl.Set.create(set).catch(err => { res.status(500).send({ message: "Input error: validation failed for json set input" }); return console.log("validation error in creating sets");})
+    updated_set.save();
+    updated_set_ids.push(mongoose.Types.ObjectId(updated_set._id)); //push saved set to array
+  }
+
+  //parse user exercises
+  for(let i = 0; i < user.exercises.length; i++){
+    let curr_exercise = user.exercises[i];
+    if(curr_exercise._id == req.body.old_exercise_id){
+      //purge old sets
+      for(let j = 0; j < curr_exercise.sets.length; j++){
+        let curr_set = curr_exercise.sets[j];
+        await schemaCtrl.Set.deleteOne({_id: curr_set.id}).catch(err => {return console.log("editExercise: error deleting set: " + curr_set._id);});
+      }
+      //update fields of the exercise
+      curr_exercise.set('name', req.body.name);
+      curr_exercise.set('muscle_groups', req.body.id.muscle_groups);
+      curr_exercise.set('equipment_type', req.body.equipment_type);
+      curr_exercise.set('sets', updated_set_ids);
+      curr_exercise.save().catch(err => {res.status(200).send({ "message": "editExercise: Failed to update exercise" }); return console.log(err);});
+      return res.status(200).send({ "message": "Successfully updated exercise " + req.body.old_exercise_id });
+    }
   }
 }
 
@@ -860,6 +907,7 @@ let apiCtrl = {
   delWorkout: delWorkout,
 
   exercises: exercises,
+  editExercise: editExercise,
   uExercises: uExercises,
   profile: profile,
   newExercise: newExercise,
