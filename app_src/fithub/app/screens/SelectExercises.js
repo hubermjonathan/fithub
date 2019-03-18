@@ -59,7 +59,7 @@ export default class SelectExercisesScreen extends React.Component {
     }
 
     _onExercisePress(exercise) {
-
+        console.log("PROPS: ", this.props.navigation);
         Alert.alert(
             'Confirm:',
             `Would you like to add this exercise to today's workout?`,
@@ -75,7 +75,9 @@ export default class SelectExercisesScreen extends React.Component {
                         sets: [],
                         };
                     console.log("New Exercise: ", newExercise);
-                    this.props.navigation.state.params.addExercise(newExercise);
+                    const addExercise = this.props.navigation.getParam('addExercise');
+                    addExercise(newExercise);
+                    //this.props.navigation.state.params.addExercise(newExercise);
                     }
                 },
             ]

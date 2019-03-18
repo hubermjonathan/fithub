@@ -10,7 +10,7 @@ export async function editProfile(profile) {
     profile.uid = uid;
     profile.id = id;
     profile.token = token;
-    fetch('https://fithub-server.herokuapp.com/users/edit', {
+    fetch('https://fithub-server.herokuapp.com/profile/editName', {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
