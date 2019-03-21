@@ -549,6 +549,40 @@ let delWorkout = async function delWorkout(req, res) {
   }
 }
 
+let editWorkoutPublic = async function editWorkoutPublic(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+
+  user = await schemaCtrl.Profile.findById(req.body.id).populate({
+    path: "workouts",
+    model: "WorkoutPlan",
+  })
+  .exec()
+  .catch(err => {return console.log("editWorkoutPublic: error querying initial profile workouts");});
+  console.log(user);
+
+  let workoutId = req.body.workout;
+  let flag = req.body.isPublic;
+
+  for(let i = 0; i < user.workouts.length; i++){
+    let workout = user.workouts[i];
+    if(workout._id == workoutId){
+      workout.set("public", flag);
+      workout.save();
+    }
+  }
+
+  let isPublic;
+  if(flag == "true"){
+    isPublic = "public";
+  }
+  else{
+    isPublic = "private";
+  }
+  return res.status(200).send({ "message": "Successfully set workout " + workoutId + " to " + isPublic } );
+}
+
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
   if(!isConnected(req, res)){ return console.log("DB is offline"); };
@@ -609,6 +643,164 @@ let editExercise = async function editExercise(req, res){ //deletes old exercise
     }
   }
 }
+
+let editWorkout = async function editWorkout(req, res){ //deletes old exercise data and replaces it with new exercise data passed in
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+
+  user = await schemaCtrl.Profile.findById(req.body.id).populate({
+    path: "workouts",
+    model: "WorkoutPlan",
+    populate: {
+      path: "exercises",
+      model: "Exercise",
+      populate: {
+        path: "sets",
+        model: "Set"
+      }
+    }
+  })
+  .exec()
+  .catch(err => {return console.log("editWorkout: error querying initial profile");});
+
+  let profile_workouts = user.workouts;
+  let old_workout_id = req.body.old_workout_id;
+  let muscles = [];
+  let exercise_ids = [];
+
+  //delete the old workout
+  for(let i = 0; i < profile_workouts.length; i++){
+    let workout = profile_workouts[i];
+    if(workout._id == old_workout_id){
+      schemaCtrl.WorkoutPlan.deleteOne({_id: old_workout_id}).catch(err => {return console.log("editWorkouts: error deleting workout: " + id);});
+    }
+  }
+  
+  /*
+  //delete the old workout
+  for(let i = 0; i < profile_workouts.length; i++){
+    let workout = profile_workouts[i];
+    if(workout._id == old_workout_id){
+      //delete nested exercises
+      for(let j = 0; j < workout.exercises.length; j++){
+        let exercise = workout.exercises[j];
+        //delete nested sets
+        for(let b = 0; b < exercise.sets.length; b++){
+          let set = exercise.sets[b];
+          schemaCtrl.Set.deleteOne({_id: set._id}).catch(err => {return console.log("editWorkouts: error deleting set " + id);});
+        }
+        schemaCtrl.Exercise.deleteOne({_id: exercise._id}).catch(err => {return console.log("editWorkouts: error deleting set " + id);});
+      }
+      schemaCtrl.WorkoutPlan.deleteOne({_id: old_workout_id}).catch(err => {return console.log("editWorkouts: error deleting workout: " + id);});
+    }
+  }
+  */
+
+  //build the new workout
+  for(let i = 0; i < req.body.exercises.length; i++){
+    let exercise = req.body.exercises[i];
+    exercise.muscle_groups.forEach(muscle => {
+      if(muscles.find( all => all == muscle) == undefined){
+        muscles.push(muscle);
+      }
+    });
+    if(exercise.exists) { //exercise exists
+      try{
+      let findExercise = await schemaCtrl.Exercise.findById(exercise.id, (err, exercise) => {
+          //exercise confirmed to exist, push _id
+          exercise_ids.push(mongoose.Types.ObjectId(exercise._id));
+      });
+      }catch(err){
+        return res.status(404).send({ message: "Database Error: Exercise claimed to exist not found" });
+      }
+    }
+    else{ //create exercise on the fly
+      //creating set data for the exercise
+      let set_ids = [];
+      for(let j = 0; j < exercise.sets.length; j++){
+        let set = exercise.sets[j];
+        let new_set;
+        try{
+          new_set = await schemaCtrl.Set.create(set);
+        }catch(validation_err){ 
+          console.log("Input Error: invalid json input at Set"); 
+          return res.status(500).send({ "message": "Input Error: Validation error while constructing set" })};
+        new_set.save(function (err, ret) {
+          if(err){ return res.status(500).send({ message: "Database error: unable to save set data" });}
+        });
+        set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
+      }; //end forEach exercise.set
+
+      let newExercise;
+      try{
+      newExercise = await schemaCtrl.Exercise.create({ //create new exercise
+        name: exercise.name,
+        muscle_groups: exercise.muscle_groups,
+        equipment_type: exercise.equipment_type,
+        sets: set_ids,
+      });
+      }catch(validation_err){ 
+        console.log("Input Error: invalid json input at exercise"); 
+        return res.status(500).send({ "message": "Input Error: Validation error while constructing exercise" })};
+
+      newExercise.save((err, newExercise) => { //save new exercise
+        if (err) {
+          console.log("error saving exercise");
+          res.status(500).send({ "message": "Database error: Error saving exercise to database" });
+          return false;
+        }
+        else{
+          user.updateOne({$push: { exercises: newExercise._id }}, {}, (err, raw) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send({ "message": "Database Error: Error while pushing exercise to user profile" });
+              return true;
+            }
+          }); //end updateOne
+        }
+      }); //end save
+      exercise_ids.push(mongoose.Types.ObjectId(newExercise._id));
+    }
+  }; //end foreach exercise
+
+
+  //Construct the workout JSON object
+  let newWorkout;
+  try{
+  newWorkout = await schemaCtrl.WorkoutPlan.create({
+    _id: old_workout_id,
+    name: req.body.name,
+    description: req.body.description,
+    muscle_groups : muscles,
+    date: req.body.date,
+    exercises: exercise_ids,
+    ownerUID: req.body.id,
+    gains: 0,
+    public: req.body.public
+  });
+  }catch(validation_err){ 
+    console.log("Input Error: invalid json input at workout"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workout" })};
+
+  //save the workout to the master workout collection
+  newWorkout.save((err, newWorkout) => {
+    if (err) {
+      console.log("error saving workout");
+      res.status(500).send({ "message": "Database Error: Error while saving new workout plan" });
+      return;
+    }
+    else {
+      res.status(200).send({ "message": "Workout edited successfully" });
+      console.log(newWorkout);
+    }
+  }); //end save
+}
+
+let editLog = async function editLog(req, res) {
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+} //end newLog
 
 
 /*--------Functions for returning user information--------*/
@@ -902,6 +1094,8 @@ let apiCtrl = {
 
   workouts: workouts,
   newWorkout: newWorkout,
+  editWorkoutPublic: editWorkoutPublic,
+  editWorkout: editWorkout,
 
   delExercise: delExercise,
   delWorkout: delWorkout,
