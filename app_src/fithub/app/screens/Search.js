@@ -27,17 +27,29 @@ export default class SearchScreen extends React.Component {
     
     updateSearch = search => {
         this.setState({ search });
+        getSearchResults(this.state.search);
     };
+
+    getSearchResults(search){
+        
+    }
 
     render() {
         return(
-            <SearchBar
-                placeholder= 'Search'
-                onChangeText={this.updateSearch}
-                value={this.state.search}
-                lightTheme={true}
-                round={true}
-            />
+            <SafeAreaView>
+                <SearchBar
+                    placeholder= 'Search'
+                    onChangeText={this.updateSearch}
+                    value={this.state.search}
+                    lightTheme={true}
+                    round={true}
+                />
+                <Text>{this.state.search}</Text>
+            </SafeAreaView>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    
+});
