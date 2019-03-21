@@ -549,6 +549,40 @@ let delWorkout = async function delWorkout(req, res) {
   }
 }
 
+let editWorkoutPublic = async function editWorkoutPublic(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+
+  user = await schemaCtrl.Profile.findById(req.body.id).populate({
+    path: "workouts",
+    model: "WorkoutPlan",
+  })
+  .exec()
+  .catch(err => {return console.log("editWorkoutPublic: error querying initial profile workouts");});
+  console.log(user);
+
+  let workoutId = req.body.workout;
+  let flag = req.body.isPublic;
+
+  for(let i = 0; i < user.workouts.length; i++){
+    let workout = user.workouts[i];
+    if(workout._id == workoutId){
+      workout.set("public", flag);
+      workout.save();
+    }
+  }
+
+  let isPublic;
+  if(flag == "true"){
+    isPublic = "public";
+  }
+  else{
+    isPublic = "private";
+  }
+  return res.status(200).send({ "message": "Successfully set workout " + workoutId + " to " + isPublic } );
+}
+
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
   if(!isConnected(req, res)){ return console.log("DB is offline"); };
@@ -902,6 +936,7 @@ let apiCtrl = {
 
   workouts: workouts,
   newWorkout: newWorkout,
+  editWorkoutPublic: editWorkoutPublic,
 
   delExercise: delExercise,
   delWorkout: delWorkout,

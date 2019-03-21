@@ -23,6 +23,7 @@ router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users wo
 router.post('/workouts/public', apiCtrl.publicWorkouts);
 router.post('/workouts/new', apiCtrl.newWorkout);           //Post a new workout plan
 router.post('/workouts/delete', apiCtrl.delWorkout);         //Post a workout deletion to a user profile
+router.post('/workouts/setpublic', apiCtrl.editWorkoutPublic);         //Post a workout deletion to a user profile
 
 router.get('/exercises/', apiCtrl.exercises);               //Get the standard exercises
 router.get('/exercises/:id', apiCtrl.uExercises);          //Get a users CUSTOM exercises
