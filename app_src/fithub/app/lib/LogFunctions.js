@@ -74,7 +74,7 @@ export async function postLog(workout) {
 //Returns the logs associated with the logged in user
 export async function getLogs() {
     const id = await getUserID();
-    let response = await fetch(`https://fithub-server.herokuapp.com/logs/${id}`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/logs/'+id, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",

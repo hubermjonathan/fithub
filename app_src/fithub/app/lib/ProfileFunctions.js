@@ -27,7 +27,7 @@ export async function editProfile(profile) {
 // Returns the profile of the user where id is the
 // id of the user
 export async function getProfile(id) {
-    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/profile/'+id, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
@@ -41,7 +41,7 @@ export async function getProfile(id) {
     Returns the dates the user with a matching id has worked out
 */
 export async function getProfileDates(id) {
-    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}/dates/`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/profile/'+id+'/dates/', {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
@@ -63,7 +63,7 @@ export async function getProfileDates(id) {
 //      }
 //  }
 export async function getProfileStats(id) {
-    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}/stats`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/profile/'+id+'/stats', {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export async function getProfileStats(id) {
 // Return the recent profile activity of a user where 
 // id is the id of the user
 export async function getProfileActivity(id) {
-    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}/activity`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/profile/'+id+'/activity', {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
