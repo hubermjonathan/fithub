@@ -7,12 +7,10 @@ router.use(bodyParser.json());
 
 const apiCtrl = require('./api/apiCtrl');
 
-
-
 //api
 
-router.post('/users/login', apiCtrl.login);                 //Login a user
-router.get('/profile/:id/', apiCtrl.profile);                //Get a users profile
+router.post('/users/login', apiCtrl.login);                     //Login a user
+router.get('/profile/:id/', apiCtrl.profile);                   //Get a users profile
 router.get('/profile/:id/stats', apiCtrl.stats);
 router.get('/profile/:id/dates', apiCtrl.dates);
 router.get('/profile/:id/activity', apiCtrl.activity);

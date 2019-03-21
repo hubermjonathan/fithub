@@ -71,30 +71,15 @@ export async function postLog(workout) {
 
 }
 
-/*
-*/
-export async function getLogs(logsArray) {
-
+//Returns the logs associated with the logged in user
+export async function getLogs() {
     const id = await getUserID();
-    //const date = //Date
-
- 
-    fetch(`https://fithub-server.herokuapp.com/logs/${id}`, {
+    let response = await fetch(`https://fithub-server.herokuapp.com/logs/${id}`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
-    }).then(res => res.json())
-        .then((data) => {
-            //console.log('Success', JSON.stringify(data));
-            let stringify = JSON.stringify(data);
-            let parsed = JSON.parse(stringify);
-            for (let x = 0; x < parsed.logs.length; x++) {
-                logsArray.push(parsed.logs[x]);
-            }
-           
-        })
-        .catch(function (e) {
-            console.log('Error');
-        });
+    });
+    let json = await response.json();
+    return json;
 }
