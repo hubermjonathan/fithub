@@ -23,75 +23,65 @@ export async function editProfile(profile) {
         });
 }
 
-/*
 
-*/
-export async function getProfile(id, store) {
-    fetch(`https://fithub-server.herokuapp.com/users/${id}`, {
+// Returns the profile of the user where id is the
+// id of the user
+export async function getProfile(id) {
+    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
-    }).then(res => res.json())
-        .then((res) => {
-            store=JSON.stringify(res);
-            return console.log('Success', JSON.stringify(res)); 
-        })
-        .catch(function (e) {
-            console.log('Error');
-        });
+    });
+    let json = await response.json();
+    return json;
 }
 
 /*
-
+    Returns the dates the user with a matching id has worked out
 */
-export async function getProfileDates(id, store) {
-    let promise = fetch(`https://fithub-server.herokuapp.com/profile/dates/${id}`, {
+export async function getProfileDates(id) {
+    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}/dates/`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
-    }).then(res => res.json());
-    return promise;
-/*    .then((res) => {
-            store=JSON.stringify(res);
-            return console.log('Success', JSON.stringify(res)); 
-        }).catch(function (e) {
-            console.log('Error');
-        });*/
+    });
+    let json = await response.json();
+    return json;
 }
 
-/*
 
-*/
-export async function getProfileStats(id, store) {
-    let promise = fetch(`https://fithub-server.herokuapp.com/profile/${id}/stats`, {
+// Returns the max stats of a user where is is the id of the user 
+// Stats is an object with the form of
+//  {
+//      volumes{
+//          workout_name: max_weight
+//      }
+//      maxes{
+//          workout_name: max_weight            
+//      }
+//  }
+export async function getProfileStats(id) {
+    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}/stats`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
-    }).then(res => res.json());
-    return promise;
-/*        .then((res) => {
-            store=JSON.stringify(res);
-            return console.log('Success', JSON.stringify(res)); 
-        }).catch(function (e) {
-            console.log('Error');
-        });*/
+    });
+    let json = await response.json();
+    return json;
 }
 
-export async function getProfileActivity(id, store) {
-    let promise = fetch(`https://fithub-server.herokuapp.com/profile/${id}/activity`, {
+// Return the recent profile activity of a user where 
+// id is the id of the user
+export async function getProfileActivity(id) {
+    let response = await fetch(`https://fithub-server.herokuapp.com/profile/${id}/activity`, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         },
-    }).then(res => res.json());
-    return promise;
-/*        .then((res) => {
-            store=JSON.stringify(res);
-            return console.log('Success', JSON.stringify(res)); 
-        }).catch(function (e) {
-            console.log('Error');
-        });*/
+    })
+    let json = await response.json();
+    return json;
 }

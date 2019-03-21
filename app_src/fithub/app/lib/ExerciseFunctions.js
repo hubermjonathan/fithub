@@ -1,19 +1,27 @@
 //Global helper functions pertaining to posting, requesting, editing, adding etc.to exercises
 
-export function getExercises(store) {
-    fetch('https://fithub-server.herokuapp.com/exercises', {
+//Return all the public exercises
+export async function getExercises() {
+    let response = await fetch('https://fithub-server.herokuapp.com/exercises', {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
         }
-    }).then(res => res.json())
-        .then((res) => {
-            console.log('Success', JSON.stringify(res))
-            store = JSON.parse(res);
-        })
-        .catch(function (e) {
-            console.log('Error');
-        });
+    });
+    let json = await response.json();
+    return json;
+}
+
+// Return a users exercises where id is the is of the user
+export async function getUserExercises(id) {
+    let response = await fetch(`https://fithub-server.herokuapp.com/exercises/${id}`, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+    let json = await response.json();
+    return json;
 }
 
 let muscleEnums = {
