@@ -27,11 +27,17 @@ async function recalc(req, res){
   user.maxes = {};
   user.dates = {};
   user.volumes = {};
+
   user.logs.forEach(log => {
-    if(log.date in user.dates) {
-      user.dates[log.date]++; 
+    let day = log.date.getDate();
+    let month = log.date.getMonth();
+    let year = log.date.getFullYear();
+    let gitLog = `${year}-${month}-${day}`
+
+    if(gitLog in user.dates) {
+      user.dates[gitLog]++; 
     } else {
-      user.dates[log.date] = 1;
+      user.dates[gitLog] = 1;
     }
     log.exercises.forEach(exercise => {
       let vol = 0;
@@ -257,12 +263,17 @@ let newLog = async function newLog(req, res) {
 
   //validate setData json input
 
+  const day = req.body.date.getDate();
+  const month = req.body.date.getMonth();
+  const year = req.body.date.getFullYear();
+  const gitLog = `${year}-${month}-${day}`
+
   let exerciseData_ids = [];
   let newActivity;
-  if(req.body.date in user.dates) {
-    user.dates[req.body.date]++; 
+  if(gitLog in user.dates) {
+    user.dates[gitLog]++; 
   } else {
-    user.dates[req.body.date] = 1;
+    user.dates[gitLog] = 1;
   }
   //Construct the exerciseData objects
   for(let i = 0; i < req.body.exercises.length; i++){
