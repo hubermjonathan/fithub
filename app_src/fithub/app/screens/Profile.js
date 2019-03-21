@@ -27,9 +27,15 @@ const screenWidth = Dimensions.get('window').width
 
 export default class ProfileScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    return {
-      title: 'Profile',
-      headerRight: <Icon name="settings" type="material" size={30} onPress={() => { navigation.push('Settings') }} />
+    if(navigation.getParam('id', '') === '') {
+      return {
+        title: 'Profile',
+        headerRight: <Icon name="settings" type="material" size={30} onPress={() => { navigation.push('Settings') }} />
+      }
+    } else {
+      return {
+        title: 'Profile',
+      }
     }
   };
 
@@ -60,7 +66,6 @@ export default class ProfileScreen extends React.Component {
 
   componentDidMount() {
     getUserID().then(id => {
-      console.log(id);
       this.setState({
         idLoaded: true,
         id: this.props.navigation.getParam('id', id)
