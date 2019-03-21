@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
-import { getUserID } from '../lib/AccountFunctions';
 import { getProfileStats, getProfileActivity } from '../lib/ProfileFunctions';
+import { getUserID } from '../lib/AccountFunctions';
 import { ContributionGraph } from 'react-native-chart-kit';
 
 const chartConfig = {
@@ -27,15 +27,24 @@ const screenWidth = Dimensions.get('window').width
 
 export default class ProfileScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    return {
-      title: 'Profile',
-      headerRight: <Icon name="settings" type="material" size={30} onPress={() => { navigation.push('Settings') }} />
+    if(navigation.getParam('id', '') === '') {
+      return {
+        title: 'Profile',
+        headerRight: <Icon name="settings" type="material" size={30} onPress={() => { navigation.push('Settings') }} />
+      }
+    } else {
+      return {
+        title: 'Profile',
+      }
     }
   };
 
   constructor(props) {
     super(props);
+
     this.state = {
+      idLoaded: false,
+      id: '',
       name: '',
       photo: '',
       activityInfo: [],
@@ -43,21 +52,32 @@ export default class ProfileScreen extends React.Component {
       volume: 0,
       bench: 0,
     }
-    const didFocusListener = this.props.navigation.addListener(
-      'didFocus',
-      () => {
-        this.loadUserData();
-        this.loadUserStats();
-      }
-    );
-    this.loadWorkoutActivity();
+    
+    const didFocusListener = this.props.navigation.addListener('didFocus', this.loader.bind(this));
+  }
+
+  loader() {
+    if(this.state.idLoaded) {
+      this.loadUserData();
+      this.loadUserStats();
+      this.loadWorkoutActivity();
+    }
+  }
+
+  componentDidMount() {
+    getUserID().then(id => {
+      this.setState({
+        idLoaded: true,
+        id: this.props.navigation.getParam('id', id)
+      });
+      this.loader();
+    });
   }
 
   render() {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === 'ios' && this.state.idLoaded) {
       return (
         <SafeAreaView style={styles.containerIOS}>
-
           <View style={styles.header}>
             <View style={styles.profPicCol}>
               <Image
@@ -127,8 +147,7 @@ export default class ProfileScreen extends React.Component {
   }
   
   async loadUserStats() {
-    let id = await getUserID();
-    let stats = await getProfileStats(id);
+    let stats = await getProfileStats(this.state.id);
 
     let totalVolume = 0;
     let maxBench = stats.maxes["Bench Press"] === undefined ? 0 : stats.maxes["Bench Press"];
@@ -146,9 +165,8 @@ export default class ProfileScreen extends React.Component {
   async loadUserData() {
     let userFullName = "";
     let userPhotoUrl = "";
-    let id = await getUserID();
 
-    fetch('https://fithub-server.herokuapp.com/profile/' + id)
+    fetch('https://fithub-server.herokuapp.com/profile/' + this.state.id)
       .then((res) => {
         return res.json();
       })
@@ -167,9 +185,7 @@ export default class ProfileScreen extends React.Component {
   }
 
   async loadWorkoutActivity() {
-    let id = await getUserID();
-
-    fetch('https://fithub-server.herokuapp.com/logs/' + id)
+    fetch('https://fithub-server.herokuapp.com/logs/' + this.state.id)
       .then((res) => {
         return res.json();
       })
@@ -195,6 +211,7 @@ class Activity extends React.Component {
     super(props);
 
     this.state = {
+      id: this.props.id,
       algoData: []
     }
 
@@ -219,8 +236,7 @@ class Activity extends React.Component {
   }
 
   async loadActivities() {
-    let id = await getUserID();
-    let activities = await getProfileActivity(id);
+    let activities = await getProfileActivity(this.state.id);
     activities = activities.activity;
     let parsedActivities = [];
 
