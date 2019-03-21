@@ -14,6 +14,7 @@ import {
     ListItem
 } from 'react-native';
 import { SearchBar } from 'react-native-elements';
+import ProfileCard from '../components/ProfileCard';
 
 
 export default class SearchScreen extends React.Component {
@@ -23,6 +24,11 @@ export default class SearchScreen extends React.Component {
 
     state = {
         search: '',
+        profiles: [
+            {user: 'Brian'},
+            {user: 'Andy'},
+            {user: 'Colin'},
+        ],
     };
     
     updateSearch = search => {
@@ -36,7 +42,7 @@ export default class SearchScreen extends React.Component {
 
     render() {
         return(
-            <SafeAreaView>
+            <SafeAreaView style={{flex: 1}}>
                 <SearchBar
                     placeholder= 'Search'
                     onChangeText={this.updateSearch}
@@ -44,12 +50,27 @@ export default class SearchScreen extends React.Component {
                     lightTheme={true}
                     round={true}
                 />
-                <Text>{this.state.search}</Text>
+                <View style={styles.searchResults}>
+                    <FlatList
+                        keyExtractor={(item, index) => index.toString()}
+                        data={this.state.profiles}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity onPress={()=>this.props.navigation.push('otherUserProfile')}>
+                            <ProfileCard
+                                user={item.user}
+                            />
+                            </TouchableOpacity>
+
+                        )}
+                    />
+                </View>
             </SafeAreaView>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    
+    searchResults: {
+        flex: 1,
+    }
 });
