@@ -118,14 +118,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                     defaultValue='e.g "Hammer Curls"'
                                                     selectTextOnFocus={true}
                                                     onChangeText={(text) => this.setState({ exerciseName: text })} />
-                                                <Text style={styles.centerText}> # of Warmup Sets</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "5"'
-                                                    selectTextOnFocus={true}
-                                                    keyboardType="number-pad"
-                                                    onChangeText={(text) => this.setState({ warmupSets: parseInt(text) })} />
+                                                
                                                 <Text style={styles.centerText}> # of Sets</Text>
                                                 <TextInput
                                                     style={styles.input}

@@ -39,25 +39,25 @@ export default class FeedScreen extends React.Component {
     modalVisible: false,
     workouts: [],
     muscleGroups: [
-      {muscle: "NECK", enum: 1},
-      {muscle: "SHOULDERS", enum: 2}, 
-      {muscle: "DELTOID", enum: 3},
-      {muscle: "TRICEPS", enum: 4},
-      {muscle: "BICEPS", enum: 5},
-      {muscle: "FOREARMS", enum: 6},
-      {muscle: "BACK", enum: 7},
-      {muscle: "LATS", enum: 8},
-      {muscle: "TRAPS", enum: 9},
-      {muscle: "CHEST", enum: 10},
-      {muscle: "WAIST", enum: 11},
-      {muscle: "OBLIQUES", enum: 12},
-      {muscle: "HIPS", enum: 13},
-      {muscle: "GLUTES", enum: 14},
-      {muscle: "THIGHS", enum: 15},
-      {muscle: "QUADS", enum: 16},
-      {muscle: "HAMSTRINGS", enum: 17}, 
-      {muscle: "CALVES", enum: 18},
-      {muscle: "ALL", enum: 99},
+      { muscle: "NECK", enum: 1 },
+      { muscle: "SHOULDERS", enum: 2 },
+      { muscle: "DELTOID", enum: 3 },
+      { muscle: "TRICEPS", enum: 4 },
+      { muscle: "BICEPS", enum: 5 },
+      { muscle: "FOREARMS", enum: 6 },
+      { muscle: "BACK", enum: 7 },
+      { muscle: "LATS", enum: 8 },
+      { muscle: "TRAPS", enum: 9 },
+      { muscle: "CHEST", enum: 10 },
+      { muscle: "WAIST", enum: 11 },
+      { muscle: "OBLIQUES", enum: 12 },
+      { muscle: "HIPS", enum: 13 },
+      { muscle: "GLUTES", enum: 14 },
+      { muscle: "THIGHS", enum: 15 },
+      { muscle: "QUADS", enum: 16 },
+      { muscle: "HAMSTRINGS", enum: 17 },
+      { muscle: "CALVES", enum: 18 },
+      { muscle: "ALL", enum: 99 },
     ]
   }
 
@@ -65,10 +65,10 @@ export default class FeedScreen extends React.Component {
     this.setState({ modalVisible: visible });
   }
 
-  selectedFilter(muscleEnum){
-    let muscles = {muscles: []};
-    if(muscleEnum === 99) {
-      for(let i = i; i < 19; i++) {
+  selectedFilter(muscleEnum) {
+    let muscles = { muscles: [] };
+    if (muscleEnum === 99) {
+      for (let i = i; i < 19; i++) {
         muscles.muscles.push(i);
       }
     } else {
@@ -87,7 +87,7 @@ export default class FeedScreen extends React.Component {
         }//for
         builtWorkouts.push({
           workout: array[x].name,
-          user: array[x].ownerUID, //replace with user's profile name later
+          user: array[x].ownerUID,
           icon: "person",
           exercises: exercises
         })
@@ -114,7 +114,9 @@ export default class FeedScreen extends React.Component {
         let builtWorkouts = [];
         let s = JSON.stringify(data);
         let array = JSON.parse(s);
+        console.log(array);
         for (let x = 0; x < array.length; x++) {
+          if (array[x].public == true) { 
           let exercises = [];
           let workouts = [];
           for (let y = 0; y < array[x].exercises.length; y++) {
@@ -149,107 +151,108 @@ export default class FeedScreen extends React.Component {
             date: new Date().toJSON().slice(0, 10),
             exercises: exercises
           })
-        }//for
+        }
+      }//for
         console.log(builtWorkouts);
-        this.setState({ workouts: builtWorkouts })
+    this.setState({ workouts: builtWorkouts })
 
 
-      })
+  })
       .catch((err) => {
-        console.log(err);
-      });
+  console.log(err);
+});
   }
-  render() {
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <View style={styles.title}>
-            <Text style={styles.title}>Feed</Text>
-          </View>
-          <View style={styles.search}>
-            <TouchableOpacity>
-              <Icon
-                style={{ right: 10 }}
-                name="filter"
-                type="MaterialDesignIcons"
-                size={30}
-                onPress={() => this.setModalVisible(true)}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Icon
-                name="magnifying-glass"
-                type="entypo"
-                size={30}
-                onPress={() => this.props.navigation.navigate('Search')}
-              />
-            </TouchableOpacity>
-          </View>
+render() {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.header}>
+        <View style={styles.title}>
+          <Text style={styles.title}>Feed</Text>
         </View>
-
-        <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          data={this.state.workouts}
-          renderItem={({ item }) => (
-            <WorkoutCard
-              fullWorkout={{
-                id: "",
-                uid: "",
-                token: "",
-                public: false,
-                description: item.description,
-                name: item.name,
-                exercises: item.exercises,
-                date:item.date
-              }}
-              workout={item.workout}
-              user={item.user}
-              userPhoto={item.icon}
-              exercises={item.exercises}
-              navigation={this.props.navigation}
+        <View style={styles.search}>
+          <TouchableOpacity>
+            <Icon
+              style={{ right: 10 }}
+              name="filter"
+              type="MaterialDesignIcons"
+              size={30}
+              onPress={() => this.setModalVisible(true)}
             />
-          )}
-        />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon
+              name="magnifying-glass"
+              type="entypo"
+              size={30}
+              onPress={() => this.props.navigation.navigate('Search')}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-        <Modal
-          animationType="fade"
-          transparent={false}
-          visible={this.state.modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}
-          style={{ flex: 1 }}>
+      <FlatList
+        keyExtractor={(item, index) => index.toString()}
+        data={this.state.workouts}
+        renderItem={({ item }) => (
+          <WorkoutCard
+            fullWorkout={{
+              id: "",
+              uid: "",
+              token: "",
+              public: false,
+              description: item.description,
+              name: item.name,
+              exercises: item.exercises,
+              date: item.date
+            }}
+            workout={item.workout}
+            user={item.user}
+            userPhoto={item.icon}
+            exercises={item.exercises}
+            navigation={this.props.navigation}
+          />
+        )}
+      />
 
-          <SafeAreaView style={{flex: 1}}>
-            <View style={{flex:10}}>
-              <FlatList
-                keyExtractor={(item, index) => index.toString()}
-                data={this.state.muscleGroups}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={()=>this.selectedFilter(item.enum)}>
-                        <Text style={{fontSize: 30}}>
-                          {item.muscle}
-                        </Text>
-                    </TouchableOpacity>
-                )}
-              />
-            </View>
-            <View style={{flex:1, paddingTop: 10}}>
-              <Button
-                style={{ allignItems: 'flex-end' }}
-                buttonStyle={{ backgroundColor: '#e04a21' }}
-                title="Cancel"
-                onPress={() => {
-                    this.setModalVisible(false);
-                }} 
-              />
-            </View>
-          </SafeAreaView>
+      <Modal
+        animationType="fade"
+        transparent={false}
+        visible={this.state.modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+        }}
+        style={{ flex: 1 }}>
 
-        </Modal>
-      </SafeAreaView>
-    )
-  }
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={{ flex: 10 }}>
+            <FlatList
+              keyExtractor={(item, index) => index.toString()}
+              data={this.state.muscleGroups}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => this.selectedFilter(item.enum)}>
+                  <Text style={{ fontSize: 30 }}>
+                    {item.muscle}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+          <View style={{ flex: 1, paddingTop: 10 }}>
+            <Button
+              style={{ allignItems: 'flex-end' }}
+              buttonStyle={{ backgroundColor: '#e04a21' }}
+              title="Cancel"
+              onPress={() => {
+                this.setModalVisible(false);
+              }}
+            />
+          </View>
+        </SafeAreaView>
+
+      </Modal>
+    </SafeAreaView>
+  )
+}
 }
 
 const styles = StyleSheet.create({

@@ -136,7 +136,6 @@ export default class ProfileScreen extends React.Component {
                     height={220}
                     chartConfig={chartConfig}
                   />
-                  <Button title={"test"} onPress={() => { this.loadWorkoutDates() }} />
                 </ScrollView>
               </View>
             </Swiper>
@@ -218,7 +217,7 @@ export default class ProfileScreen extends React.Component {
         for (let i in data.dates) {
           rdates.push({ date: i, count: data.dates[i] });
         }
-        console.log(rdates)
+        //console.log(rdates)
         this.setState({ dates: rdates });
       })
       .catch((err) => {
