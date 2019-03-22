@@ -25,15 +25,11 @@ export default class WorkoutCard extends React.Component {
 
     render() {
         return (
-            <SafeAreaView>
+            <SafeAreaView style={{flex: 1}}>
                 <View style={styles.card}>
                     {/* show user at top of card */}
                     <View style={styles.user}>
                         {/* show user profile pic */}
-                        <Icon
-                            name={this.props.icon}
-                            style='materialicons'
-                        />
                         {/* <Image
                             source={{ uri: this.state.userPhoto }}
                         /> */}
@@ -49,17 +45,21 @@ export default class WorkoutCard extends React.Component {
                     {/* show workout */}
                     <View style={styles.workoutHeader}>
                         {/* title of workout with plus icon*/}
-                        <Text style={styles.workoutTitle}>{this.props.workout}</Text>
-                        <TouchableOpacity style={styles.add}
-                            onPress={()=>{
-                                //add to workouts
-                            }}>
-                            <Icon
-                                name="plus"
-                                type="entypo"
-                                size={30}
-                            />
-                        </TouchableOpacity>
+                        <View style={styles.workoutTitle}>
+                            <Text style={styles.workoutTitleText}>{this.props.workout}</Text>
+                        </View>
+                        <View style={styles.add}>
+                            <TouchableOpacity
+                                onPress={()=>{
+                                    //add to workouts
+                                }}>
+                                <Icon
+                                    name="plus"
+                                    type="entypo"
+                                    size={30}
+                                />
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     {/* list exercises of workout */}
@@ -90,7 +90,6 @@ export default class WorkoutCard extends React.Component {
 
 const styles = StyleSheet.create({
     card: {
-        flex: 0,
         height: 'auto',
         margin: 10,
         padding: 5,
@@ -113,17 +112,26 @@ const styles = StyleSheet.create({
     },
     workoutHeader: {
         flex: 1,
+        flexDirection: 'row',
         //borderBottomWidth: 1,
     },
     workoutTitle: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
         paddingTop: 10,
+    },
+    workoutTitleText: {
         fontSize: 30,
         textAlign: 'center',
+        color: '#00adf5',
     },
     add: {
-        flexDirection: 'row-reverse',
-        right: 0,
-        bottom: 30,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        //right: 0,
+        //bottom: 30,
     },
     exerciseList: {
         paddingBottom: 10,
