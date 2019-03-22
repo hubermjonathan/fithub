@@ -564,7 +564,14 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   console.log(user);
 
   let workoutId = req.body.workout;
-  let flag = req.body.isPublic;
+  let flag;
+
+  if(req.body.isPublic){
+    flag = true;
+  }
+  else{
+    flag = false;
+  }
 
   if(user.workouts.length == 0){
     return res.status(500).send({ "message": "You have no workouts!" } );
@@ -912,6 +919,9 @@ let gain = async function gain(req, res){
   let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workout).catch(err => {console.log("error querying post");});
   if(!workout.public){
     return res.status(500).send({ "message": "This is a private workout" });
+  }
+  if(workout.ownerUID == user._id){
+    return res.status(500).send({ "message": "You cannot gain your own post!" });
   }
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
