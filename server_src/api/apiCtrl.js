@@ -32,6 +32,12 @@ async function recalc(req, res){
     let day = log.date.getDate();
     let month = log.date.getMonth();
     let year = log.date.getFullYear();
+    if(month<10){
+      month = "0" + month;
+    }
+    if(day<10){
+      day = "0" + day;
+    }
     let gitLog = `${year}-${month}-${day}`
 
     if(gitLog in user.dates) {
