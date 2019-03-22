@@ -39,7 +39,7 @@ export default class LogCard extends React.Component {
     }
 
     render() {
-        console.log("LogCard props: ", this.props);
+        //console.log("LogCard props: ", this.props);
         var totalSets;
         var totalReps = 0;
         var totalWeight = 0;
@@ -216,7 +216,7 @@ export default class LogCard extends React.Component {
 
     //HANDLER FUNCTIONS
     _modalOKButton() {
-        console.log("LOG CARD: ", this.props);
+        //console.log("LOG CARD: ", this.props);
         if (this.state.modalReps !== undefined && this.state.modalWeight !== undefined) {
             const set = {"weight": this.state.modalWeight, "reps": this.state.modalReps, "warmup": this.state.modalCheckbox};
             if (this.state.modalMode === "add") {
