@@ -51,7 +51,6 @@ export default class SearchScreen extends React.Component {
                 
             return itemUser.indexOf(textData) > -1;    
         });    
-        console.log(newUsers);
         this.setState({ searchedUsers: newUsers });  
     };
 
