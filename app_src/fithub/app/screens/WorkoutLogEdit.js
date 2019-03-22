@@ -64,7 +64,8 @@ export default class WorkoutLogEditScreen extends React.Component {
               style={{ paddingTop: '3%' }}
               title={'Log this workout'}
               onPress={() => {
-                /*
+                //console.log(this.state.exercises);
+                
                 postLog({
                   id: "",
                   uid: "",
@@ -72,7 +73,7 @@ export default class WorkoutLogEditScreen extends React.Component {
                   date: this.state.date,
                   name: this.state.name,
                   exercises: this.state.exercises,
-                })*/
+                })
                 //postlog is broken for now. will crash the server
               }}
             />
