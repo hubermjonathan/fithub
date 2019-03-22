@@ -1189,7 +1189,7 @@ let social = function social(req, res){
       res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
-    res.status(200).send(data);
+    res.status(200).send({gains: data.gains});
   });
 }
 
