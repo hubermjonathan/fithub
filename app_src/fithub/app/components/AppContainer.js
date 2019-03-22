@@ -49,7 +49,7 @@ const FeedStack = createStackNavigator({
     }
   },
   Search: SearchScreen,
-  otherUserProfile: ProfileScreen
+  Profile: ProfileScreen
 });
 
 const AppContainer = createAppContainer(createBottomTabNavigator(

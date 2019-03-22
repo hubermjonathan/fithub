@@ -28,17 +28,7 @@ export default class ProfileCard extends React.Component {
         return (
             <SafeAreaView>
                 <View style={styles.card}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            //figure how to navigate to profile
-                        }}>
-                        {/* show user profile pic */}
-                        {/* <Image
-                            style={styles.photo}
-                            source={{ uri: this.state.userPhoto }}
-                        />                         */}
-                        <Text style={styles.userName}>{this.props.user}</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.userName}>{this.props.user}</Text>
                 </View>
             </SafeAreaView>
         );

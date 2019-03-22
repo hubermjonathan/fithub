@@ -15,6 +15,7 @@ import {
 import { ListItem, Icon } from 'react-native-elements';
 import { getProfileName } from '../lib/ProfileFunctions';
 
+
 export default class WorkoutCard extends React.Component {
     constructor(props) {
         super(props);
@@ -50,12 +51,10 @@ export default class WorkoutCard extends React.Component {
                 <View style={styles.card}>
                     {/* show user at top of card */}
                     <View style={styles.user}>
-                        {/* show user profile pic */}
-                        {/* <Image
-                            source={{ uri: this.state.userPhoto }}
-                        /> */}
                         {/* print user of workout */}
-                        <Text style={styles.userName}>{this.state.user}</Text>
+                        <TouchableOpacity onPress={() => this.props.navigation.push('Profile', {id: this.props.user})}>
+                            <Text style={styles.userName}>{this.state.user}</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {/* show workout */}
