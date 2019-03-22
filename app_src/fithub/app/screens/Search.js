@@ -28,19 +28,32 @@ export default class SearchScreen extends React.Component {
             searchedUsers: [],
         };
     }
-    updateSearch = search => {
-        this.setState({ search: search });
-        this.getSearchResults(this.state.search);
-    };
+    
 
     
-      componentDidMount() {
-        getUsers().then(users => {
-          this.setState({
-            users: users
-          });
+    componentDidMount() {
+    getUsers().then(users => {
+        this.setState({
+        users: users
         });
-      }
+    });
+    }
+
+    updateSearch = search => {
+        this.setState({ search: search });
+        this.searchFilterFunction(this.state.search);
+    };
+
+    searchFilterFunction = text => {    
+        const newUsers = this.state.users.filter(user => {      
+            const itemUser = `${user.pseudonym.toUpperCase()}`;
+            const textData = text.toUpperCase();
+                
+            return itemUser.indexOf(textData) > -1;    
+        });    
+        console.log(newUsers);
+        this.setState({ searchedUsers: newUsers });  
+    };
 
     getSearchResults(search){
         //console.log(search);
@@ -59,7 +72,7 @@ export default class SearchScreen extends React.Component {
             <SafeAreaView style={{flex: 1}}>
                 <SearchBar
                     placeholder= 'Search'
-                    onChangeText={this.updateSearch}
+                    onChangeText={text => this.updateSearch(text)}
                     value={this.state.search}
                     lightTheme={true}
                     round={true}
