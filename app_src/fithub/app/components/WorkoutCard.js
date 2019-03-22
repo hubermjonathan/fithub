@@ -13,6 +13,7 @@ import {
     List
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
+import { getProfileName } from '../lib/ProfileFunctions';
 
 export default class WorkoutCard extends React.Component {
     constructor(props) {
@@ -22,6 +23,26 @@ export default class WorkoutCard extends React.Component {
             userPhoto: 'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
         }
     }
+
+    componentDidMount() {
+        fetch('https://fithub-server.herokuapp.com/profile/' + this.props.user)
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => {
+
+                this.setState({
+                    user: data.name,
+                });
+                console.log(data.name);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+
+
 
     render() {
         return (
@@ -38,12 +59,7 @@ export default class WorkoutCard extends React.Component {
                             source={{ uri: this.state.userPhoto }}
                         /> */}
                         {/* print user of workout */}
-                        <TouchableOpacity
-                            onPress={() => {
-                                //figure how to navigate to profile
-                            }}>
-                            <Text style={styles.userName}>{this.props.user}</Text>
-                        </TouchableOpacity>
+                        <Text style={styles.userName}>{this.state.user}</Text>
                     </View>
 
                     {/* show workout */}
@@ -51,7 +67,7 @@ export default class WorkoutCard extends React.Component {
                         {/* title of workout with plus icon*/}
                         <Text style={styles.workoutTitle}>{this.props.workout}</Text>
                         <TouchableOpacity style={styles.add}
-                            onPress={()=>{
+                            onPress={() => {
                                 //add to workouts
                             }}>
                             <Icon

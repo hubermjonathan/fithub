@@ -24,7 +24,7 @@ export async function postWorkout(workout) {
 
 // Return a users workout plans where id is the id of the user
 export async function getWorkouts(id) {
-    let response = await fetch(`https://fithub-server.herokuapp.com/workouts/user/${id}`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/workouts/user/'+id, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export async function getWorkouts(id) {
 // that the user wants. Leave empty if you want all public
 // workouts returned. Usage : muscles = [4, 3, 10]
 export async function getPublicWorkouts(muscles) {
-    let response = await fetch(`https://fithub-server.herokuapp.com/workouts/public`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/workouts/public', {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -48,3 +48,4 @@ export async function getPublicWorkouts(muscles) {
     let json = await response.json();
     return json;
 }
+

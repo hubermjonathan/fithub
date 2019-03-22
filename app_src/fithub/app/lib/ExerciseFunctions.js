@@ -14,7 +14,7 @@ export async function getExercises() {
 
 // Return a users exercises where id is the is of the user
 export async function getUserExercises(id) {
-    let response = await fetch(`https://fithub-server.herokuapp.com/exercises/${id}`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/exercises/'+id, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
