@@ -34,40 +34,6 @@ export default class FeedScreen extends React.Component {
   }
 
   state = {
-    //dummy workout cards to test look of UI
-    /*workouts: [
-      {
-        workout: "Dorito", user: "Brian", icon: "person",
-        exercises: [
-          { name: "Bench Press" },
-          { name: "Bicep Curls" },
-          { name: "Front Squat" },
-        ]
-      },
-      {
-        workout: "Big Werk", user: "Andy", icon: "person",
-        exercises: [
-          { name: "Cardio" },
-          { name: "Lat Pulldown" },
-          { name: "Curls" },
-        ]
-      },
-      {
-        workout: "The Grind", user: "Colin", icon: "person",
-        exercises: [
-          { name: "Bench Press" },
-          { name: "Bicep Curls" },
-          { name: "Front Squat" },
-        ]
-      },
-      { workout: "Dorito", user: "Brian", icon: "person" },
-      { workout: "Big Werk", user: "Andy", icon: "person" },
-      { workout: "The Grind", user: "Colin", icon: "person" },
-      { workout: "Dorito", user: "Brian", icon: "person" },
-      { workout: "Big Werk", user: "Andy", icon: "person" },
-      { workout: "The Grind", user: "Colin", icon: "person" },
-    ]*/
-
     workouts: []
   }
 
@@ -111,15 +77,20 @@ export default class FeedScreen extends React.Component {
   render() {
     return (
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.search}>
-          <TouchableOpacity>
-            <Icon
-              name="magnifying-glass"
-              type="entypo"
-              size={30}
-              onPress={() => this.props.navigation.navigate('Search')}
-            />
-          </TouchableOpacity>
+        <View style={styles.header}>
+          <View style={styles.title}>
+            <Text style={styles.title}>Feed</Text>
+          </View>
+          <View style={styles.search}>
+            <TouchableOpacity>
+              <Icon
+                name="magnifying-glass"
+                type="entypo"
+                size={30}
+                onPress={() => this.props.navigation.navigate('Search')}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <FlatList
@@ -146,7 +117,17 @@ export default class FeedScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    height: 35,
+    padding: 5,
+  },
+  title: {
+    fontSize: 25,
+    left: 5,
+  },
   search: {
+    flex: 1,
     flexDirection: 'row-reverse',
     right: 15,
     //bottom: 30,

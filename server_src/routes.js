@@ -18,11 +18,13 @@ router.get('/users', apiCtrl.users);
 router.post('/profile/editName', apiCtrl.editUsername);          //Get a users CUSTOM exercises
 
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans
+router.get('/workouts/public/:id', apiCtrl.social);             //get comments and gains for a workout plan
 router.post('/workouts/public', apiCtrl.publicWorkouts);
 router.post('/workouts/new', apiCtrl.newWorkout);           //Post a new workout plan
 router.post('/workouts/delete', apiCtrl.delWorkout);         //Post a workout deletion to a user profile
 router.post('/workouts/setpublic', apiCtrl.editWorkoutPublic);         //Post a workout deletion to a user profile
 router.post('/workouts/edit', apiCtrl.editWorkout);          //edit a user's workout
+router.post('/workouts/gain', apiCtrl.gain);          //gain a workout
 
 router.get('/exercises/', apiCtrl.exercises);               //Get the standard exercises
 router.get('/exercises/:id', apiCtrl.uExercises);          //Get a users CUSTOM exercises
@@ -32,7 +34,7 @@ router.post('/exercises/edit', apiCtrl.editExercise);          //edit a user's p
 
 router.get('/logs/:id', apiCtrl.logs);                     //Get a users workout logs
 router.post('/logs/new', apiCtrl.newLog);                   //Post a users workout
-//router.post('/logs/edit', apiCtrl.editLog);                   //Post a users workout
+router.post('/logs/edit', apiCtrl.editLog);                   //Post a users workout
 
 //router.post('/dev/exercises/new', apiCtrl.devExercise);     //Post a custom standard exercise (DEV ONLY)
 

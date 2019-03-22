@@ -120,7 +120,7 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.subContainer}>
                 <ScrollView stickyHeaderIndices={[0]}>
                   <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
-                  <Activity />
+                  <Activity id={this.state.id}/>
 
                 </ScrollView>
               </View>
