@@ -32,6 +32,12 @@ async function recalc(req, res){
     let day = log.date.getDate();
     let month = log.date.getMonth();
     let year = log.date.getFullYear();
+    if(month<10){
+      month = "0" + month;
+    }
+    if(day<10){
+      day = "0" + day;
+    }
     let gitLog = `${year}-${month}-${day}`
 
     if(gitLog in user.dates) {
@@ -263,10 +269,15 @@ let newLog = async function newLog(req, res) {
 
   //validate setData json input
 
-  const day = req.body.date.getDate();
-  const month = req.body.date.getMonth();
-  const year = req.body.date.getFullYear();
-  const gitLog = `${year}-${month}-${day}`
+  let gitLog;
+  if(req.body.date instanceof Date){
+    const day = req.body.date.getDate();
+    const month = req.body.date.getMonth();
+    const year = req.body.date.getFullYear();
+    gitLog = `${year}-${month}-${day}`
+  } else {
+    gitLog = req.body.date;
+  }
 
   let exerciseData_ids = [];
   let newActivity;
@@ -894,6 +905,26 @@ let editLog = async function editLog(req, res) {
   return res.status(200).send({ "message": "Successfully edited workout: " + old_log_id });
 } //end newLog
 
+let gain = async function gain(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+  let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workout).catch(err => {console.log("error querying post");});
+  if(!workout.isPublic){
+    return res.status(500).send({ "message": "This is a private workout" });
+  }
+  for(let i = 0; i < workout.liked_users.length; i++){
+    let curr_usr = workout.liked_users[i]._id;
+    if(curr_usr == req.body.id){
+      return res.status(500).send({ "message": "You have already gained workout!" });
+    }
+  }
+  workout.gains++;
+  workout.liked_users.push(user._id);
+  workout.save();
+  return res.status(200).send({ "message": "Successfully gained!" });
+}
+
 
 /*--------Functions for returning user information--------*/
 
@@ -1088,7 +1119,7 @@ let publicWorkouts = function publicWorkouts(req, res){
     res.status(500).send({
       error: "Database connection is down."
     });
-    return;
+   return;
   }
   let query = schemaCtrl.WorkoutPlan.find({}).select('-__v').populate({
     path: "exercises",
@@ -1134,6 +1165,28 @@ let activity = function activity(req, res){
   promise.then(data => {
     if(!data){
       res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+    res.status(200).send(data);
+  });
+}
+
+let social = function social(req, res){
+  if(db.readyState==0){
+    res.status(500).send({
+      error: "Database connection is down."
+    });
+    return;
+  }
+  let query = schemaCtrl.WorkoutPlan.findById(req.params.id).select("gains");
+  let promise = query.exec();
+  promise.then(data => {
+    if(!data){
+      res.status(500).send({ "message": "Database Error: workout not found" });
+      return
+    }
+    if(!data.isPublic){
+      res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
     res.status(200).send(data);
@@ -1188,6 +1241,8 @@ let apiCtrl = {
   newWorkout: newWorkout,
   editWorkoutPublic: editWorkoutPublic,
   editWorkout: editWorkout,
+  social: social,
+  gain: gain,
 
   delExercise: delExercise,
   delWorkout: delWorkout,

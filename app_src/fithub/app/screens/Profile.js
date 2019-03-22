@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Icon, Button } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 import { getProfileStats, getProfileActivity } from '../lib/ProfileFunctions';
 import { getUserID } from '../lib/AccountFunctions';
@@ -27,7 +27,7 @@ const screenWidth = Dimensions.get('window').width
 
 export default class ProfileScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    if(navigation.getParam('id', '') === '') {
+    if (navigation.getParam('id', '') === '') {
       return {
         title: 'Profile',
         headerRight: <Icon name="settings" type="material" size={30} onPress={() => { navigation.push('Settings') }} />
@@ -57,19 +57,20 @@ export default class ProfileScreen extends React.Component {
       name: '',
       photo: '',
       activityInfo: [],
-      dates:[],
+      dates: [],
       volume: 0,
       bench: 0,
     }
-    
+
     const didFocusListener = this.props.navigation.addListener('didFocus', this.loader.bind(this));
   }
 
   loader() {
-    if(this.state.idLoaded) {
+    if (this.state.idLoaded) {
       this.loadUserData();
       this.loadUserStats();
       this.loadWorkoutActivity();
+      this.loadWorkoutDates();
     }
   }
 
@@ -119,7 +120,7 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.subContainer}>
                 <ScrollView stickyHeaderIndices={[0]}>
                   <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
-                  <Activity />
+                  <Activity id={this.state.id}/>
 
                 </ScrollView>
               </View>
@@ -127,7 +128,7 @@ export default class ProfileScreen extends React.Component {
                 <ScrollView>
                   <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Workouts</Text></View>
                   <ContributionGraph
-                    style={{borderBottomWidth:1}}
+                    style={{ borderBottomWidth: 1,color:'red' }}
                     values={this.state.dates}
                     endDate={new Date('2019-06-01')}
                     numDays={105}
@@ -135,9 +136,7 @@ export default class ProfileScreen extends React.Component {
                     height={220}
                     chartConfig={chartConfig}
                   />
-                  <ActivityCard
-                    data={this.state.activityInfo}
-                  />
+                  <Button title={"test"} onPress={() => { this.loadWorkoutDates() }} />
                   <Text>{this.state.activityInfo.length}</Text>
                 </ScrollView>
               </View>
@@ -154,14 +153,14 @@ export default class ProfileScreen extends React.Component {
       );
     }
   }
-  
+
   async loadUserStats() {
     let stats = await getProfileStats(this.state.id);
 
     let totalVolume = 0;
     let maxBench = stats.maxes["Bench Press"] === undefined ? 0 : stats.maxes["Bench Press"];
-   
-    for(let key in stats.volumes) {
+
+    for (let key in stats.volumes) {
       totalVolume += stats.volumes[key];
     }
 
@@ -200,13 +199,28 @@ export default class ProfileScreen extends React.Component {
       })
       .then((data) => {
         let info = [];
-        let dates = [];
         data.logs.map((val, index) => {
           info.push({ name: val.name, date: val.date.slice(0, 10) });
-          dates.push({date:val.date.slice(0,10), count: 3})
         });
         this.setState({ activityInfo: info });
-        this.setState({ dates: dates });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async loadWorkoutDates() {
+    let rdates = [];
+    fetch(`https://fithub-server.herokuapp.com/profile/${this.state.id}/dates`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        for (let i in data.dates) {
+          rdates.push({ date: i, count: data.dates[i] });
+        }
+        console.log(rdates)
+        this.setState({ dates: rdates });
       })
       .catch((err) => {
         console.log(err);
@@ -249,11 +263,11 @@ class Activity extends React.Component {
     activities = activities.activity;
     let parsedActivities = [];
 
-    for(let i = 0; i < activities.length; i++) {
+    for (let i = 0; i < activities.length; i++) {
       let icon = "";
-      if(activities[i].includes("new max of")) {
+      if (activities[i].includes("new max of")) {
         icon = "star";
-      } else if(activities[i].includes("worked out on")) {
+      } else if (activities[i].includes("worked out on")) {
         icon = "today";
       } else {
         icon = "error";

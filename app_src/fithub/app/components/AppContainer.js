@@ -10,7 +10,7 @@ import ProfileScreen from '../screens/Profile';
 import CreateExercisesScreen from '../screens/CreateExercises';
 import CreateWorkoutScreen from '../screens/CreateWorkout';
 import DetailScreen from '../screens/Detail';
-import { SelectExercisesScreen } from '../screens/Logger';
+import SelectExercisesScreen from '../screens/SelectExercises';
 import SettingsScreen from '../screens/Settings';
 import WorkoutLogEditScreen from '../screens/WorkoutLogEdit'
 import SearchScreen from '../screens/Search';
