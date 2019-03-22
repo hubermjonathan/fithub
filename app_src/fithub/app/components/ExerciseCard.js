@@ -23,13 +23,15 @@ export default class ExerciseCard extends React.Component {
 const styles = StyleSheet.create({
     card: {
         width: '98%',
+        height: 50,
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 5,
-        marginBottom: 5,
+        paddingTop: 5,
+        paddingBottom: 5,
         borderTopWidth: .5,
         borderTopColor: 'black',
+        backgroundColor: '#fff',
     },
     cardTitle: {
         flex: 1,
