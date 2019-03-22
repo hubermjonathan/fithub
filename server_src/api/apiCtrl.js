@@ -30,7 +30,7 @@ async function recalc(req, res){
 
   user.logs.forEach(log => {
     let day = log.date.getDate();
-    let month = log.date.getMonth();
+    let month = log.date.getMonth()+1;
     let year = log.date.getFullYear();
     if(month<10){
       month = "0" + month;
@@ -272,7 +272,7 @@ let newLog = async function newLog(req, res) {
   let gitLog;
   if(req.body.date instanceof Date){
     const day = req.body.date.getDate();
-    const month = req.body.date.getMonth();
+    const month = req.body.date.getMonth()+1;
     const year = req.body.date.getFullYear();
     gitLog = `${year}-${month}-${day}`
   } else {
@@ -783,7 +783,6 @@ let editWorkout = async function editWorkout(req, res){ //deletes old exercise d
     }
     else {
       res.status(200).send({ "message": "Workout edited successfully" });
-      console.log(newWorkout);
     }
   }); //end save
 }
