@@ -555,6 +555,10 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   let workoutId = req.body.workout;
   let flag = req.body.isPublic;
 
+  if(user.workouts.length == 0){
+    return res.status(500).send({ "message": "You have no workouts!" } );
+  }
+
   for(let i = 0; i < user.workouts.length; i++){
     let workout = user.workouts[i];
     if(workout._id == workoutId){
