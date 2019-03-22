@@ -17,6 +17,7 @@ import {
 import Dash from 'react-native-dash';
 import { Icon, Button } from 'react-native-elements';
 import WorkoutCard from '../components/WorkoutCard';
+import { getPublicWorkouts } from '../lib/WorkoutFunctions';
 
 export default class FeedScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -38,24 +39,24 @@ export default class FeedScreen extends React.Component {
     modalVisible: false,
     workouts: [],
     muscleGroups: [
-      "NECK",
-      "SHOULDERS", 
-      "DELTOID",
-      "TRICEPS",
-      "BICEPS",
-      "FOREARMS",
-      "BACK",
-      "LATS",
-      "TRAPS",
-      "CHEST",
-      "WAIST",
-      "OBLIQUES",
-      "HIPS",
-      "GLUTES",
-      "THIGHS",
-      "QUADS",
-      "HAMSTRINGS", 
-      "CALVES",
+      {muscle: "NECK", enum: 1},
+      {muscle: "SHOULDERS", enum: 2}, 
+      {muscle: "DELTOID", enum: 3},
+      {muscle: "TRICEPS", enum: 4},
+      {muscle: "BICEPS", enum: 5},
+      {muscle: "FOREARMS", enum: 6},
+      {muscle: "BACK", enum: 7},
+      {muscle: "LATS", enum: 8},
+      {muscle: "TRAPS", enum: 9},
+      {muscle: "CHEST", enum: 10},
+      {muscle: "WAIST", enum: 11},
+      {muscle: "OBLIQUES", enum: 12},
+      {muscle: "HIPS", enum: 13},
+      {muscle: "GLUTES", enum: 14},
+      {muscle: "THIGHS", enum: 15},
+      {muscle: "QUADS", enum: 16},
+      {muscle: "HAMSTRINGS", enum: 17}, 
+      {muscle: "CALVES", enum: 18},
     ]
   }
   
@@ -63,10 +64,11 @@ export default class FeedScreen extends React.Component {
     this.setState({ modalVisible: visible });
   }
 
-  selectedFilter(muscleGroup){
-    const filter = this.state.workouts.filter(workout =>{
-
+  selectedFilter(muscleEnum){
+    getPublicWorkouts(muscleEnum).then(workouts => {
+      this.setState({workouts: workouts})
     })
+    this.setModalVisible(false);
   }
 
   componentDidMount() {
@@ -120,7 +122,7 @@ export default class FeedScreen extends React.Component {
                 name="filter"
                 type="MaterialDesignIcons"
                 size={30}
-                onPress={() => this.setModalVisible()}
+                onPress={() => this.setModalVisible(true)}
               />
             </TouchableOpacity>
             <TouchableOpacity>
@@ -163,9 +165,9 @@ export default class FeedScreen extends React.Component {
                 keyExtractor={(item, index) => index.toString()}
                 data={this.state.muscleGroups}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={()=>this.selectedFilter(item)}>
+                    <TouchableOpacity onPress={()=>this.selectedFilter(item.enum)}>
                         <Text style={{fontSize: 30}}>
-                          {item}
+                          {item.muscle}
                         </Text>
                     </TouchableOpacity>
                 )}

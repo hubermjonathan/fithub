@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     },
     userName: {
         //fontSize: 'bold',
-        fontSize: 20,
+        fontSize: 25,
     },
     workout: {
         flexDirection: 'column',
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
         //borderBottomWidth: 1,
     },
     workoutTitle: {
-        flex: 1,
+        flex: 10,
         flexDirection: 'row',
         justifyContent: 'center',
         paddingTop: 10,
