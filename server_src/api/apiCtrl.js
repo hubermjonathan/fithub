@@ -910,6 +910,9 @@ let gain = async function gain(req, res){
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workout).catch(err => {console.log("error querying post");});
+  if(!workout.isPublic){
+    return res.status(500).send({ "message": "This is a private workout" });
+  }
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
     if(curr_usr == req.body.id){
@@ -1180,6 +1183,10 @@ let social = function social(req, res){
   promise.then(data => {
     if(!data){
       res.status(500).send({ "message": "Database Error: workout not found" });
+      return
+    }
+    if(!data.isPublic){
+      res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
     res.status(200).send(data);
