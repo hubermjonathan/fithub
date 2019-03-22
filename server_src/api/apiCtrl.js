@@ -579,7 +579,7 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   }
 
   let isPublic;
-  if(flag == "true"){
+  if(flag){
     isPublic = "public";
   }
   else{
@@ -910,7 +910,7 @@ let gain = async function gain(req, res){
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workout).catch(err => {console.log("error querying post");});
-  if(!workout.isPublic){
+  if(!workout.public){
     return res.status(500).send({ "message": "This is a private workout" });
   }
   for(let i = 0; i < workout.liked_users.length; i++){
@@ -1178,14 +1178,14 @@ let social = function social(req, res){
     });
     return;
   }
-  let query = schemaCtrl.WorkoutPlan.findById(req.params.id).select("gains");
+  let query = schemaCtrl.WorkoutPlan.findById(req.params.id);
   let promise = query.exec();
   promise.then(data => {
     if(!data){
       res.status(500).send({ "message": "Database Error: workout not found" });
       return
     }
-    if(!data.isPublic){
+    if(!data.public){
       res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
