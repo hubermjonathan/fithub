@@ -10,10 +10,11 @@ import {
     TouchableHighlight,
     FlatList,
     TouchableOpacity,
-    List
+    List,
+    Alert
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
-import { getProfileName } from '../lib/ProfileFunctions';
+import { postWorkout } from '../lib/WorkoutFunctions';
 
 
 export default class WorkoutCard extends React.Component {
@@ -66,7 +67,8 @@ export default class WorkoutCard extends React.Component {
                         <View style={styles.add}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    //add to workouts
+                                    postWorkout(this.workout);
+                                    Alert.alert("Workout added");
                                 }}>
                                 <Icon
                                     name="plus"
