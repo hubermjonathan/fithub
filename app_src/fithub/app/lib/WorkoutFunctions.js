@@ -48,3 +48,4 @@ export async function getPublicWorkouts(muscles) {
     let json = await response.json();
     return json;
 }
+

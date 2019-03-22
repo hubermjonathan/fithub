@@ -35,6 +35,15 @@ export default class ProfileScreen extends React.Component {
     } else {
       return {
         title: 'Profile',
+        headerLeft: (
+          <TouchableOpacity
+            onPress={() => { navigation.push('Feed') }}>
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+              <Icon name="chevron-left" type="material" size={30} />
+              <Text style={{ fontSize: 18 }}>Feed</Text>
+            </View>
+          </TouchableOpacity>
+        )
       }
     }
   };
@@ -110,7 +119,7 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.subContainer}>
                 <ScrollView stickyHeaderIndices={[0]}>
                   <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
-                  <Activity />
+                  <Activity id={this.state.id}/>
 
                 </ScrollView>
               </View>
