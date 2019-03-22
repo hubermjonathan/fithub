@@ -78,7 +78,7 @@ export async function logOutFromGoogle() {
 }
 
 export async function verifyAuthToken() {
-    return false;
+    return true;
 }
 
 //get function for current_user google_auth_token. 

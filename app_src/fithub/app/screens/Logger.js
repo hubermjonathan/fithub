@@ -48,7 +48,7 @@ class LoggerScreen extends React.Component {
     };
 
     render() {
-        console.log("State: ", this.props);
+        //console.log("State: ", this.props);
         return(
             <Logger 
                 workout={this.props.workout}
