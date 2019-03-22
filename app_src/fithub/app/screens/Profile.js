@@ -131,13 +131,12 @@ export default class ProfileScreen extends React.Component {
                     style={{ borderBottomWidth: 1,color:'red' }}
                     values={this.state.dates}
                     endDate={new Date('2019-06-01')}
-                    numDays={105}
+                    numDays={104}
                     width={screenWidth}
                     height={220}
                     chartConfig={chartConfig}
                   />
                   <Button title={"test"} onPress={() => { this.loadWorkoutDates() }} />
-                  <Text>{this.state.activityInfo.length}</Text>
                 </ScrollView>
               </View>
             </Swiper>
