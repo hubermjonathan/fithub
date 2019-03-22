@@ -42,6 +42,7 @@ let WorkoutPlan = new Schema({
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise", required: true}],
   ownerUID : { type: String, required: true },
   gains : { type : Number, default: 0, required: true },
+  liked_users : { type : Array, default: 0, required: true },
   public : { type : Boolean, default: true, required: true}
 });
 
