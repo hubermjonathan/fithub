@@ -35,7 +35,17 @@ export async function postLog(workout) {
         const uid = await getUserUID();
         const token = await getUserToken();
         //const date = //Date
-
+        let fixedExercises = [];
+        for(let x = 0; x < workout.exercises.length;x++){
+            let eobj = {name:workout.exercises[x].name,muscle_groups:workout.exercises[x].muscle_groups,sets:[]};
+            for(let y = 0; y < workout.exercises[x].sets.length;y++){
+                eobj.sets.push({weight:workout.exercises[x].sets[y].weight,reps:workout.exercises[x].sets[y].reps,isWarmup:workout.exercises[x].sets[y].isWarmup})
+            }
+            fixedExercises.push(eobj);
+            
+        }
+        workout.exercises = fixedExercises;
+        
         const data = {
             id: id,
             uid: uid,
@@ -44,7 +54,7 @@ export async function postLog(workout) {
             name: workout.name,
             exercises: workout.exercises,
         }
-        //console.log("DATA", data);
+        console.log("DATA", data);
         //console.log(JSON.stringify(workout));
 
         fetch('https://fithub-server.herokuapp.com/logs/new', {

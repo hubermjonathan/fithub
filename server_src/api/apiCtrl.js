@@ -30,7 +30,7 @@ async function recalc(req, res){
 
   user.logs.forEach(log => {
     let day = log.date.getDate();
-    let month = log.date.getMonth();
+    let month = log.date.getMonth()+1;
     let year = log.date.getFullYear();
     if(month<10){
       month = "0" + month;
@@ -272,7 +272,7 @@ let newLog = async function newLog(req, res) {
   let gitLog;
   if(req.body.date instanceof Date){
     const day = req.body.date.getDate();
-    const month = req.body.date.getMonth();
+    const month = req.body.date.getMonth()+1;
     const year = req.body.date.getFullYear();
     gitLog = `${year}-${month}-${day}`
   } else {
@@ -564,7 +564,14 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   console.log(user);
 
   let workoutId = req.body.workout;
-  let flag = req.body.isPublic;
+  let flag;
+
+  if(req.body.isPublic){
+    flag = true;
+  }
+  else{
+    flag = false;
+  }
 
   if(user.workouts.length == 0){
     return res.status(500).send({ "message": "You have no workouts!" } );
@@ -579,7 +586,7 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   }
 
   let isPublic;
-  if(flag == "true"){
+  if(flag){
     isPublic = "public";
   }
   else{
@@ -776,7 +783,6 @@ let editWorkout = async function editWorkout(req, res){ //deletes old exercise d
     }
     else {
       res.status(200).send({ "message": "Workout edited successfully" });
-      console.log(newWorkout);
     }
   }); //end save
 }
@@ -910,8 +916,11 @@ let gain = async function gain(req, res){
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workout).catch(err => {console.log("error querying post");});
-  if(!workout.isPublic){
+  if(!workout.public){
     return res.status(500).send({ "message": "This is a private workout" });
+  }
+  if(workout.ownerUID == user._id){
+    return res.status(500).send({ "message": "You cannot gain your own post!" });
   }
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
@@ -1178,18 +1187,18 @@ let social = function social(req, res){
     });
     return;
   }
-  let query = schemaCtrl.WorkoutPlan.findById(req.params.id).select("gains");
+  let query = schemaCtrl.WorkoutPlan.findById(req.params.id);
   let promise = query.exec();
   promise.then(data => {
     if(!data){
       res.status(500).send({ "message": "Database Error: workout not found" });
       return
     }
-    if(!data.isPublic){
+    if(!data.public){
       res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
-    res.status(200).send(data);
+    res.status(200).send({gains: data.gains});
   });
 }
 

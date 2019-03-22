@@ -11,7 +11,8 @@ import {
   Alert,
   RefreshControl,
   FlatList,
-  ListItem
+  ListItem,
+  Modal,
 } from 'react-native';
 import Dash from 'react-native-dash';
 import { Icon, Button } from 'react-native-elements';
@@ -34,7 +35,12 @@ export default class FeedScreen extends React.Component {
   }
 
   state = {
+    modalVisible: false,
     workouts: []
+  }
+  
+  setModalVisible(visible) {
+    this.setState({ modalVisible: visible });
   }
 
   componentDidMount() {
@@ -84,6 +90,15 @@ export default class FeedScreen extends React.Component {
           <View style={styles.search}>
             <TouchableOpacity>
               <Icon
+                style={{right: 10}}
+                name="filter"
+                type="MaterialDesignIcons"
+                size={30}
+                //onPress={() => this.setModalVisible()}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Icon
                 name="magnifying-glass"
                 type="entypo"
                 size={30}
@@ -97,20 +112,26 @@ export default class FeedScreen extends React.Component {
           keyExtractor={(item, index) => index.toString()}
           data={this.state.workouts}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={()=>{
-              //console.log(item.user);
-              this.props.navigation.push('Profile', { id: item.user } )
-            }}>
-              <WorkoutCard
-                workout={item.workout}
-                user={item.user}
-                userPhoto={item.icon}
-                exercises={item.exercises}
-              />
-            </TouchableOpacity>
-
+            <WorkoutCard
+              workout={item.workout}
+              user={item.user}
+              userPhoto={item.icon}
+              exercises={item.exercises}
+              navigation={this.props.navigation}
+            />
           )}
         />
+
+        <Modal
+          animationType="fade"
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+          }}
+          style={{ flex: 1 }}>  
+
+        </Modal>
       </SafeAreaView>
     )
   }
@@ -128,7 +149,8 @@ const styles = StyleSheet.create({
   },
   search: {
     flex: 1,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
     right: 15,
     //bottom: 30,
   },

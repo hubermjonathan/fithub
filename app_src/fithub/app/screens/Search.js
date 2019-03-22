@@ -15,57 +15,66 @@ import {
 } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import ProfileCard from '../components/ProfileCard';
+import { getUsers } from '../lib/SocialFunctions';
 
 
 export default class SearchScreen extends React.Component {
     constructor(props) {
         super(props);
-    }
 
-    state = {
-        search: '',
-        profiles: [
-            {user: 'Brian'},
-            {user: 'Andy'},
-            {user: 'Colin'},
-        ],
-    };
+        console.log(props.navigation);
     
+        this.state = {
+            search: '',
+            users: [],
+        };
+    }
     updateSearch = search => {
         this.setState({ search });
         getSearchResults(this.state.search);
     };
+
+    
+      componentDidMount() {
+        getUsers().then(users => {
+            console.log(users);
+          this.setState({
+            users: users
+          });
+        });
+      }
 
     getSearchResults(search){
         
     }
 
     render() {
-        return(
-            <SafeAreaView style={{flex: 1}}>
-                <SearchBar
-                    placeholder= 'Search'
-                    onChangeText={this.updateSearch}
-                    value={this.state.search}
-                    lightTheme={true}
-                    round={true}
-                />
-                <View style={styles.searchResults}>
-                    <FlatList
-                        keyExtractor={(item, index) => index.toString()}
-                        data={this.state.profiles}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity onPress={()=>this.props.navigation.push('otherUserProfile')}>
-                            <ProfileCard
-                                user={item.user}
-                            />
-                            </TouchableOpacity>
-
-                        )}
+            this.getSearchResults();
+            return(
+                <SafeAreaView style={{flex: 1}}>
+                    <SearchBar
+                        placeholder= 'Search'
+                        onChangeText={this.updateSearch}
+                        value={this.state.search}
+                        lightTheme={true}
+                        round={true}
                     />
-                </View>
-            </SafeAreaView>
-        );
+                    <View style={styles.searchResults}>
+                        <FlatList
+                            keyExtractor={(item, index) => index.toString()}
+                            data={this.state.users}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity onPress={()=>this.props.navigation.push('Profile', {id: item._id})}>
+                                <ProfileCard
+                                    user={item.pseudonym}
+                                />
+                                </TouchableOpacity>
+
+                            )}
+                        />
+                    </View>
+                </SafeAreaView>
+            );
     }
 }
 
