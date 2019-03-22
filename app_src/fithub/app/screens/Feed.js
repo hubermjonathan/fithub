@@ -57,6 +57,7 @@ export default class FeedScreen extends React.Component {
       {muscle: "QUADS", enum: 16},
       {muscle: "HAMSTRINGS", enum: 17}, 
       {muscle: "CALVES", enum: 18},
+      {muscle: "ALL", enum: 99},
     ]
   }
   
@@ -65,9 +66,35 @@ export default class FeedScreen extends React.Component {
   }
 
   selectedFilter(muscleEnum){
-    getPublicWorkouts(muscleEnum).then(workouts => {
-      this.setState({workouts: workouts})
-    })
+    let muscles = {muscles: []};
+    if(muscleEnum === 99) {
+      for(let i = i; i < 19; i++) {
+        muscles.muscles.push(i);
+      }
+    } else {
+      muscles.muscles.push(muscleEnum);
+    }
+
+    getPublicWorkouts(muscles).then(workouts => {
+      let builtWorkouts = [];
+      let s = JSON.stringify(workouts);
+      let array = JSON.parse(s);
+      for (let x = 0; x < array.length; x++) {
+        let exercises = [];
+        let workouts = [];
+        for (let y = 0; y < array[x].exercises.length; y++) {
+          exercises.push({ name: array[x].exercises[y].name });
+        }//for
+        builtWorkouts.push({
+          workout: array[x].name,
+          user: array[x].ownerUID, //replace with user's profile name later
+          icon: "person",
+          exercises: exercises
+        })
+      }//for
+
+      this.setState({ workouts: builtWorkouts })
+    });
     this.setModalVisible(false);
   }
 
