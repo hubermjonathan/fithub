@@ -36,9 +36,11 @@ export default class FeedScreen extends React.Component {
 
   state = {
     modalVisible: false,
-    workouts: []
+    workouts: [],
+    savedWorkout: null,
+
   }
-  
+
   setModalVisible(visible) {
     this.setState({ modalVisible: visible });
   }
@@ -55,6 +57,7 @@ export default class FeedScreen extends React.Component {
         return res.json();
       })
       .then((data) => {
+        this.setState({ savedWorkout: data });
         let builtWorkouts = [];
         let s = JSON.stringify(data);
         let array = JSON.parse(s);
@@ -62,16 +65,39 @@ export default class FeedScreen extends React.Component {
           let exercises = [];
           let workouts = [];
           for (let y = 0; y < array[x].exercises.length; y++) {
-            exercises.push({ name: array[x].exercises[y].name });
+            let fixedSets = [];
+            for (let z = 0; z < array[x].exercises[y].sets.length; z++) {
+              let setobj = {
+                isWarmup: array[x].exercises[y].sets[z].isWarmup,
+                reps: array[x].exercises[y].sets[z].reps,
+                weight: array[x].exercises[y].sets[z].weight
+              }
+              fixedSets.push(setobj);
+            }
+            exercises.push({
+              exists: false,
+              name: array[x].exercises[y].name,
+              muscle_groups: array[x].exercises[y].muscle_groups,
+              equipment_type: array[x].exercises[y].equipment_type,
+              sets: fixedSets
+
+            });
           }//for
           builtWorkouts.push({
+            id: "",
+            uid: "",
+            token: "",
+            public: false,
+            description: array[x].description,
+            name: array[x].name,
             workout: array[x].name,
             user: array[x].ownerUID, //replace with user's profile name later
             icon: "person",
+            date: new Date().toJSON().slice(0, 10),
             exercises: exercises
           })
         }//for
-
+        console.log(builtWorkouts);
         this.setState({ workouts: builtWorkouts })
 
 
@@ -90,11 +116,11 @@ export default class FeedScreen extends React.Component {
           <View style={styles.search}>
             <TouchableOpacity>
               <Icon
-                style={{right: 10}}
+                style={{ right: 10 }}
                 name="filter"
                 type="MaterialDesignIcons"
                 size={30}
-                //onPress={() => this.setModalVisible()}
+              //onPress={() => this.setModalVisible()}
               />
             </TouchableOpacity>
             <TouchableOpacity>
@@ -113,6 +139,16 @@ export default class FeedScreen extends React.Component {
           data={this.state.workouts}
           renderItem={({ item }) => (
             <WorkoutCard
+              fullWorkout={{
+                id: "",
+                uid: "",
+                token: "",
+                public: false,
+                description: item.description,
+                name: item.name,
+                exercises: item.exercises,
+                date:item.date
+              }}
               workout={item.workout}
               user={item.user}
               userPhoto={item.icon}
@@ -127,9 +163,9 @@ export default class FeedScreen extends React.Component {
           transparent={false}
           visible={this.state.modalVisible}
           onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
+            Alert.alert('Modal has been closed.');
           }}
-          style={{ flex: 1 }}>  
+          style={{ flex: 1 }}>
 
         </Modal>
       </SafeAreaView>

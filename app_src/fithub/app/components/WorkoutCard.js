@@ -67,7 +67,8 @@ export default class WorkoutCard extends React.Component {
                         <View style={styles.add}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    postWorkout(this.workout);
+                                    console.log(this.props.fullWorkout);
+                                    postWorkout(this.props.fullWorkout);
                                     Alert.alert("Workout added");
                                 }}>
                                 <Icon

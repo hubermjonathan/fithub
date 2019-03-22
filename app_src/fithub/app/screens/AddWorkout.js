@@ -180,8 +180,11 @@ export default class AddWorkoutScreen extends React.Component {
                                                     }
                                                     let exerciseObj = {
                                                         name: this.state.exerciseName,
-                                                        reps: this.state.reps,
-                                                        warmup: this.state.warmup
+                                                        exists:false,
+                                                        muscle_groups:[],
+                                                        equipment_type:"Placeholder",
+                                                        sets:[]
+                                                    
                                                     }
                                                     this.state.exercises.push(exerciseObj);
                                                     this.setState({ name: "" });
@@ -245,12 +248,13 @@ export default class AddWorkoutScreen extends React.Component {
                                             {
                                                 token: '',
                                                 uid: '',
+                                                id: '',
                                                 name: this.state.workoutName,
                                                 date: this.getCurrentDate(),
                                                 description: this.state.description,
                                                 exercises: this.state.exercises,
-                                                id: '',
-                                                likes: 0
+                                                public:false,
+                        
                                             }
                                         );
                                         Alert.alert(
