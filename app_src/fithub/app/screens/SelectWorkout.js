@@ -91,16 +91,20 @@ class WorkoutCard extends React.Component {
                             id: workout.id,
                             exercises: workout.exercises
                     };
+                    //console.log(workout.exercises);
                     postWorkout(
                         {
                             token: '',
                             id: '',
                             uid: '',
                             name: workout.name,
+                            muscle_groups:[],
                             date: new Date().toJSON().slice(0, 10),
                             description: "Predefined workout",
                             exercises: workout.exercises,
-                            likes: 0
+                            public:false,
+
+                            //likes: 0
                         }
                     );
                     }
