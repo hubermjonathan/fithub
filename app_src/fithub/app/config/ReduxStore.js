@@ -11,9 +11,27 @@ const initialState = {
         uid: '12345678910',
         name: 'Chest Day Boi',
         exercises: [
-          {name: 'Bench Press', muscle_group: 'Pectorals', equipment_type: 'Barbell', sets: []},
-          {name: 'Chest Pullovers', muscle_group: 'Pectorals', equipment_type: 'Dumbbell', sets: []},
-          {name: 'Flyes', muscle_group: 'Pectoralis', equipment_type: 'Cables', sets: []},
+          {name: 'Bench Press', muscle_group: 'Pectorals', equipment_type: 'Barbell', sets: [
+              {reps: 15, weight: 45, warmup: true},
+              {reps: 12, weight: 65, warmup: true},
+              {reps: 8, weight: 95, warmup: true},
+              {reps: 8, weight: 135, warmup: false},
+              {reps: 6, weight: 165, warmup: false},
+              {reps: 6, weight: 165, warmup: false},
+              {reps: 15, weight: 115, warmup: false},
+          ]},
+          {name: 'Chest Pullovers', muscle_group: 'Pectorals', equipment_type: 'Dumbbell', sets: [
+            {reps: 8, weight: 50, warmup: false},
+            {reps: 8, weight: 50, warmup: false},
+            {reps: 8, weight: 50, warmup: false},
+            {reps: 6, weight: 50, warmup: false},
+          ]},
+          {name: 'Flyes', muscle_group: 'Pectoralis', equipment_type: 'Cables', sets: [
+            {reps: 8, weight: 25, warmup: false},
+            {reps: 8, weight: 25, warmup: false},
+            {reps: 6, weight: 25, warmup: false}, 
+            {reps: 6, weight: 25, warmup: false},
+          ]},
         ],
     }
 }
@@ -59,31 +77,5 @@ const reducer = function(state=initialState, action) {
     }
     return newState;
 }
-
-// editSet: (exerciseIndex, setIndex, set) => {
-//     console.log("Exercise Index: ", exerciseIndex);
-//     console.log("Set Index: ", setIndex); 
-//     console.log("Set: ", set);
-//     const newExercises = JSON.parse(JSON.stringify(this.state.exercises)); 
-//     newExercises[exerciseIndex].sets.splice(setIndex, 1, set);
-//     this.setState({
-//         exercises: newExercises
-//     });
-// },
-// duplicateSet: (exerciseIndex, setIndex) => { 
-//     const newSet = this.state.exercises[exerciseIndex].sets[setIndex];
-//     const newExercises = JSON.parse(JSON.stringify(this.state.exercises));
-//     newExercises[exerciseIndex].sets.splice(setIndex, 0, newSet);
-//     this.setState({
-//         exercises: newExercises
-//     });
-// },
-// deleteSet: (exerciseIndex, setIndex) => {
-//     const newExercises = JSON.parse(JSON.stringify(this.state.exercises));
-//     newExercises[exerciseIndex].sets.splice(setIndex, 1);
-//     this.setState({
-//         exercises: newExercises
-//     });
-// }
 
 export default createStore(reducer);

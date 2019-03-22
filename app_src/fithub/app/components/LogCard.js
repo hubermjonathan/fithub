@@ -74,14 +74,15 @@ export default class LogCard extends React.Component {
                             <TextInput
                                 style={styles.modalTextInput}
                                 keyboardType='numeric'
-                                onChangeText={(reps) => this.setState({ modalWeight: reps })}
+                                onChangeText={(reps) => this.setState({ modalReps: reps })}
                                 //value={this.state.text}
                             />
                             {/*Weight Input*/}
                             <TextInput
                                 style={styles.modalTextInput}
                                 keyboardType='numeric'
-                                onChangeText={(weight) => this.setState({ modalReps: weight })}
+                                initialValue="12345"
+                                onChangeText={(weight) => this.setState({ modalWeight: weight })}
                                 //value={this.state.text}
                             />
                         </View>
