@@ -23,7 +23,12 @@ import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
 
-
+    static navigationOptions = ({ navigation }) => {
+        return {
+          title: 'Create A Workout',
+          headerRight: <Icon name="add" type="material" size={35} onPress={() => {navigation.push('SelectWorkout')} } />
+        }
+    };
 
     state = {
         modalVisible: false,
