@@ -20,8 +20,8 @@ const initialState = {
 
 const reducer = function(state=initialState, action) {
     const newState = cloneDeep(state);
-    console.log("NEW STATE: ", newState);
-    console.log("ACTION: ", action);
+    //console.log("NEW STATE: ", newState);
+    //console.log("ACTION: ", action);
     // const exerciseIndex = action.payload.exerciseIndex;
     // const setIndex = action.payload.setIndex;
     

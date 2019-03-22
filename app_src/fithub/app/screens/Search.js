@@ -21,23 +21,21 @@ import { getUsers } from '../lib/SocialFunctions';
 export default class SearchScreen extends React.Component {
     constructor(props) {
         super(props);
-
-        console.log(props.navigation);
     
         this.state = {
             search: '',
             users: [],
+            searchedUsers: [],
         };
     }
     updateSearch = search => {
-        this.setState({ search });
-        getSearchResults(this.state.search);
+        this.setState({ search: search });
+        this.getSearchResults(this.state.search);
     };
 
     
       componentDidMount() {
         getUsers().then(users => {
-            console.log(users);
           this.setState({
             users: users
           });
@@ -45,36 +43,42 @@ export default class SearchScreen extends React.Component {
       }
 
     getSearchResults(search){
-        
+        //console.log(search);
+        this.state.searchedUsers.length = 0;
+        for (let i=0; i < this.state.users.length; i++){
+            console.log(this.state.users[i].pseudonym.includes(search))
+            if(this.state.users[i].pseudonym.includes(search)){
+                this.state.searchedUsers.push(this.state.users[i]);
+            }
+        }
+        //console.log(this.state.searchedUsers);
     }
 
     render() {
-            this.getSearchResults();
-            return(
-                <SafeAreaView style={{flex: 1}}>
-                    <SearchBar
-                        placeholder= 'Search'
-                        onChangeText={this.updateSearch}
-                        value={this.state.search}
-                        lightTheme={true}
-                        round={true}
-                    />
-                    <View style={styles.searchResults}>
-                        <FlatList
-                            keyExtractor={(item, index) => index.toString()}
-                            data={this.state.users}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity onPress={()=>this.props.navigation.push('Profile', {id: item._id})}>
+        return(
+            <SafeAreaView style={{flex: 1}}>
+                <SearchBar
+                    placeholder= 'Search'
+                    onChangeText={this.updateSearch}
+                    value={this.state.search}
+                    lightTheme={true}
+                    round={true}
+                />
+                <View style={styles.searchResults}>
+                    <FlatList
+                        keyExtractor={(item, index) => index.toString()}
+                        data={this.state.searchedUsers}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity onPress={()=>this.props.navigation.push('Profile', {id: item._id})}>
                                 <ProfileCard
                                     user={item.pseudonym}
                                 />
-                                </TouchableOpacity>
-
-                            )}
-                        />
-                    </View>
-                </SafeAreaView>
-            );
+                            </TouchableOpacity>
+                        )}
+                    />
+                </View>
+            </SafeAreaView>
+        );
     }
 }
 

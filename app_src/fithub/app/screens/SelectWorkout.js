@@ -78,7 +78,7 @@ class WorkoutCard extends React.Component {
     }
 
     _onWorkoutPress(workout) {
-        console.log("WORKOUT: ", workout);
+        //console.log("WORKOUT: ", workout);
         Alert.alert(
             'Confirm:',
             `Would you like to add this workout to today's workout?`,
