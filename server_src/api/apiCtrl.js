@@ -30,7 +30,7 @@ async function recalc(req, res){
 
   user.logs.forEach(log => {
     let day = log.date.getDate();
-    let month = log.date.getMonth();
+    let month = log.date.getMonth()+1;
     let year = log.date.getFullYear();
     if(month<10){
       month = "0" + month;
