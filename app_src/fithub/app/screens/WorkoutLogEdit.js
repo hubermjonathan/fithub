@@ -29,7 +29,7 @@ export default class WorkoutLogEditScreen extends React.Component {
       name: this.props.navigation.getParam('name', 'Workout'),
       exercises: this.props.navigation.getParam('exercises', []),
       selectedRep: 0,
-      date: '01-01-2019'
+      date: '2019-01-01'
 
     }
 
@@ -86,7 +86,6 @@ export default class WorkoutLogEditScreen extends React.Component {
           <ScrollView style={styles.cardsContainer}>
             <SummaryCard exercises={this.state.exercises} />
             <Cards exercises={this.state.exercises} />
-
           </ScrollView>
         </View>
       );
