@@ -17,16 +17,18 @@ import {
 import { CheckBox } from 'react-native-elements'
 
 import Swipeout from 'react-native-swipeout';
+import { connect } from 'react-redux';
 
 export default class LogCard extends React.Component {
-    //LOGCARD RECIEVES EXERCISE AS PROPS
     constructor(props) {
         super(props);
 
         this.state = {
             modalVisible: false,
+            modalMode: undefined,
+            modalSetIndex: undefined,
  
-            modalWeight: undefined,
+            modalWeight: undefined, 
             modalReps: undefined,
             modalCheckbox: false,
         }
@@ -37,6 +39,7 @@ export default class LogCard extends React.Component {
     }
 
     render() {
+        console.log("LogCard props: ", this.props);
         var totalSets;
         var totalReps = 0;
         var totalWeight = 0;
@@ -46,12 +49,11 @@ export default class LogCard extends React.Component {
             totalReps += parseInt(this.props.exercise.sets[i].reps);
             totalWeight += parseInt(this.props.exercise.sets[i].weight);
         }
-
         return(
             <View>
                 {/*Modal for creating new set*/}
                 <Modal
-                    style={styles.modal}
+                    //style={styles.modal}
                     animationType="slide"
                     transparent={false}
                     visible={this.state.modalVisible}
@@ -64,55 +66,74 @@ export default class LogCard extends React.Component {
                                 Reps
                             </Text>
                             <Text style={styles.modalText}>
-                                Sets
+                                Weight
                             </Text>
                         </View>
                         <View style={styles.modalRow}>
-                            {/*Weight Input*/}
-                            <TextInput
-                                style={styles.modalTextInput}
-                                onChangeText={(weight) => this.setState({ modalWeight: weight })}
-                                //value={this.state.text}
-                            />
                             {/*Rep Input*/}
                             <TextInput
                                 style={styles.modalTextInput}
                                 keyboardType='numeric'
-                                onChangeText={(reps) => this.setState({ modalReps: reps })}
+                                onChangeText={(reps) => this.setState({ modalWeight: reps })}
+                                //value={this.state.text}
+                            />
+                            {/*Weight Input*/}
+                            <TextInput
+                                style={styles.modalTextInput}
+                                keyboardType='numeric'
+                                onChangeText={(weight) => this.setState({ modalReps: weight })}
                                 //value={this.state.text}
                             />
                         </View>
 
                         {/*Warmup Checkbox Input*/}
                         <CheckBox
-                            center
-                            title='Warmup?'
-                            checkedIcon='dot-circle-o'
-                            uncheckedIcon='circle-o'
-                            checked={this.state.modalCheckbox}
-                            onPress={() => this.setState({ modalCheckbox: !this.state.modalCheckbox })}
+                                center
+                                title='Warmup?'
+                                checkedIcon='check-square-o'
+                                uncheckedIcon='square-o'
+                                checkedColor='#00adf5'
+                                checked={this.state.modalCheckbox}
+                                onPress={() => this.setState({ modalCheckbox: !this.state.modalCheckbox })}
                         />
 
-                        <TouchableOpacity 
-                        onPress={() => this._modalOKButton() }
-                        style={styles.button}
-                        >
-                            <Text style={styles.buttonText}>
-                                OK
-                            </Text>
-                        </TouchableOpacity>
+                        <View style={styles.buttonView}>
+                            <TouchableOpacity onPress={() => this._modalOKButton() }>
+                                <Text style={styles.buttonText}>
+                                    Add Set
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </Modal>
 
                 {/*LogCard rendering*/}
                 <View style={styles.card} key={null}>
-                    <View style={styles.cardTitle}>
-                        <Text style={styles.exerciseLabel}>{this.props.exercise.name}</Text>
-                        {this.props.exercise.equipment_type != null &&
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{this.props.exercise.equipment_type}</Text>
-                        </View>
-                        }
+
+                    <View>
+                        <Swipeout
+                        style={{backgroundColor: '#fff'}}
+                            right={
+                            [
+                                {
+                                text: 'Delete',
+                                backgroundColor: 'red',
+                                underlayColor: 'rgba(0, 0, 0, 0.6)',
+                                onPress: () => { this.props.dispatch({type: "DeleteExercise", payload: this.props.index}) }
+                                },
+                            ]
+                            } 
+                            autoClose={true}
+                        >
+                            <View style={styles.cardTitle}>
+                                <Text style={styles.exerciseLabel}>{this.props.exercise.name}</Text>
+                                {this.props.exercise.equipment_type != null &&
+                                <View style={styles.badge}>
+                                    <Text style={styles.badgeText}>{this.props.exercise.equipment_type}</Text>
+                                </View>
+                                }
+                            </View>
+                        </Swipeout>
                     </View>
                     
                     <View style={styles.setsList}>
@@ -131,7 +152,12 @@ export default class LogCard extends React.Component {
                     </View> 
                     
                     <View style={styles.buttonView}>
-                        <TouchableOpacity onPress={() => this.setState({ modalVisible: true }) }>
+                        <TouchableOpacity onPress={() => 
+                            this.setState({ 
+                                modalMode: "add",
+                                modalVisible: true 
+                            })}
+                        >
                             <Text style={styles.buttonText}>
                                 Add Set
                             </Text>
@@ -144,21 +170,33 @@ export default class LogCard extends React.Component {
 
     renderSetRow(set) {
         //Define Delete button for swiping right on a set to delete.
-        //console.log("renderSetRow: props: ", this.props);
-        //console.log("renderSetRow: set: ", set);
         var swipeoutButtons = [
+            {
+                text: 'Edit',
+                backgroundColor: 'blue',
+                underlayColor: 'rgba(0, 0, 0, 0.6)',
+                onPress: () =>
+                    this.setState({
+                        modalMode: "edit",
+                        modalSetIndex: set.index,
+                        modalVisible: true 
+                    })
+            },
             {
                 text: 'Duplicate',
                 backgroundColor: 'green',
                 underlayColor: 'rgba(0, 0, 0, 0.6)',
-                onPress: () => { this.props.duplicateSet(this.props.index, set.index) }
+                //onPress: () => { this.props.duplicateSet(this.props.index, set.index) }
+                onPress: () => { this.props.dispatch({type: "DuplicateSet", payload: {exerciseIndex: this.props.index, setIndex: set.index }}) }
             },
             {
                 text: 'Delete',
                 backgroundColor: 'red',
                 underlayColor: 'rgba(0, 0, 0, 0.6)',
                 //This.props.index == exercise.index
-                onPress: () => { this.props.deleteSet(this.props.index, set.index) }
+                //onPress: () => { this.props.deleteSet(this.props.index, set.index) }
+                onPress: () => { this.props.dispatch({type: "DeleteSet", payload: {exerciseIndex: this.props.index, setIndex: set.index}}) }
+                //this.props.dispatch({type: "DuplicateSet", payload: {set, setIndex: this.state.modalSetIndex, exerciseIndex: this.props.index}});
             },
         ];
         //Render a set row, with ability to delete
@@ -168,9 +206,9 @@ export default class LogCard extends React.Component {
                 autoClose={true}
             >
                 <View style={styles.setRow}>
-                    <Text style={set.isWarmup ? styles.warmupText : styles.exerciseText}>Set {set.index + 1}</Text>
-                    <Text style={set.isWarmup ? styles.warmupText : styles.exerciseText}>{set.item.reps} reps</Text>
-                    <Text style={set.isWarmup ? styles.warmupText : styles.exerciseText}>{set.item.weight} lbs</Text>
+                    <Text style={set.item.warmup ? styles.warmupText : styles.exerciseText}>Set {set.index + 1}</Text>
+                    <Text style={set.item.warmup ? styles.warmupText : styles.exerciseText}>{set.item.reps} reps</Text>
+                    <Text style={set.item.warmup ? styles.warmupText : styles.exerciseText}>{set.item.weight} lbs</Text>
                 </View>
             </Swipeout>
         );
@@ -178,20 +216,39 @@ export default class LogCard extends React.Component {
 
     //HANDLER FUNCTIONS
     _modalOKButton() {
+        console.log("LOG CARD: ", this.props);
         if (this.state.modalReps !== undefined && this.state.modalWeight !== undefined) {
             const set = {"weight": this.state.modalWeight, "reps": this.state.modalReps, "warmup": this.state.modalCheckbox};
-            this.props.addSet(this.props.index, set);
+            if (this.state.modalMode === "add") {
+                this.props.dispatch({type: "AddSet", payload: {set, exerciseIndex: this.props.index}});
+                //this.props.addSet(this.props.index, set);
+            } else if (this.state.modalMode === "edit") {
+                this.props.dispatch({type: "EditSet", payload: {set, setIndex: this.state.modalSetIndex, exerciseIndex: this.props.index}});
+                //this.props.editSet(this.props.index, this.state.modalSetIndex, set);
+            }
         }
+ 
         this.setState({
             modalVisible: false,
+            modalMode: undefined,
+            modalSetIndex: undefined,
 
             modalReps: undefined,
             modalWeight: undefined,
             modalCheckbox: false,
         });
     }   
-
+    // swipeoutExerciseButtons = [
+    //     {
+    //         text: 'Delete',
+    //         backgroundColor: 'red',
+    //         underlayColor: 'rgba(0, 0, 0, 0.6)',
+    //         //This.props.index == exercise.index
+    //         onPress: () => { this.props.deleteExercise(this.props.index) } 
+    //     },
+    // ];
 }
+
 
 const styles = StyleSheet.create({
     //Modal
@@ -200,7 +257,10 @@ const styles = StyleSheet.create({
         alignContent: 'center',
     },
     modalContent: {
-
+        justifyContent: 'center',
+        flex: 1,
+        width: '100%',
+        backgroundColor: '#fff',
     },
     modalRow: {
         flexDirection: 'row',
@@ -220,9 +280,7 @@ const styles = StyleSheet.create({
     //LogCard
     card: {
         flex: 1,
-        width: '95%',
-        minWidth: '95%',
-        maxWidth: '95%',
+        width: '100%',
         alignContent: 'stretch',
         backgroundColor: '#fff',
         borderRadius: 5,
@@ -284,7 +342,7 @@ const styles = StyleSheet.create({
         paddingTop: 6,
     },
     buttonView: {
-        flex: 1,
+        flex: 0,
         paddingTop: 5,
         paddingBottom: 5,
         justifyContent: 'center',

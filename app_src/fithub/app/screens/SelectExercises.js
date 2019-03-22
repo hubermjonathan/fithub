@@ -12,8 +12,10 @@ import {
 import ExerciseCard from '../components/ExerciseCard';
 
 import { getWorkouts } from '../lib/WorkoutFunctions';
+import { DefaultExercises } from '../defaults/Exercises';
+import { connect } from 'react-redux';
 
-export default class SelectExercisesScreen extends React.Component {
+class SelectExercisesScreen extends React.Component {
 
     constructor(props) {
         super(props);
@@ -24,17 +26,7 @@ export default class SelectExercisesScreen extends React.Component {
 
     componentWillMount() {
         this.setState({
-            //exercises = GetExercisesFromBackend()
-            
-            //Dummy data for debugging purposes
-            exercises: [
-                {name: "Bench Press", equipment_type: "Barbell", key: "1"},
-                {name: "Bicep Curls", equipment_type: "Dumbbells", key: "2"},
-                {name: "Front Squat", equipment_type: "Smith Machine", key: "3"},
-                {name: "Cardio", equipment_type: "Treadmill", key: "4"},
-                {name: "Weighted Crunches", equipment_type: "Plate", key: "5"},
-                {name: "Calf Raises", equipment_type: "Dumbbells", key: "6"},
-            ]
+            exercises: DefaultExercises
         });
     }
 
@@ -44,6 +36,7 @@ export default class SelectExercisesScreen extends React.Component {
                 <FlatList
                     data={this.state.exercises}
                     contentContainerStyle={styles.list}
+                    keyExtractor={(item, index) => index.toString()}
                     renderItem={({item, index}) => 
                         <TouchableHighlight onPress={() => this._onExercisePress(item)}>
                             <ExerciseCard
@@ -75,15 +68,16 @@ export default class SelectExercisesScreen extends React.Component {
                         sets: [],
                         };
                     console.log("New Exercise: ", newExercise);
-                    const addExercise = this.props.navigation.getParam('addExercise');
-                    addExercise(newExercise);
-                    //this.props.navigation.state.params.addExercise(newExercise);
+                    this.props.dispatch({type: "AddExercise", payload: newExercise});
                     }
                 },
             ]
         );
     }
 }
+
+export default connect((state)=> { return {workout: state.workout}})(SelectExercisesScreen);
+
 const styles = StyleSheet.create({
     input: {
         borderColor: 'grey',

@@ -1,7 +1,7 @@
 //Default provided Exercises, Workouts, etc.
 //This permits local storage so that unnecessary server calls aren't made
 
-export const defaultExercises = [
+export const DefaultExercises = [
         //Exercise Template
         //{name: "", equipment_type: "", muscle_group: ""},
 
@@ -51,7 +51,7 @@ export const defaultExercises = [
         {name: "Calve Raises", equipment_type: "Dumbbell", muscle_group: "Calves"},
 ];
 
-export const defaultWorkouts = [
+export const DefaultWorkouts = [
     {
         uid: undefined,
         name: "Chest Day",
