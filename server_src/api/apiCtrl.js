@@ -269,10 +269,15 @@ let newLog = async function newLog(req, res) {
 
   //validate setData json input
 
-  const day = req.body.date.getDate();
-  const month = req.body.date.getMonth();
-  const year = req.body.date.getFullYear();
-  const gitLog = `${year}-${month}-${day}`
+  let gitLog;
+  if(req.body.date instanceof Date){
+    const day = req.body.date.getDate();
+    const month = req.body.date.getMonth();
+    const year = req.body.date.getFullYear();
+    gitLog = `${year}-${month}-${day}`
+  } else {
+    gitLog = req.body.date;
+  }
 
   let exerciseData_ids = [];
   let newActivity;
