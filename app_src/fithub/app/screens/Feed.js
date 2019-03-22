@@ -36,11 +36,37 @@ export default class FeedScreen extends React.Component {
 
   state = {
     modalVisible: false,
-    workouts: []
+    workouts: [],
+    muscleGroups: [
+      "NECK",
+      "SHOULDERS", 
+      "DELTOID",
+      "TRICEPS",
+      "BICEPS",
+      "FOREARMS",
+      "BACK",
+      "LATS",
+      "TRAPS",
+      "CHEST",
+      "WAIST",
+      "OBLIQUES",
+      "HIPS",
+      "GLUTES",
+      "THIGHS",
+      "QUADS",
+      "HAMSTRINGS", 
+      "CALVES",
+    ]
   }
   
   setModalVisible(visible) {
     this.setState({ modalVisible: visible });
+  }
+
+  selectedFilter(muscleGroup){
+    const filter = this.state.workouts.filter(workout =>{
+
+    })
   }
 
   componentDidMount() {
@@ -94,7 +120,7 @@ export default class FeedScreen extends React.Component {
                 name="filter"
                 type="MaterialDesignIcons"
                 size={30}
-                //onPress={() => this.setModalVisible()}
+                onPress={() => this.setModalVisible()}
               />
             </TouchableOpacity>
             <TouchableOpacity>
@@ -130,6 +156,32 @@ export default class FeedScreen extends React.Component {
               Alert.alert('Modal has been closed.');
           }}
           style={{ flex: 1 }}>  
+
+          <SafeAreaView style={{flex: 1}}>
+            <View style={{flex:10}}>
+              <FlatList
+                keyExtractor={(item, index) => index.toString()}
+                data={this.state.muscleGroups}
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={()=>this.selectedFilter(item)}>
+                        <Text style={{fontSize: 30}}>
+                          {item}
+                        </Text>
+                    </TouchableOpacity>
+                )}
+              />
+            </View>
+            <View style={{flex:1, paddingTop: 10}}>
+              <Button
+                style={{ allignItems: 'flex-end' }}
+                buttonStyle={{ backgroundColor: '#e04a21' }}
+                title="Cancel"
+                onPress={() => {
+                    this.setModalVisible(false);
+                }} 
+              />
+            </View>
+          </SafeAreaView>
 
         </Modal>
       </SafeAreaView>
