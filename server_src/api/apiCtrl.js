@@ -27,11 +27,17 @@ async function recalc(req, res){
   user.maxes = {};
   user.dates = {};
   user.volumes = {};
+
   user.logs.forEach(log => {
-    if(log.date in user.dates) {
-      user.dates[log.date]++; 
+    let day = log.date.getDate();
+    let month = log.date.getMonth();
+    let year = log.date.getFullYear();
+    let gitLog = `${year}-${month}-${day}`
+
+    if(gitLog in user.dates) {
+      user.dates[gitLog]++; 
     } else {
-      user.dates[log.date] = 1;
+      user.dates[gitLog] = 1;
     }
     log.exercises.forEach(exercise => {
       let vol = 0;
@@ -257,12 +263,17 @@ let newLog = async function newLog(req, res) {
 
   //validate setData json input
 
+  const day = req.body.date.getDate();
+  const month = req.body.date.getMonth();
+  const year = req.body.date.getFullYear();
+  const gitLog = `${year}-${month}-${day}`
+
   let exerciseData_ids = [];
   let newActivity;
-  if(req.body.date in user.dates) {
-    user.dates[req.body.date]++; 
+  if(gitLog in user.dates) {
+    user.dates[gitLog]++; 
   } else {
-    user.dates[req.body.date] = 1;
+    user.dates[gitLog] = 1;
   }
   //Construct the exerciseData objects
   for(let i = 0; i < req.body.exercises.length; i++){
@@ -332,27 +343,6 @@ let newLog = async function newLog(req, res) {
     exercises: exerciseData_ids
     });
   }catch(validation_err){ console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" })};
-
-  /*newWorkoutData.save((err, newWorkoutData) => {
-    if (err) {
-      console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving workout log" });
-    } 
-    else{
-      //Push the newWorkout log to the user profile
-      console.log(newWorkoutData._id);
-      user.updateOne({$push: {logs: newWorkoutData._id, activity: newActivity}}, (err) => {
-        if (err) {
-          res.status(500).send({"message": "Error: Log addition unsuccessful"});
-          return;
-        } 
-        else {
-          res.status(200).send({"message": "Log added successfully "});
-          return;
-        }
-      }); //end updateOne
-    }
-  }); //end save
-*/
 
     user.updateOne({$set: {maxes: user.maxes, dates: user.dates}}, {}, (err, raw) => {});
     //Push the newWorkout log to the user profile
@@ -565,6 +555,10 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   let workoutId = req.body.workout;
   let flag = req.body.isPublic;
 
+  if(user.workouts.length == 0){
+    return res.status(500).send({ "message": "You have no workouts!" } );
+  }
+
   for(let i = 0; i < user.workouts.length; i++){
     let workout = user.workouts[i];
     if(workout._id == workoutId){
@@ -676,26 +670,6 @@ let editWorkout = async function editWorkout(req, res){ //deletes old exercise d
       schemaCtrl.WorkoutPlan.deleteOne({_id: old_workout_id}).catch(err => {return console.log("editWorkouts: error deleting workout: " + id);});
     }
   }
-  
-  /*
-  //delete the old workout
-  for(let i = 0; i < profile_workouts.length; i++){
-    let workout = profile_workouts[i];
-    if(workout._id == old_workout_id){
-      //delete nested exercises
-      for(let j = 0; j < workout.exercises.length; j++){
-        let exercise = workout.exercises[j];
-        //delete nested sets
-        for(let b = 0; b < exercise.sets.length; b++){
-          let set = exercise.sets[b];
-          schemaCtrl.Set.deleteOne({_id: set._id}).catch(err => {return console.log("editWorkouts: error deleting set " + id);});
-        }
-        schemaCtrl.Exercise.deleteOne({_id: exercise._id}).catch(err => {return console.log("editWorkouts: error deleting set " + id);});
-      }
-      schemaCtrl.WorkoutPlan.deleteOne({_id: old_workout_id}).catch(err => {return console.log("editWorkouts: error deleting workout: " + id);});
-    }
-  }
-  */
 
   //build the new workout
   for(let i = 0; i < req.body.exercises.length; i++){
@@ -800,6 +774,124 @@ let editLog = async function editLog(req, res) {
   if(!isConnected(req, res)){ return console.log("DB is offline");}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+
+  user = await schemaCtrl.Profile.findById(req.body.id).populate({
+    path: "logs",
+    model: "WorkoutData",
+    populate: {
+      path: "exercises",
+      model: "ExerciseData",
+      populate: {
+        path: "sets",
+        model: "SetData"
+      }
+    }
+  })
+  .exec()
+  .catch(err => {return console.log("editLog: error querying initial profile");});
+
+  //delete old log
+  let profile_logs = user.logs;
+  let old_log_id = req.body.old_log_id;
+
+  //delete the old log
+  for(let i = 0; i < profile_logs.length; i++){ //for each log
+    let log = profile_logs[i];
+    if(log._id == old_log_id){
+      for(let j = 0; j < log.exercises.length; j++){ //for each exercise in the log
+        let exercise = log.exercises[j];
+        for(let z = 0; z < exercise.sets.length; z++){ //for each exercise in the log
+          let set = exercise.sets[z];
+          schemaCtrl.SetData.deleteOne({_id: set._id}).catch(err => {return console.log("editLog: error deleting set: " + set._id);});
+        }
+        schemaCtrl.ExerciseData.deleteOne({_id: exercise._id}).catch(err => {return console.log("editLog: error deleting exercise: " + exercise._id);});
+      }
+      schemaCtrl.WorkoutData.deleteOne({_id: log._id}).catch(err => {return console.log("editLog: error deleting log: " + log._id);});
+    }
+  }
+
+
+  //validate setData json input
+
+  let exerciseData_ids = [];
+  let newActivity;
+  if(req.body.date in user.dates) {
+    user.dates[req.body.date]++; 
+  } else {
+    user.dates[req.body.date] = 1;
+  }
+  //Construct the exerciseData objects
+  for(let i = 0; i < req.body.exercises.length; i++){
+    let exercise = req.body.exercises[i];
+
+    exercise.sets.forEach(set =>
+    {
+      //For keeping track of user maxes
+      if(exercise.name in user.maxes){
+        if(user.maxes[exercise.name] < set.weight){
+          newActivity = `${user.name} has achieved a new max of ${set.weight} on ${exercise.name}`;
+          user.maxes[exercise.name] = set.weight;
+        }
+      } else {
+        user.maxes[exercise.name] = set.weight;
+        newActivity = `${user.name} has done ${exercise.name} for the first time!`;
+      }
+    });
+    
+    if(newActivity==null){
+      newActivity = `${user.name} worked out on ${req.body.date}!`
+    }
+
+    //build setData objects for the current exercise
+    let setData_ids = [];
+    for(let j = 0; j < exercise.sets.length; j++){
+      let set = exercise.sets[j];
+
+      let newSetData; 
+      try{
+      newSetData = await schemaCtrl.SetData.create(set);
+      }catch(validation_err){ console.log("Input Error: invalid json input at SetData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing setData" })};
+
+      newSetData.save((err, newSetData) => {
+        if (err) {
+          console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
+        } 
+      }); //end save
+      setData_ids.push(mongoose.Types.ObjectId(newSetData._id));
+    }; //end forEach set
+
+    //build exerciseData objects for the workoutData
+    let newExerciseData;
+    try{
+      newExerciseData = await schemaCtrl.ExerciseData.create({
+        name: exercise.name,
+        muscle_groups: exercise.muscle_groups,
+        sets: setData_ids
+      });
+    }catch(validation_err){ console.log("Input Error: validation error creating ExerciseData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exerciseData" })};
+
+    //save the exerciseData
+    newExerciseData.save((err, newExerciseData) => {
+      if (err) {
+        console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving exercise log" });
+      } 
+    }); //end save
+    exerciseData_ids.push(mongoose.Types.ObjectId(newExerciseData._id));
+  }; //end forEach exercise, all exerciseData documents have been built and saved
+
+  //Construct the workoutData object, catch validation error
+  let newWorkoutData;
+  try{
+    newWorkoutData = await schemaCtrl.WorkoutData.create({
+    _id: old_log_id,
+    name: req.body.name,
+    date: req.body.date,
+    exercises: exerciseData_ids
+    });
+  }catch(validation_err){ console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" })};
+  newWorkoutData.save().catch(err => {return res.status(500).send({ "message": "editLog: Error saving log" })});
+  user.updateOne({$set: {maxes: user.maxes, dates: user.dates}}, {}, (err, raw) => {});
+  return res.status(200).send({ "message": "Successfully edited workout: " + old_log_id });
 } //end newLog
 
 
@@ -1107,6 +1199,7 @@ let apiCtrl = {
   newExercise: newExercise,
 
   logs: logs,
+  editLog: editLog,
   newLog: newLog,
 
   users: users,                     //Returns all users

@@ -60,7 +60,7 @@ export default class FeedScreen extends React.Component {
           }//for
           builtWorkouts.push({
             workout: array[x].name,
-            user: array[x]._id, //replace with user's profile name later
+            user: array[x].ownerUID, //replace with user's profile name later
             icon: "person",
             exercises: exercises
           })
@@ -97,7 +97,10 @@ export default class FeedScreen extends React.Component {
           keyExtractor={(item, index) => index.toString()}
           data={this.state.workouts}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={()=>this.props.navigation.push('otherUserProfile')}>
+            <TouchableOpacity onPress={()=>{
+              //console.log(item.user);
+              this.props.navigation.push('Profile', { id: item.user } )
+            }}>
               <WorkoutCard
                 workout={item.workout}
                 user={item.user}
