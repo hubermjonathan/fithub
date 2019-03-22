@@ -1,21 +1,10 @@
 import { getUserToken, getUserID, getUserUID } from '../lib/AccountFunctions';
 
+// Returns the usernames and ids of all the users registered with the app
 export function getUsers() {
-    fetch(`/users`, {
+    let response = await fetch('https://fithub-server.herokuapp.com/users', {
         method: 'GET'
-    }).then(res => res.json())
-        .then(res => console.log(res))
-        .catch(function (e) {
-            console.log("User not found");
-        });
-}
-
-export function getPublicWorkouts() {
-    fetch(`/workouts/public`, {
-        method: 'GET'
-    }).then(res => res.json())
-        .then(res => console.log(res))
-        .catch(function (e) {
-            console.log("User not found");
-        });
+    });
+    let json = await response.json();
+    return json;
 }

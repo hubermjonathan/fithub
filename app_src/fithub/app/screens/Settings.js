@@ -9,6 +9,7 @@ import {
   Button,
 } from 'react-native';
 import { getUserID } from '../lib/AccountFunctions';
+import { editProfile } from '../lib/ProfileFunctions';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
@@ -55,8 +56,11 @@ export default class SettingsScreen extends React.Component {
     }
   }
 
-  saveChanges() {
-    console.log(this.state.nameText);
+  async saveChanges() {
+    let profile = {
+      name: this.state.nameText
+    };
+    await editProfile(profile);
     this.props.navigation.goBack();
   }
 
