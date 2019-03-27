@@ -30,7 +30,7 @@ export default class ProfileScreen extends React.Component {
     if (navigation.getParam('id', '') === '') {
       return {
         title: 'Profile',
-        headerRight: <Icon name="settings" type="material" size={30} onPress={() => { navigation.push('Settings') }} />
+        headerRight: <Icon name="settings" type="material" containerStyle={{paddingRight: 10}} size={30} onPress={() => { navigation.push('Settings') }} />
       }
     } else {
       return {
@@ -84,49 +84,60 @@ export default class ProfileScreen extends React.Component {
     });
   }
 
+  renderPagination(index, total, context) {
+    return (
+      <View style={styles.paginationContainer}>
+        <View style={index == 0 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 0 ? styles.paginationTextActive : styles.paginationText}>Activity</Text></View>
+        <View style={index == 1 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 1 ? styles.paginationTextActive : styles.paginationText}>History</Text></View>
+        <View style={index == 2 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 2 ? styles.paginationTextActive : styles.paginationText}>Graphs</Text></View>
+      </View>
+    );
+  }
+
   render() {
     if (Platform.OS === 'ios' && this.state.idLoaded) {
       return (
         <SafeAreaView style={styles.containerIOS}>
+
           <View style={styles.header}>
-            <View style={styles.profPicCol}>
-              <Image
-                style={styles.profPic}
-                source={{ uri: this.state.photo }}
-              />
-            </View>
-            <View style={styles.infoCol}>
+            <View style={styles.infoContainer}>
               <View style={styles.nameRow}>
-                <Text style={styles.name}>
+                <Text style={styles.nameText}>
                   {this.state.name}
                 </Text>
               </View>
 
               <View style={styles.statsRow}>
-                <View style={styles.statsCol}>
-                  <Text style={styles.stats}>Volume:</Text>
-                  <Text style={styles.stats}>{this.state.volume}</Text>
+                <View style={styles.statContainer}>
+                  <Text style={styles.statText}>Volume:</Text>
+                  <Text style={styles.statText}>{this.state.volume}</Text>
                 </View>
-                <View style={styles.statsCol}>
-                  <Text style={styles.stats}>Bench:</Text>
-                  <Text style={styles.stats}>{this.state.bench}</Text>
+                <View style={styles.statContainer}>
+                  <Text style={styles.statText}>Max Bench:</Text>
+                  <Text style={styles.statText}>{this.state.bench}</Text>
                 </View>
               </View>
+            </View>
+
+            <View style={styles.picContainer}>
+              <Image
+                style={styles.profPic}
+                source={{ uri: this.state.photo }}
+              />
             </View>
           </View>
 
           <View style={styles.body}>
-            <Swiper activeDotColor='#00adf5' loop={false}>
+            <Swiper activeDotColor='#00adf5' loop={false} renderPagination={this.renderPagination.bind(this)}>
               <View style={styles.subContainer}>
-                <ScrollView stickyHeaderIndices={[0]}>
-                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Activity</Text></View>
-                  <Activity id={this.state.id}/>
-
+                <ScrollView>
+                  <View style={styles.subScroller}>
+                    <Activity id={this.state.id}/>
+                  </View>
                 </ScrollView>
               </View>
-              <View>
+              <View style={styles.subContainer}>
                 <ScrollView>
-                  <View style={styles.subHeaderContainer}><Text style={styles.subHeader}>Workouts</Text></View>
                   <ContributionGraph
                     style={{ borderBottomWidth: 1,color:'red' }}
                     values={this.state.dates}
@@ -137,6 +148,8 @@ export default class ProfileScreen extends React.Component {
                     chartConfig={chartConfig}
                   />
                 </ScrollView>
+              </View>
+              <View style={styles.subContainer}>
               </View>
             </Swiper>
           </View>
@@ -233,7 +246,16 @@ class Activity extends React.Component {
 
     this.state = {
       id: this.props.id,
-      algoData: []
+      algoData: [],
+      shadowProps: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 1,
+          height: 2,
+        },
+        shadowOpacity: .4,
+        shadowRadius: 3,
+      }
     }
 
     this.loadActivities();
@@ -244,7 +266,7 @@ class Activity extends React.Component {
 
     for (let i = 0; i < this.state.algoData.length; i++) {
       activities.push(
-        <View style={styles.record} key={i}>
+        <View style={[styles.record, this.state.shadowProps]} key={i}>
           <Icon name={this.state.algoData[i].icon} type="material" size={30} />
           <Text style={styles.recordText}>
             {this.state.algoData[i].text}
@@ -329,35 +351,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     flex: 1,
-    backgroundColor: '#eee',
+    paddingTop: 10,
   },
-  profPicCol: {
+  infoContainer: {
     flex: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  infoCol: {
-    flex: 4,
+    paddingLeft: 20,
+    justifyContent: 'space-evenly',
   },
   nameRow: {
     flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingBottom: 20,
   },
   statsRow: {
     flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'space-between',
   },
-  statsCol: {
+  statContainer: {
+    marginRight: 40,
+  },
+  picContainer: {
+    padding: 10,
     flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   body: {
     flexDirection: 'row',
-    flex: 3,
+    flex: 4,
     backgroundColor: '#fff',
   },
   profPic: {
@@ -365,17 +383,62 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 55,
   },
-  name: {
+  nameText: {
     color: '#333',
     fontSize: 36,
     fontWeight: 'bold',
   },
-  stats: {
+  statText: {
     color: '#333',
-    fontSize: 20,
+    fontSize: 18,
+  },
+  paginationContainer: {
+    position: 'absolute',
+    flexDirection: 'row',
+    flex: 1,
+    height: 55,
+    width: Dimensions.get('window').width,
+    backgroundColor: '#fff',
+    paddingLeft: 20,
+    paddingRight: 20,
+    justifyContent: 'space-between',
+  },
+  paginationTextContainer: {
+    height: 55,
+    justifyContent: 'center',
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderBottomWidth: 1,
+    borderColor: '#333',
+  },
+  paginationTextContainerActive: {
+    height: 55,
+    justifyContent: 'center',
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderBottomWidth: 2,
+    borderColor: '#00adf5',
+  },
+  paginationText: {
+    fontSize: 22,
+    color: '#333',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  paginationTextActive: {
+    color: '#00adf5',
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   subContainer: {
+    paddingTop: 55,
     flex: 1,
+    backgroundColor: '#eee',
+  },
+  subScroller: {
+    alignItems: 'center',
+    marginBottom: 15,
   },
   subHeaderContainer: {
     borderBottomWidth: 1,
@@ -383,18 +446,20 @@ const styles = StyleSheet.create({
   subHeader: {
     fontSize: 28,
     backgroundColor: '#fff',
-    color: '#333',
+    color: '#00adf5',
     fontWeight: 'bold',
     padding: 20,
   },
   record: {
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
     flexDirection: 'row',
     height: 100,
+    width: '95%',
+    borderRadius: 15,
     alignItems: 'center',
     paddingLeft: 20,
-    paddingRight: 20,
+    paddingRight: 30,
+    marginTop: 15,
   },
   recordText: {
     color: '#333',
