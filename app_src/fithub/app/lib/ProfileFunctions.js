@@ -85,3 +85,14 @@ export async function getProfileActivity(id) {
     let json = await response.json();
     return json;
 }
+
+export async function getSelectedStats(id) {
+    let response = await fetch('https://fithub-server.herokuapp.com/profile/'+id+'/selected_stats', {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    let json = await response.json();
+    return json;
+}

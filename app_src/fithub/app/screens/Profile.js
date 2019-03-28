@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Icon, Button } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
-import { getProfileStats, getProfileActivity } from '../lib/ProfileFunctions';
+import { getProfileStats, getProfileActivity, getSelectedStats } from '../lib/ProfileFunctions';
 import { getUserID } from '../lib/AccountFunctions';
 import { ContributionGraph } from 'react-native-chart-kit';
 
@@ -58,8 +58,14 @@ export default class ProfileScreen extends React.Component {
       photo: '',
       activityInfo: [],
       dates: [],
-      volume: 0,
-      bench: 0,
+      stat1: {
+        name: "Stat 1",
+        data: 0,
+      },
+      stat2: {
+        name: "Stat 2",
+        data: 0,
+      }
     }
 
     const didFocusListener = this.props.navigation.addListener('didFocus', this.loader.bind(this));
@@ -74,110 +80,47 @@ export default class ProfileScreen extends React.Component {
     }
   }
 
-  componentDidMount() {
-    getUserID().then(id => {
-      this.setState({
-        idLoaded: true,
-        id: this.props.navigation.getParam('id', id)
-      });
-      this.loader();
-    });
-  }
-
-  renderPagination(index, total, context) {
-    return (
-      <View style={styles.paginationContainer}>
-        <View style={index == 0 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 0 ? styles.paginationTextActive : styles.paginationText}>Activity</Text></View>
-        <View style={index == 1 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 1 ? styles.paginationTextActive : styles.paginationText}>History</Text></View>
-        <View style={index == 2 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 2 ? styles.paginationTextActive : styles.paginationText}>Graphs</Text></View>
-      </View>
-    );
-  }
-
-  render() {
-    if (Platform.OS === 'ios' && this.state.idLoaded) {
-      return (
-        <SafeAreaView style={styles.containerIOS}>
-
-          <View style={styles.header}>
-            <View style={styles.infoContainer}>
-              <View style={styles.nameRow}>
-                <Text style={styles.nameText}>
-                  {this.state.name}
-                </Text>
-              </View>
-
-              <View style={styles.statsRow}>
-                <View style={styles.statContainer}>
-                  <Text style={styles.statText}>Volume:</Text>
-                  <Text style={styles.statText}>{this.state.volume}</Text>
-                </View>
-                <View style={styles.statContainer}>
-                  <Text style={styles.statText}>Max Bench:</Text>
-                  <Text style={styles.statText}>{this.state.bench}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.picContainer}>
-              <Image
-                style={styles.profPic}
-                source={{ uri: this.state.photo }}
-              />
-            </View>
-          </View>
-
-          <View style={styles.body}>
-            <Swiper activeDotColor='#00adf5' loop={false} renderPagination={this.renderPagination.bind(this)}>
-              <View style={styles.subContainer}>
-                <ScrollView>
-                  <View style={styles.subScroller}>
-                    <Activity id={this.state.id}/>
-                  </View>
-                </ScrollView>
-              </View>
-              <View style={styles.subContainer}>
-                <ScrollView>
-                  <ContributionGraph
-                    style={{ borderBottomWidth: 1,color:'red' }}
-                    values={this.state.dates}
-                    endDate={new Date('2019-06-01')}
-                    numDays={104}
-                    width={screenWidth}
-                    height={220}
-                    chartConfig={chartConfig}
-                  />
-                </ScrollView>
-              </View>
-              <View style={styles.subContainer}>
-              </View>
-            </Swiper>
-          </View>
-
-        </SafeAreaView>
-      );
-    } else {
-      return (
-        <View style={styles.containerAND}>
-          <Text>PROFILE</Text>
-        </View>
-      );
-    }
-  }
-
   async loadUserStats() {
     let stats = await getProfileStats(this.state.id);
+    let selected_stats = await getSelectedStats(this.state.id);
 
-    let totalVolume = 0;
-    let maxBench = stats.maxes["Bench Press"] === undefined ? 0 : stats.maxes["Bench Press"];
+    let stat1 = {
+      name: selected_stats.selected_stat1,
+      data: 0
+    }
 
-    for (let key in stats.volumes) {
-      totalVolume += stats.volumes[key];
+    let stat2 = {
+      name: selected_stats.selected_stat2,
+      data: 0
+    }
+
+    if(stat1.name.includes("Total")) {
+      let totalVolume = 0;
+      for (let key in stats.volumes) {
+        totalVolume += stats.volumes[key];
+      }
+      stat1.data = totalVolume;
+    } else if(stat1.name.includes("Max")) {
+      stat1.data = stats.maxes[stat1.name.slice(4)];
+    } else if(stat1.name.includes("Volume")) {
+      stat1.data = stats.volumes[stat1.name.slice(0, stat1.name.search("Volume")-1)];
+    }
+
+    if(stat2.name.includes("Total")) {
+      let totalVolume = 0;
+      for (let key in stats.volumes) {
+        totalVolume += stats.volumes[key];
+      }
+      stat2.data = totalVolume;
+    } else if(stat2.name.includes("Max")) {
+      stat2.data = stats.maxes[stat2.name.slice(4)];
+    } else if(stat2.name.includes("Volume")) {
+      stat2.data = stats.volumes[stat2.name.slice(0, stat2.name.search("Volume")-1)];
     }
 
     this.setState({
-      volume: totalVolume,
-      bench: maxBench
+      stat1: stat1,
+      stat2, stat2
     });
   }
 
@@ -238,6 +181,93 @@ export default class ProfileScreen extends React.Component {
       });
   }
 
+  componentDidMount() {
+    getUserID().then(id => {
+      this.setState({
+        idLoaded: true,
+        id: this.props.navigation.getParam('id', id)
+      });
+      this.loader();
+    });
+  }
+
+  renderPagination(index, total, context) {
+    return (
+      <View style={styles.paginationContainer}>
+        <View style={index == 0 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 0 ? styles.paginationTextActive : styles.paginationText}>Activity</Text></View>
+        <View style={index == 1 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 1 ? styles.paginationTextActive : styles.paginationText}>History</Text></View>
+        <View style={index == 2 ? styles.paginationTextContainerActive : styles.paginationTextContainer}><Text style={index == 2 ? styles.paginationTextActive : styles.paginationText}>Graphs</Text></View>
+      </View>
+    );
+  }
+
+  render() {
+    if (Platform.OS === 'ios' && this.state.idLoaded) {
+      return (
+        <SafeAreaView style={styles.containerIOS}>
+
+          <View style={styles.header}>
+            <View style={styles.infoContainer}>
+              <View style={styles.nameRow}>
+                <Text style={styles.nameText}>
+                  {this.state.name}
+                </Text>
+              </View>
+
+              <View style={styles.statsRow}>
+                <View style={styles.statContainer}>
+                  <Text style={styles.statText}>{this.state.stat1.name}:</Text>
+                  <Text style={styles.statText}>{this.state.stat1.data}</Text>
+                </View>
+                <View style={styles.statContainer}>
+                  <Text style={styles.statText}>{this.state.stat2.name}:</Text>
+                  <Text style={styles.statText}>{this.state.stat2.data}</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.picContainer}>
+                { this.state.photo !== '' && <Image style={styles.profPic} source={{ uri: this.state.photo }}/> }
+            </View>
+          </View>
+
+          <View style={styles.body}>
+            <Swiper activeDotColor='#00adf5' loop={false} renderPagination={this.renderPagination.bind(this)}>
+              <View style={styles.subContainer}>
+                <ScrollView>
+                  <View style={styles.subScroller}>
+                    <Activity id={this.state.id}/>
+                  </View>
+                </ScrollView>
+              </View>
+              <View style={styles.subContainer}>
+                <ScrollView>
+                  <ContributionGraph
+                    style={{ borderBottomWidth: 1,color:'red' }}
+                    values={this.state.dates}
+                    endDate={new Date('2019-06-01')}
+                    numDays={104}
+                    width={screenWidth}
+                    height={220}
+                    chartConfig={chartConfig}
+                  />
+                </ScrollView>
+              </View>
+              <View style={styles.subContainer}>
+              </View>
+            </Swiper>
+          </View>
+
+        </SafeAreaView>
+      );
+    } else {
+      return (
+        <View style={styles.containerAND}>
+          <Text>PROFILE</Text>
+        </View>
+      );
+    }
+  }
 }
 
 class Activity extends React.Component {
@@ -366,6 +396,7 @@ const styles = StyleSheet.create({
   },
   statContainer: {
     marginRight: 40,
+    width: 95,
   },
   picContainer: {
     padding: 10,
