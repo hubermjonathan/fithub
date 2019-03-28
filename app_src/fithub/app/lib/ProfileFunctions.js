@@ -96,3 +96,23 @@ export async function getSelectedStats(id) {
     let json = await response.json();
     return json;
 }
+
+export async function editStats(stats) {
+    const id = await getUserID();
+    const uid = await getUserUID();
+    const token = await getUserToken();
+    stats.uid = uid;
+    stats.id = id;
+    stats.token = token;
+    fetch('https://fithub-server.herokuapp.com/profile/editStats', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(stats)
+    }).then(res => res.json())
+        .then((res) => console.log('Success', JSON.stringify(res)))
+        .catch(function (e) {
+            console.log(e);
+        });
+}
