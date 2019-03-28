@@ -584,7 +584,7 @@ let editUsername = async function editUsername(req, res){
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
   let new_name = req.body.name;
-  if(new_name.length > 32 || !(new_name.match(/^[a-z0-9]+$/i))){
+  if(new_name.length > 32 || !(new_name.match(/^[a-z0-9 ]+$/i))){
     return res.status(500).send({ "message": "Invalid name: name must be 32 alphanumeric characters or less"});
   }
   else{
