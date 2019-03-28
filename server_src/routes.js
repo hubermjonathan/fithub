@@ -15,6 +15,7 @@ router.get('/profile/:id/stats', apiCtrl.stats);
 router.get('/profile/:id/dates', apiCtrl.dates);
 router.get('/profile/:id/activity', apiCtrl.activity);
 router.get('/users', apiCtrl.users);
+router.get('/profile/:id/selected_stats', apiCtrl.selected_stats);          //get the user's selected stats
 router.post('/profile/editName', apiCtrl.editUsername);          //Get a users CUSTOM exercises
 
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans

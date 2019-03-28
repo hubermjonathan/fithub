@@ -1087,6 +1087,37 @@ let profile = function profile(req, res) {
   });
 }
 
+let selected_stats = function selected_stats(req, res) {
+  if(!isConnected(req, res))
+  {
+    return;
+  }
+
+  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
+  {
+    if(err){
+      res.status(404).send({ "message": "Database Error: error querying profile" });
+      return
+    }
+    else if(!user){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+  }) //end findById
+  .select("selected_stat1 selected_stat2")
+  .exec((err, data) =>
+  {
+    if(err)
+    {
+      res.status(500).send({ "message": "Database Error: profile query failed" });
+      return;
+    }
+    else{
+      res.status(200).send(data);
+    }
+  });
+}
+
 //Return all standard exercises
 let exercises = function exercises(req, res) {
   if (db.readyState == 0) {
@@ -1252,6 +1283,7 @@ let apiCtrl = {
   editWorkout: editWorkout,
   social: social,
   gain: gain,
+  selected_stats: selected_stats,
 
   delExercise: delExercise,
   delWorkout: delWorkout,
