@@ -28,6 +28,7 @@ let Profile = new Schema({
   dates : { type : Object },
   volumes : { type : Object },  
   activity : { type : Object},
+  following: [{ type: Schema.Types.ObjectId, ref: "Profile"}],         //Workout plans the user has submitted to the master list
   workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutPlan"}],         //Workout plans the user has submitted to the master list
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],         //Private exercises
   logs: [{ type: Schema.Types.ObjectId, ref: "WorkoutData"}],         //Workout data

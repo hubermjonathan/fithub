@@ -1243,6 +1243,17 @@ let dates = function dates(req, res){
   });
 }
 
+let follow = async function follow(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = schemaCtrl.Profile.findById(req.body.id).select(following);
+}
+
+let followingWorkouts = async function followingWorkouts(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = schemaCtrl.Profile.findById(req.body.id).select(following);
+
+}
+
 let stats = function stats(req, res){
   recalc(req, res);
   /*if(db.readyState==0){
@@ -1277,6 +1288,8 @@ let apiCtrl = {
   gain: gain,
   selected_stats: selected_stats,
   editStats:editStats,
+  follow : follow,
+  followingWorkouts : followingWorkouts,
 
   delExercise: delExercise,
   delWorkout: delWorkout,

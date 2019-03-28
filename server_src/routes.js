@@ -18,6 +18,8 @@ router.get('/users', apiCtrl.users);
 router.get('/profile/:id/selected_stats', apiCtrl.selected_stats);          //get the user's selected stats
 router.post('/profile/editName', apiCtrl.editUsername);          //Get a users CUSTOM exercises
 router.post('/profile/editStats', apiCtrl.editStats);          //edit a user's selected stats
+router.post('/profile/follow', apiCtrl.follow);          //edit a user's selected stats
+
 
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans
 router.get('/workouts/public/:id', apiCtrl.social);             //get comments and gains for a workout plan
