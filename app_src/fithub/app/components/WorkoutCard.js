@@ -10,10 +10,12 @@ import {
     TouchableHighlight,
     FlatList,
     TouchableOpacity,
-    List
+    List,
+    Alert
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
-import { getProfileName } from '../lib/ProfileFunctions';
+import { postWorkout } from '../lib/WorkoutFunctions';
+
 
 export default class WorkoutCard extends React.Component {
     constructor(props) {
@@ -50,12 +52,10 @@ export default class WorkoutCard extends React.Component {
                 <View style={styles.card}>
                     {/* show user at top of card */}
                     <View style={styles.user}>
-                        {/* show user profile pic */}
-                        {/* <Image
-                            source={{ uri: this.state.userPhoto }}
-                        /> */}
                         {/* print user of workout */}
-                        <Text style={styles.userName}>{this.state.user}</Text>
+                        <TouchableOpacity onPress={() => this.props.navigation.push('Profile', {id: this.props.user})}>
+                            <Text style={styles.userName}>{this.state.user}</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {/* show workout */}
@@ -67,7 +67,9 @@ export default class WorkoutCard extends React.Component {
                         <View style={styles.add}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    //add to workouts
+                                    console.log(this.props.fullWorkout);
+                                    postWorkout(this.props.fullWorkout);
+                                    Alert.alert("Workout added");
                                 }}>
                                 <Icon
                                     name="plus"
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
     },
     userName: {
         //fontSize: 'bold',
-        fontSize: 20,
+        fontSize: 25,
     },
     workout: {
         flexDirection: 'column',
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
         //borderBottomWidth: 1,
     },
     workoutTitle: {
-        flex: 1,
+        flex: 10,
         flexDirection: 'row',
         justifyContent: 'center',
         paddingTop: 10,

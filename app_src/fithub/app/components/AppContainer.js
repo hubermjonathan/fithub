@@ -10,10 +10,11 @@ import ProfileScreen from '../screens/Profile';
 import CreateExercisesScreen from '../screens/CreateExercises';
 import CreateWorkoutScreen from '../screens/CreateWorkout';
 import DetailScreen from '../screens/Detail';
-import { SelectExercisesScreen } from '../screens/Logger';
+import SelectExercisesScreen from '../screens/SelectExercises';
 import SettingsScreen from '../screens/Settings';
 import WorkoutLogEditScreen from '../screens/WorkoutLogEdit'
 import SearchScreen from '../screens/Search';
+import SelectWorkoutScreen from '../screens/SelectWorkout';
 
 
 const HomeStack = createStackNavigator({
@@ -41,15 +42,22 @@ const LoggerStack = createStackNavigator({
   SelectExercises: SelectExercisesScreen
 });
 
+const WorkoutStack = createStackNavigator({
+  AddWorkout: {
+    screen: AddWorkoutScreen,
+  },
+  SelectWorkout: SelectWorkoutScreen
+});
+
 const FeedStack = createStackNavigator({
   Feed: {
-    screen: FeedScreen,
+    screen: FeedScreen, 
     navigationOptions: {
       header: null,
     }
   },
   Search: SearchScreen,
-  otherUserProfile: ProfileScreen
+  Profile: ProfileScreen
 });
 
 const AppContainer = createAppContainer(createBottomTabNavigator(
@@ -61,7 +69,7 @@ const AppContainer = createAppContainer(createBottomTabNavigator(
       }
     },
     Workouts: {
-      screen: AddWorkoutScreen,
+      screen: WorkoutStack,
       navigationOptions: {
         tabBarIcon: <Icon name="book" type="material" size={35} />
       }

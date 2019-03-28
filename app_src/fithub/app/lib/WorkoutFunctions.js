@@ -43,7 +43,7 @@ export async function getPublicWorkouts(muscles) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(workout)
+        body: JSON.stringify(muscles)
     });
     let json = await response.json();
     return json;

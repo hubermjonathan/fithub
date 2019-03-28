@@ -31,6 +31,8 @@ let Profile = new Schema({
   workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutPlan"}],         //Workout plans the user has submitted to the master list
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],         //Private exercises
   logs: [{ type: Schema.Types.ObjectId, ref: "WorkoutData"}],         //Workout data
+  selected_stat1: { type: String, default: "Total Volume", required: true },                                  //default stat1
+  selected_stat2: { type: String, default: "Max Bench Press", required: true }                               //default stat2
 });
 
 //Schema for creating a new workout plan

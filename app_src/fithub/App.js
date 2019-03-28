@@ -2,6 +2,9 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { Asset, AppLoading } from 'expo';
 
+import { Provider } from 'react-redux';
+import ReduxStore from './app/config/ReduxStore';
+
 import AppContainer from './app/components/AppContainer';
 import { verifyAuthToken, logInToGoogle } from './app/lib/AccountFunctions';
 import SignInScreen from './app/screens/SignIn';
@@ -16,13 +19,10 @@ export default class App extends React.Component {
 }
    
   async _verifyUser() {
-    console.log("IN VERIFY USER");
     try {
       const status = await verifyAuthToken();
-      console.log("STATUS:", status);
       if (status === undefined) {
         //Consider throwing error, or prompt restart
-        console.log("WTF");
       }
 
       this.setState({
@@ -57,7 +57,6 @@ export default class App extends React.Component {
 
   render() {
     if (this.state.LoggedIn === undefined) {
-      console.log("UNDEFINED");
       return (
         <AppLoading
           startAsync={() => this._verifyUser()}
@@ -71,6 +70,10 @@ export default class App extends React.Component {
       );
     } 
     //this.state.LoggedIn === true) 
-    return <AppContainer />;
+    return (
+      <Provider store={ReduxStore}>
+        <AppContainer />
+      </Provider>
+    );
   }
 }

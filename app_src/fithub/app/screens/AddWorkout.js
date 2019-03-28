@@ -23,7 +23,12 @@ import WorkoutCard from '../components/WorkoutCard';
 
 export default class AddWorkoutScreen extends React.Component {
 
-
+    static navigationOptions = ({ navigation }) => {
+        return {
+          title: 'Create A Workout',
+          headerRight: <Icon name="add" type="material" size={35} onPress={() => {navigation.push('SelectWorkout')} } />
+        }
+    };
 
     state = {
         modalVisible: false,
@@ -113,14 +118,7 @@ export default class AddWorkoutScreen extends React.Component {
                                                     defaultValue='e.g "Hammer Curls"'
                                                     selectTextOnFocus={true}
                                                     onChangeText={(text) => this.setState({ exerciseName: text })} />
-                                                <Text style={styles.centerText}> # of Warmup Sets</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    clearButtonMode='while-editing'
-                                                    defaultValue='e.g "5"'
-                                                    selectTextOnFocus={true}
-                                                    keyboardType="number-pad"
-                                                    onChangeText={(text) => this.setState({ warmupSets: parseInt(text) })} />
+                                                
                                                 <Text style={styles.centerText}> # of Sets</Text>
                                                 <TextInput
                                                     style={styles.input}
@@ -175,8 +173,11 @@ export default class AddWorkoutScreen extends React.Component {
                                                     }
                                                     let exerciseObj = {
                                                         name: this.state.exerciseName,
-                                                        reps: this.state.reps,
-                                                        warmup: this.state.warmup
+                                                        exists:false,
+                                                        muscle_groups:[],
+                                                        equipment_type:"Placeholder",
+                                                        sets:[]
+                                                    
                                                     }
                                                     this.state.exercises.push(exerciseObj);
                                                     this.setState({ name: "" });
@@ -240,12 +241,13 @@ export default class AddWorkoutScreen extends React.Component {
                                             {
                                                 token: '',
                                                 uid: '',
+                                                id: '',
                                                 name: this.state.workoutName,
                                                 date: this.getCurrentDate(),
                                                 description: this.state.description,
                                                 exercises: this.state.exercises,
-                                                id: '',
-                                                likes: 0
+                                                public:false,
+                        
                                             }
                                         );
                                         Alert.alert(

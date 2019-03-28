@@ -272,7 +272,7 @@ let newLog = async function newLog(req, res) {
   let gitLog;
   if(req.body.date instanceof Date){
     const day = req.body.date.getDate();
-    const month = req.body.date.getMonth();
+    const month = req.body.date.getMonth()+1;
     const year = req.body.date.getFullYear();
     gitLog = `${year}-${month}-${day}`
   } else {
@@ -378,58 +378,40 @@ let newExercise = async function newExercise(req, res) {
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
-  //validate json synchronously
-  try{
-    for(let i = 0; i < req.body.sets.length; i++){
-      set = req.body.sets[i];
-      let validate = await schemaCtrl.Set.create(set);
-    };
-  }catch(validation_err){ res.status(500).send({ message: "Input error: validation failed for json set input" }); return console.log("validation error in creating sets"); };
+  let new_sets = [];
+  let validate_promises = [];
+  let save_promises = [];
 
-  //validation successful, create the sets and save
-  let set_ids= [];
-  req.body.sets.forEach(set =>
-  {
-    let new_set = new schemaCtrl.Set(set);
-    new_set.save();
-    set_ids.push(mongoose.Types.ObjectId(new_set._id)); //push saved set to array
-  });
+  for(let i = 0; i < req.body.sets.length; i++){
+    let set = new schemaCtrl.Set(req.body.sets[i]);
+    let promise = set.validate().catch(err => {res.status(500).send({"message": "newExercise: validation error creating sets"}); return console.log(err)});;
+    validate_promises.push(promise);
+    new_sets.push(set);
+  }
 
-  //validate exercise input
-  try{
-    let new_exercise = await schemaCtrl.Exercise.create
-    ({
-      name: req.body.name, //string
-      muscle_groups: req.body.muscle_groups, //array of strings
-      equipment_type: req.body.equipment_type, //string
-      sets: set_ids
-    });
-  }catch(validation_err){ res.status(500).send({ message: "Input error: validation failed for json exercise input" }); return console.log("validation error in creating exercise"); }
+  let ensure_valid = await Promise.all(validate_promises);
 
-  //validation successful, construct exercise
-  let new_exercise = new schemaCtrl.Exercise
+  for(let i = 0; i < new_sets.length; i++){
+    let set = new_sets[i];
+    let promise = set.save().catch(err => {res.status(500).send({"message": "newExercise: error attempting to save sets"}); return console.log(err);});
+    save_promises.push(promise);
+  }
+
+  let ensure_saved = await Promise.all(save_promises);
+
+  let new_exercise = await schemaCtrl.Exercise.create
   ({
     name: req.body.name, //string
     muscle_groups: req.body.muscle_groups, //array of strings
     equipment_type: req.body.equipment_type, //string
-    sets: set_ids
-  });
-
-  new_exercise.save(function (err, ret) {
-    if(err){
-      return res.status(500).send({ message: "Database error: unable to save new exercise data" });
-    }
-  });
+    sets: new_sets
+  })
+  .catch(err => {res.status(500).send({"message": "newExercise: error creating exercise object"}); return console.log(err);});
 
   //push to user profile
-  user.updateOne({$push: { exercises: new_exercise._id }}, {},(err, raw) => {
-    if (err) {
-      return res.status(500).send({ "message": " Error: Exercise addition unsuccessful" });
-    }
-    else {
-      return res.status(200).send({ "message": " Exercise added successfully " });
-    }
-  }); //end updateOne
+  user.updateOne({$push: { exercises: new_exercise._id }})
+  .catch(err => {res.status(500).send({"message": "newExercise: error pushing id to profile"}); return console.log(err);});
+  res.status(200).send({"message": "newExercise: Success!"});
 } //end new exercise
 
 
@@ -564,7 +546,14 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   console.log(user);
 
   let workoutId = req.body.workout;
-  let flag = req.body.isPublic;
+  let flag;
+
+  if(req.body.isPublic){
+    flag = true;
+  }
+  else{
+    flag = false;
+  }
 
   if(user.workouts.length == 0){
     return res.status(500).send({ "message": "You have no workouts!" } );
@@ -579,7 +568,7 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   }
 
   let isPublic;
-  if(flag == "true"){
+  if(flag){
     isPublic = "public";
   }
   else{
@@ -595,7 +584,7 @@ let editUsername = async function editUsername(req, res){
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
   let new_name = req.body.name;
-  if(new_name.length > 32 || !(new_name.match(/^[a-z0-9]+$/i))){
+  if(new_name.length > 32 || !(new_name.match(/^[a-z0-9 ]+$/i))){
     return res.status(500).send({ "message": "Invalid name: name must be 32 alphanumeric characters or less"});
   }
   else{
@@ -776,7 +765,6 @@ let editWorkout = async function editWorkout(req, res){ //deletes old exercise d
     }
     else {
       res.status(200).send({ "message": "Workout edited successfully" });
-      console.log(newWorkout);
     }
   }); //end save
 }
@@ -910,6 +898,12 @@ let gain = async function gain(req, res){
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workout).catch(err => {console.log("error querying post");});
+  if(!workout.public){
+    return res.status(500).send({ "message": "This is a private workout" });
+  }
+  if(workout.ownerUID == user._id){
+    return res.status(500).send({ "message": "You cannot gain your own post!" });
+  }
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
     if(curr_usr == req.body.id){
@@ -920,6 +914,16 @@ let gain = async function gain(req, res){
   workout.liked_users.push(user._id);
   workout.save();
   return res.status(200).send({ "message": "Successfully gained!" });
+}
+
+let editStats = async function editStats(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+  user.selected_stat1 = req.body.stat1;
+  user.selected_stat2 = req.body.stat2;
+  user.save().catch(err => {console.log("editStats: error saving profile");});
+  return res.status(200).send({ "message": "Successfully edited selected stats" });
 }
 
 
@@ -1075,6 +1079,37 @@ let profile = function profile(req, res) {
   });
 }
 
+let selected_stats = function selected_stats(req, res) {
+  if(!isConnected(req, res))
+  {
+    return;
+  }
+
+  let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
+  {
+    if(err){
+      res.status(404).send({ "message": "Database Error: error querying profile" });
+      return
+    }
+    else if(!user){
+      res.status(500).send({ "message": "Database Error: user not found" });
+      return
+    }
+  }) //end findById
+  .select("selected_stat1 selected_stat2")
+  .exec((err, data) =>
+  {
+    if(err)
+    {
+      res.status(500).send({ "message": "Database Error: profile query failed" });
+      return;
+    }
+    else{
+      res.status(200).send(data);
+    }
+  });
+}
+
 //Return all standard exercises
 let exercises = function exercises(req, res) {
   if (db.readyState == 0) {
@@ -1175,14 +1210,18 @@ let social = function social(req, res){
     });
     return;
   }
-  let query = schemaCtrl.WorkoutPlan.findById(req.params.id).select("gains");
+  let query = schemaCtrl.WorkoutPlan.findById(req.params.id);
   let promise = query.exec();
   promise.then(data => {
     if(!data){
       res.status(500).send({ "message": "Database Error: workout not found" });
       return
     }
-    res.status(200).send(data);
+    if(!data.public){
+      res.status(500).send({ "message": "Error: This workout is private" });
+      return
+    }
+    res.status(200).send({gains: data.gains});
   });
 }
 
@@ -1236,6 +1275,8 @@ let apiCtrl = {
   editWorkout: editWorkout,
   social: social,
   gain: gain,
+  selected_stats: selected_stats,
+  editStats:editStats,
 
   delExercise: delExercise,
   delWorkout: delWorkout,
