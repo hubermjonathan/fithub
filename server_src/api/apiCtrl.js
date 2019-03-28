@@ -934,6 +934,16 @@ let gain = async function gain(req, res){
   return res.status(200).send({ "message": "Successfully gained!" });
 }
 
+let editStats = async function editStats(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+  user.selected_stat1 = req.body.stat1;
+  user.selected_stat2 = req.body.stat2;
+  user.save().catch(err => {console.log("editStats: error saving profile");});
+  return res.status(200).send({ "message": "Successfully edited selected stats" });
+}
+
 
 /*--------Functions for returning user information--------*/
 
@@ -1284,6 +1294,7 @@ let apiCtrl = {
   social: social,
   gain: gain,
   selected_stats: selected_stats,
+  editStats:editStats,
 
   delExercise: delExercise,
   delWorkout: delWorkout,
