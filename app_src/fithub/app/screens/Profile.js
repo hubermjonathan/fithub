@@ -15,13 +15,21 @@ import { Icon, Button } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 import { getProfileStats, getProfileActivity, getSelectedStats } from '../lib/ProfileFunctions';
 import { getUserID } from '../lib/AccountFunctions';
-import { ContributionGraph } from 'react-native-chart-kit';
+import { ContributionGraph, LineChart } from 'react-native-chart-kit';
 
 const chartConfig = {
   backgroundGradientFrom: '#ffffff',
   backgroundGradientTo: '#ffffff',
   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-  strokeWidth: 2 // optional, default 3
+  strokeWidth: 3 // optional, default 3
+}
+const garbageWeightData = {
+  labels: ['03-04', '03-05', '03-10', '04-04', '04-09', '04-21'],
+  datasets: [{
+    data: [140, 140, 142, 147, 146, 144],
+    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+    strokeWidth: 2 // optional
+  }]
 }
 const screenWidth = Dimensions.get('window').width
 
@@ -30,7 +38,7 @@ export default class ProfileScreen extends React.Component {
     if (navigation.getParam('id', '') === '') {
       return {
         title: 'Profile',
-        headerRight: <Icon name="settings" type="material" containerStyle={{paddingRight: 10}} size={30} onPress={() => { navigation.push('Settings') }} />
+        headerRight: <Icon name="settings" type="material" containerStyle={{ paddingRight: 10 }} size={30} onPress={() => { navigation.push('Settings') }} />
       }
     } else {
       return {
@@ -94,28 +102,28 @@ export default class ProfileScreen extends React.Component {
       data: 0
     }
 
-    if(stat1.name.includes("Total")) {
+    if (stat1.name.includes("Total")) {
       let totalVolume = 0;
       for (let key in stats.volumes) {
         totalVolume += stats.volumes[key];
       }
       stat1.data = totalVolume;
-    } else if(stat1.name.includes("Max")) {
+    } else if (stat1.name.includes("Max")) {
       stat1.data = stats.maxes[stat1.name.slice(4)];
-    } else if(stat1.name.includes("Volume")) {
-      stat1.data = stats.volumes[stat1.name.slice(0, stat1.name.search("Volume")-1)];
+    } else if (stat1.name.includes("Volume")) {
+      stat1.data = stats.volumes[stat1.name.slice(0, stat1.name.search("Volume") - 1)];
     }
 
-    if(stat2.name.includes("Total")) {
+    if (stat2.name.includes("Total")) {
       let totalVolume = 0;
       for (let key in stats.volumes) {
         totalVolume += stats.volumes[key];
       }
       stat2.data = totalVolume;
-    } else if(stat2.name.includes("Max")) {
+    } else if (stat2.name.includes("Max")) {
       stat2.data = stats.maxes[stat2.name.slice(4)];
-    } else if(stat2.name.includes("Volume")) {
-      stat2.data = stats.volumes[stat2.name.slice(0, stat2.name.search("Volume")-1)];
+    } else if (stat2.name.includes("Volume")) {
+      stat2.data = stats.volumes[stat2.name.slice(0, stat2.name.search("Volume") - 1)];
     }
 
     this.setState({
@@ -227,7 +235,7 @@ export default class ProfileScreen extends React.Component {
             </View>
 
             <View style={styles.picContainer}>
-                { this.state.photo !== '' && <Image style={styles.profPic} source={{ uri: this.state.photo }}/> }
+              {this.state.photo !== '' && <Image style={styles.profPic} source={{ uri: this.state.photo }} />}
             </View>
           </View>
 
@@ -236,14 +244,14 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.subContainer}>
                 <ScrollView>
                   <View style={styles.subScroller}>
-                    <Activity id={this.state.id}/>
+                    <Activity id={this.state.id} />
                   </View>
                 </ScrollView>
               </View>
               <View style={styles.subContainer}>
                 <ScrollView>
                   <ContributionGraph
-                    style={{ borderBottomWidth: 1,color:'red' }}
+                    style={{ borderBottomWidth: 1, color: 'red' }}
                     values={this.state.dates}
                     endDate={new Date('2019-06-01')}
                     numDays={104}
@@ -254,6 +262,19 @@ export default class ProfileScreen extends React.Component {
                 </ScrollView>
               </View>
               <View style={styles.subContainer}>
+                <ScrollView>
+                  <View style={{ paddingTop: '3%' }}>
+                    <Text style={styles.paginationText}>Bodyweight History</Text>
+                    <LineChart
+                      style={{ paddingTop: '1%' }}
+                      data={garbageWeightData}
+                      width={screenWidth}
+                      height={220}
+                      chartConfig={chartConfig}
+                      
+                    />
+                  </View>
+                </ScrollView>
               </View>
             </Swiper>
           </View>
