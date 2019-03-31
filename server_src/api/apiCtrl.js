@@ -1221,13 +1221,34 @@ let dates = function dates(req, res){
 
 let follow = async function follow(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = schemaCtrl.Profile.findById(req.body.id).select(following);
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
+    res.status(400).send();
+    console.log("invalid id");
+    return;
+  });
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+  let follow = await schemaCtrl.Profile.findById(req.body.followid).catch(err => {
+    res.status(400).send();
+    console.log("invalid id");
+    return;
+  });
+  await user.updateOne({$push: { following: follow.id }});
+  res.status(200).send({message: "Success"});
 }
 
 let followingWorkouts = async function followingWorkouts(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = schemaCtrl.Profile.findById(req.body.id).select(following);
-
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  let workouts = await schemaCtrl.WorkoutPlan.find({ownerid: {$in : user.following}}).select('-__v').populate({
+    path: "exercises",
+    select: "-__v",
+    populate:
+    {
+      path: "sets",
+      model: "Set",
+      select: "-__v",
+    }
+  }).sort({"date":-1});
 }
 
 let stats = function stats(req, res){
