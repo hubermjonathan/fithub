@@ -1,78 +1,62 @@
 import React, { Component } from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity,
-    ScrollView,
-    Alert,
-    FlatList,
-} from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert, FlatList, TextInput } from 'react-native';
+import Swipeout from 'react-native-swipeout';
+
 import SelectExercisesScreen from './SelectExercises';
-import { Button } from 'react-native-elements';
 
 export default class CreateWorkoutScreen extends React.Component {
 
-    //PROPS SHOULD CONTAIN RELEVANT DATA IN ORDER TO ACCESS WORKOUT IN DATABASE.
-    //EXERCISES CREATED HERE WILL BE SENT TO SERVER IN REAL TIME
     constructor(props) {
         super(props);
+        this.state = {
+            name: undefined,
+            exercises: [],
+        }
     }
-    /*state = {
-        workoutName,
-    };*/
-
-    componentWillMount() {
-        this.setState({
-        });
-    }
-
-    static navigationOptions = {
-        //title: 'Create A Custom Workout'
-    }
-
+    
     render() {
         return (
             <View style={styles.page}>
-                <ScrollView>
-                    <View style={styles.content}>
-                        <View style={styles.header}>
-                            <Text style={styles.headingText}>
-                                Create A Custom Workout
-                            </Text>
-                        </View>
-                        <View style={styles.dialog}>
-                            <Text style={styles.subheadingText}>
-                                Workout Name
-                            </Text>
-                            <TextInput
-                                style={styles.textInput}
-                                clearButtonMode='while-editing'
-                                defaultValue='e.g "The Dorito"'
-                                selectTextOnFocus={true}
-                                onChangeText={(text) => this.setState({ exerciseName: text })}
+                <View style={styles.content}>
+                    <View style={styles.workout}> 
+                        <Text style={styles.text}>Name of Workout</Text>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(name) => { this.setState({ name: name })} }
+                        />
+                    </View>
+                    <View style={styles.exercises}>
+                        <Text style={styles.text}>Exercises</Text>
+                        <View style={styles.list}>
+                            <FlatList
+                                data={this.state.exercises}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={(item) => 
+                                    <Swipeout>
+                                        <ExerciseCard
+                                            name={item.name}
+                                            muscle_group={item.muscle_group}
+                                            equipment_type={item.equipment_type}
+                                        />
+                                    </Swipeout>
+                                }
                             />
-                        </View>
-                        <View style={styles.dialog}>
-                            <Text style={styles.subheadingText}>
-                                Add Exercises
-                            </Text>                            
-                            
-                        </View>
-                        <View style={styles.SelectExercises}>
-                            <SelectExercisesScreen />
                         </View>
                         <View style={styles.button}>
-                            <Button
-                                title= 'Create'
-                                onPress={this._onSubmitWorkout}
-                            />
+                            <TouchableOpacity 
+                                onPress={() => { this.onAddExercise() }}
+                            > 
+                                <Text style={styles.buttonText}>Add Exercise</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
-                </ScrollView>
+                </View>
             </View>
         );
+    }
+
+    _onAddExercise() {
+        console.log("Pressed!");
     }
 
     _onSubmitWorkout() {
@@ -107,52 +91,50 @@ export default class CreateWorkoutScreen extends React.Component {
 const styles = StyleSheet.create({
     page: {
         flex: 1,
+        backgroundColor: '#f4f4f4', 
     },
     content: {
-        //flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 50
-        //paddingBottom: 15
+        alignItems: 'stretch',
+        paddingLeft: 5,
+        paddingRight: 5,
+        marginTop: 17,
     },
-    header: {
+    workout: {
+    }, 
+    exercises: {
     },
-    headingText: {
-        textAlign: 'center',
-        fontFamily: 'System',
-        fontSize: 30,
-        color: 'grey'
-    },
-    dialog: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: 25
-    },
-    subheadingText: {
-        textAlign: 'center',
-        fontFamily: 'System',
-        fontSize: 24,
-        color: 'grey'
-    },
-    textInput: {
-        borderColor: 'grey',
-        borderWidth: 4,
-        borderRadius: 50,
-        width: 300,
-        textAlign: 'center',
-        fontFamily: 'System',
-        fontSize: 18,
-        padding: 5,
-        color: 'grey'
-    },
-    SelectExercises: {
-        flex: .4,
-        alignItems: 'center',
+    list: {
         padding: 10,
+        borderWidth: 1,
+        borderRadius: 5,
+        marginBottom: 20,
+    },
+    text: {
+        textAlign: 'center',
+        fontSize: 30,
+    },
+    input: {
+        fontSize: 24,
+        padding: 10,
+        borderWidth: 1,
+        borderRadius: 5,
+        marginBottom: 20,
     },
     button: {
+        flex: 0,
+        marginTop: 10,
+        paddingBottom: 5,
+        justifyContent: 'center',
+        flexDirection: 'row',
         alignItems: 'center',
-        padding: 15,
-        fontFamily: 'System'
+        backgroundColor: '#dedad6',
+        borderTopWidth: 0.5,
+        borderBottomWidth: 0.5,
+        borderTopColor: '#333',
     },
+    buttonText: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        color: '#00adf5'
+    }
 });

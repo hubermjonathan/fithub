@@ -73,6 +73,12 @@ export default class ProfileScreen extends React.Component {
       stat2: {
         name: "Stat 2",
         data: 0,
+      },
+      weightStats: {
+        data: garbageWeightData.datasets[0].data,
+        min: 0,
+        max: 0,
+        average: 0
       }
     }
 
@@ -86,6 +92,32 @@ export default class ProfileScreen extends React.Component {
       this.loadWorkoutActivity();
       this.loadWorkoutDates();
     }
+  }
+
+  calcWeightStats() {
+    let min = this.state.weightStats.data[0];
+    let max = this.state.weightStats.data[0];
+    let average = this.state.weightStats.data[0];
+
+
+    for (let x = 1; x < this.state.weightStats.data.length; x++) {
+      if (this.state.weightStats.data[x] < min) {
+        min = this.state.weightStats.data[x];
+      }
+      if (this.state.weightStats.data[x] > max) {
+        max = this.state.weightStats.data[x];
+      }
+      average += this.state.weightStats.data[x];
+    }
+    average = average / this.state.weightStats.data.length;
+
+    console.log("length", this.state.weightStats.data.length)
+
+    let newobj = { data: this.state.weightStats.data, min: min, max: max, average: average.toFixed(1) };
+
+    this.setState({ weightStats: newobj }, function () {
+      console.log(this.state.weightStats);
+    });
   }
 
   async loadUserStats() {
@@ -197,6 +229,7 @@ export default class ProfileScreen extends React.Component {
       });
       this.loader();
     });
+    this.calcWeightStats();
   }
 
   renderPagination(index, total, context) {
@@ -271,8 +304,18 @@ export default class ProfileScreen extends React.Component {
                       width={screenWidth}
                       height={220}
                       chartConfig={chartConfig}
-                      
                     />
+                    <View style={styles.graphStats}>
+                      <Text style={{ paddingLeft: '1%', fontSize: 18, color:'white' }}>
+                        Min: {this.state.weightStats.min} lbs
+                      </Text>
+                      <Text style={{ fontSize: 18,color:'white' }}>
+                        Max: {this.state.weightStats.max} lbs
+                      </Text>
+                      <Text style={{ paddingRight: '1%', fontSize: 18,color:'white' }}>
+                        Average: {this.state.weightStats.average} lbs
+                      </Text>
+                    </View>
                   </View>
                 </ScrollView>
               </View>
@@ -525,4 +568,13 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 17,
   },
+  graphStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor:'white',
+    width: '100%',
+    backgroundColor: '#00adf5',
+    borderRadius: 5,
+  },
+  
 });
