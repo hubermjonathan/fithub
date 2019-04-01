@@ -221,6 +221,19 @@ export default class ProfileScreen extends React.Component {
       });
   }
 
+  async loadWeightData() {
+    fetch('route-for-weightdata')
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        //get the data and set state here
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
+
   componentDidMount() {
     getUserID().then(id => {
       this.setState({
@@ -297,22 +310,23 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.subContainer}>
                 <ScrollView>
                   <View style={{ paddingTop: '3%' }}>
-                    <Text style={styles.paginationText}>Bodyweight History</Text>
+                    <View style = {styles.graphTitle}>
+                      <Text style={styles.graphText}>Bodyweight History</Text>
+                    </View>
                     <LineChart
-                      style={{ paddingTop: '1%' }}
                       data={garbageWeightData}
                       width={screenWidth}
                       height={220}
                       chartConfig={chartConfig}
                     />
                     <View style={styles.graphStats}>
-                      <Text style={{ paddingLeft: '1%', fontSize: 18, color:'white' }}>
+                      <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
                         Min: {this.state.weightStats.min} lbs
                       </Text>
-                      <Text style={{ fontSize: 18,color:'white' }}>
+                      <Text style={{ fontSize: 18, color: 'white' }}>
                         Max: {this.state.weightStats.max} lbs
                       </Text>
-                      <Text style={{ paddingRight: '1%', fontSize: 18,color:'white' }}>
+                      <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
                         Average: {this.state.weightStats.average} lbs
                       </Text>
                     </View>
@@ -571,10 +585,21 @@ const styles = StyleSheet.create({
   graphStats: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor:'white',
+    backgroundColor: 'white',
     width: '100%',
     backgroundColor: '#00adf5',
     borderRadius: 5,
   },
-  
+  graphTitle: {
+    backgroundColor: 'white',
+  },
+  graphText:{
+    fontSize: 22,
+    color: '#333',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textDecorationLine: 'underline'
+  }
+
+
 });
