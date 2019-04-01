@@ -15,13 +15,21 @@ import { Icon, Button } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 import { getProfileStats, getProfileActivity, getSelectedStats } from '../lib/ProfileFunctions';
 import { getUserID } from '../lib/AccountFunctions';
-import { ContributionGraph } from 'react-native-chart-kit';
+import { ContributionGraph, LineChart } from 'react-native-chart-kit';
 
 const chartConfig = {
   backgroundGradientFrom: '#ffffff',
   backgroundGradientTo: '#ffffff',
   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-  strokeWidth: 2 // optional, default 3
+  strokeWidth: 3 // optional, default 3
+}
+const garbageWeightData = {
+  labels: ['03-04', '03-05', '03-10', '04-04', '04-09', '04-21'],
+  datasets: [{
+    data: [140, 140, 142, 147, 146, 144],
+    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+    strokeWidth: 2 // optional
+  }]
 }
 const screenWidth = Dimensions.get('window').width
 
@@ -30,7 +38,7 @@ export default class ProfileScreen extends React.Component {
     if (navigation.getParam('id', '') === '') {
       return {
         title: 'Profile',
-        headerRight: <Icon name="settings" type="material" containerStyle={{paddingRight: 10}} size={30} onPress={() => { navigation.push('Settings') }} />
+        headerRight: <Icon name="settings" type="material" containerStyle={{ paddingRight: 10 }} size={30} onPress={() => { navigation.push('Settings') }} />
       }
     } else {
       return {
@@ -65,6 +73,12 @@ export default class ProfileScreen extends React.Component {
       stat2: {
         name: "Stat 2",
         data: 0,
+      },
+      weightStats: {
+        data: garbageWeightData.datasets[0].data,
+        min: 0,
+        max: 0,
+        average: 0
       }
     }
 
@@ -78,6 +92,32 @@ export default class ProfileScreen extends React.Component {
       this.loadWorkoutActivity();
       this.loadWorkoutDates();
     }
+  }
+
+  calcWeightStats() {
+    let min = this.state.weightStats.data[0];
+    let max = this.state.weightStats.data[0];
+    let average = this.state.weightStats.data[0];
+
+
+    for (let x = 1; x < this.state.weightStats.data.length; x++) {
+      if (this.state.weightStats.data[x] < min) {
+        min = this.state.weightStats.data[x];
+      }
+      if (this.state.weightStats.data[x] > max) {
+        max = this.state.weightStats.data[x];
+      }
+      average += this.state.weightStats.data[x];
+    }
+    average = average / this.state.weightStats.data.length;
+
+    console.log("length", this.state.weightStats.data.length)
+
+    let newobj = { data: this.state.weightStats.data, min: min, max: max, average: average.toFixed(1) };
+
+    this.setState({ weightStats: newobj }, function () {
+      console.log(this.state.weightStats);
+    });
   }
 
   async loadUserStats() {
@@ -94,28 +134,28 @@ export default class ProfileScreen extends React.Component {
       data: 0
     }
 
-    if(stat1.name.includes("Total")) {
+    if (stat1.name.includes("Total")) {
       let totalVolume = 0;
       for (let key in stats.volumes) {
         totalVolume += stats.volumes[key];
       }
       stat1.data = totalVolume;
-    } else if(stat1.name.includes("Max")) {
+    } else if (stat1.name.includes("Max")) {
       stat1.data = stats.maxes[stat1.name.slice(4)];
-    } else if(stat1.name.includes("Volume")) {
-      stat1.data = stats.volumes[stat1.name.slice(0, stat1.name.search("Volume")-1)];
+    } else if (stat1.name.includes("Volume")) {
+      stat1.data = stats.volumes[stat1.name.slice(0, stat1.name.search("Volume") - 1)];
     }
 
-    if(stat2.name.includes("Total")) {
+    if (stat2.name.includes("Total")) {
       let totalVolume = 0;
       for (let key in stats.volumes) {
         totalVolume += stats.volumes[key];
       }
       stat2.data = totalVolume;
-    } else if(stat2.name.includes("Max")) {
+    } else if (stat2.name.includes("Max")) {
       stat2.data = stats.maxes[stat2.name.slice(4)];
-    } else if(stat2.name.includes("Volume")) {
-      stat2.data = stats.volumes[stat2.name.slice(0, stat2.name.search("Volume")-1)];
+    } else if (stat2.name.includes("Volume")) {
+      stat2.data = stats.volumes[stat2.name.slice(0, stat2.name.search("Volume") - 1)];
     }
 
     this.setState({
@@ -189,6 +229,7 @@ export default class ProfileScreen extends React.Component {
       });
       this.loader();
     });
+    this.calcWeightStats();
   }
 
   renderPagination(index, total, context) {
@@ -227,7 +268,7 @@ export default class ProfileScreen extends React.Component {
             </View>
 
             <View style={styles.picContainer}>
-                { this.state.photo !== '' && <Image style={styles.profPic} source={{ uri: this.state.photo }}/> }
+              {this.state.photo !== '' && <Image style={styles.profPic} source={{ uri: this.state.photo }} />}
             </View>
           </View>
 
@@ -236,14 +277,14 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.subContainer}>
                 <ScrollView>
                   <View style={styles.subScroller}>
-                    <Activity id={this.state.id}/>
+                    <Activity id={this.state.id} />
                   </View>
                 </ScrollView>
               </View>
               <View style={styles.subContainer}>
                 <ScrollView>
                   <ContributionGraph
-                    style={{ borderBottomWidth: 1,color:'red' }}
+                    style={{ borderBottomWidth: 1, color: 'red' }}
                     values={this.state.dates}
                     endDate={new Date('2019-06-01')}
                     numDays={104}
@@ -254,6 +295,29 @@ export default class ProfileScreen extends React.Component {
                 </ScrollView>
               </View>
               <View style={styles.subContainer}>
+                <ScrollView>
+                  <View style={{ paddingTop: '3%' }}>
+                    <Text style={styles.paginationText}>Bodyweight History</Text>
+                    <LineChart
+                      style={{ paddingTop: '1%' }}
+                      data={garbageWeightData}
+                      width={screenWidth}
+                      height={220}
+                      chartConfig={chartConfig}
+                    />
+                    <View style={styles.graphStats}>
+                      <Text style={{ paddingLeft: '1%', fontSize: 18, color:'white' }}>
+                        Min: {this.state.weightStats.min} lbs
+                      </Text>
+                      <Text style={{ fontSize: 18,color:'white' }}>
+                        Max: {this.state.weightStats.max} lbs
+                      </Text>
+                      <Text style={{ paddingRight: '1%', fontSize: 18,color:'white' }}>
+                        Average: {this.state.weightStats.average} lbs
+                      </Text>
+                    </View>
+                  </View>
+                </ScrollView>
               </View>
             </Swiper>
           </View>
@@ -504,4 +568,13 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 17,
   },
+  graphStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor:'white',
+    width: '100%',
+    backgroundColor: '#00adf5',
+    borderRadius: 5,
+  },
+  
 });
