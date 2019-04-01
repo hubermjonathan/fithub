@@ -1,6 +1,6 @@
 import React from 'React';
 import { Icon } from 'react-native-elements';
-import { createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator, createAppContainer, createMaterialTopTabNavigator } from 'react-navigation';
 
 import AddWorkoutScreen from '../screens/AddWorkout';
 import LoggerScreen from '../screens/Logger';
@@ -15,6 +15,8 @@ import SettingsScreen from '../screens/Settings';
 import WorkoutLogEditScreen from '../screens/WorkoutLogEdit'
 import SearchScreen from '../screens/Search';
 import SelectWorkoutScreen from '../screens/SelectWorkout';
+import DefaultWorkoutsScreen from '../screens/DefaultWorkouts';
+import CustomWorkoutsScreen from '../screens/CustomWorkouts';
 
 
 const HomeStack = createStackNavigator({
@@ -42,12 +44,49 @@ const LoggerStack = createStackNavigator({
   SelectExercises: SelectExercisesScreen
 });
 
-const WorkoutStack = createStackNavigator({
-  AddWorkout: {
-    screen: AddWorkoutScreen,
+const WorkoutTabs = createMaterialTopTabNavigator(
+  {
+    CustomWorkouts: {
+      screen: CustomWorkoutsScreen,
+      navigationOptions: {
+        title: 'Custom',
+      }
+    },
+    DefaultWorkouts: {
+      screen: DefaultWorkoutsScreen,
+      navigationOptions: {
+        title: 'Default',
+      }
+    }
   },
-  SelectWorkout: SelectWorkoutScreen
-});
+  {
+    tabBarOptions: {
+      style: {
+        backgroundColor: '#00adf5',
+      },
+
+    },
+  }
+)
+
+const WorkoutStack = createStackNavigator(
+{
+  AddWorkout: {
+    screen: WorkoutTabs,
+  },
+  CreateWorkout: {
+    screen: CreateWorkoutScreen,
+  },
+},
+{
+  defaultNavigationOptions: ({navigation}) => { 
+    return {
+    title: 'Workouts',
+    headerRight: <Icon name="add" type="material" size={35} onPress={() => { navigation.push('CreateWorkout')} } />
+    }
+  }
+},
+);
 
 const FeedStack = createStackNavigator({
   Feed: {
