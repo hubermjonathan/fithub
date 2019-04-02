@@ -23,10 +23,20 @@ const chartConfig = {
   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
   strokeWidth: 3 // optional, default 3
 }
+//delete this later
 const garbageWeightData = {
   labels: ['03-04', '03-05', '03-10', '04-04', '04-09', '04-21'],
   datasets: [{
     data: [140, 140, 142, 147, 146, 144],
+    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+    strokeWidth: 2 // optional
+  }]
+}
+//delete this later
+const garbageVolumeData = {
+  labels: ['03-04', '03-05', '03-10', '04-04', '04-09', '04-21'],
+  datasets: [{
+    data: [820, 1320, 990, 1204, 1193, 1002],
     color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
     strokeWidth: 2 // optional
   }]
@@ -79,6 +89,12 @@ export default class ProfileScreen extends React.Component {
         min: 0,
         max: 0,
         average: 0
+      },
+      volumeStats:{
+        data:garbageVolumeData.datasets[0].data,
+        min:0,
+        max:0,
+        average:0
       }
     }
 
@@ -91,33 +107,33 @@ export default class ProfileScreen extends React.Component {
       this.loadUserStats();
       this.loadWorkoutActivity();
       this.loadWorkoutDates();
+      this.setState({weightStats:this.calcWeightStats(this.state.weightStats)});
+      this.setState({volumeStats:this.calcWeightStats(this.state.volumeStats)});
     }
   }
 
-  calcWeightStats() {
-    let min = this.state.weightStats.data[0];
-    let max = this.state.weightStats.data[0];
-    let average = this.state.weightStats.data[0];
+  calcWeightStats(obj) {
+    let min = obj.data[0];
+    let max = obj.data[0];
+    let average = obj.data[0];
 
 
-    for (let x = 1; x < this.state.weightStats.data.length; x++) {
-      if (this.state.weightStats.data[x] < min) {
-        min = this.state.weightStats.data[x];
+    for (let x = 1; x < obj.data.length; x++) {
+      if (obj.data[x] < min) {
+        min = obj.data[x];
       }
-      if (this.state.weightStats.data[x] > max) {
-        max = this.state.weightStats.data[x];
+      if (obj.data[x] > max) {
+        max = obj.data[x];
       }
-      average += this.state.weightStats.data[x];
+      average += obj.data[x];
     }
-    average = average / this.state.weightStats.data.length;
+    average = average / obj.data.length;
 
-    console.log("length", this.state.weightStats.data.length)
+    console.log("length", obj.data.length)
 
-    let newobj = { data: this.state.weightStats.data, min: min, max: max, average: average.toFixed(1) };
+    let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
 
-    this.setState({ weightStats: newobj }, function () {
-      console.log(this.state.weightStats);
-    });
+    return newobj;
   }
 
   async loadUserStats() {
@@ -242,7 +258,6 @@ export default class ProfileScreen extends React.Component {
       });
       this.loader();
     });
-    this.calcWeightStats();
   }
 
   renderPagination(index, total, context) {
@@ -331,6 +346,30 @@ export default class ProfileScreen extends React.Component {
                       </Text>
                     </View>
                   </View>
+
+                  <View style={{ paddingTop: '3%' }}>
+                    <View style = {styles.graphTitle}>
+                      <Text style={styles.graphText}>Volume History</Text>
+                    </View>
+                    <LineChart
+                      data={garbageVolumeData}
+                      width={screenWidth}
+                      height={220}
+                      chartConfig={chartConfig}
+                    />
+                    <View style={styles.graphStats}>
+                      <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
+                        Min: {this.state.volumeStats.min} lbs
+                      </Text>
+                      <Text style={{ fontSize: 18, color: 'white' }}>
+                        Max: {this.state.volumeStats.max} lbs
+                      </Text>
+                      <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
+                        Average: {this.state.volumeStats.average} lbs
+                      </Text>
+                    </View>
+                  </View>
+
                 </ScrollView>
               </View>
             </Swiper>
