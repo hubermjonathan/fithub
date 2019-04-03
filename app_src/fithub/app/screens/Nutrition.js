@@ -9,14 +9,7 @@ import {
     AlertIOS,
 } from 'react-native';
 
-export default class NutritionScreen extends React.Component {
-    static navigationOptions = ({ navigation }) => {
-        return {
-          title: 'Nutrition',
-          headerTintColor: '#00adf5',
-        };
-    };
-
+export class CalorieScreen extends React.Component {
     constructor(props) {
         super(props);
 
@@ -27,7 +20,7 @@ export default class NutritionScreen extends React.Component {
 
     enterCalories() {
         AlertIOS.prompt(
-            'Add Calories',
+            'Log Calories',
             'How many calories do you want to log?',
             [
                 {
@@ -59,7 +52,7 @@ export default class NutritionScreen extends React.Component {
             <SafeAreaView style={styles.containerIOS}>
                 <View style={styles.loggingContainer}>
                     <View style={styles.numberContainer}>
-                        <Text style={styles.trackingNumber}>{this.state.calories}</Text>                    
+                        <Text style={styles.trackingNumber}>{this.state.calories}</Text>
                         <Text style={styles.trackingText}>calories today</Text>
                     </View>
                     <View style={styles.buttonContainer}>
@@ -68,6 +61,71 @@ export default class NutritionScreen extends React.Component {
                             onPress={this.enterCalories.bind(this)}
                         >
                             <Text style={styles.buttonText}>Log Calories</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={styles.graphsContainer}>
+                    <View style={styles.graphCard}>
+                        <Text style={styles.graphLabel}>This Week</Text>
+                    </View>
+                </View>
+            </SafeAreaView>
+        );
+    }
+}
+
+export class WeightScreen extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            weight: 180,
+        };
+    }
+
+    enterWeight() {
+        AlertIOS.prompt(
+            'Log Weight',
+            'What is your new weight?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+                {
+                    text: 'Update',
+                    onPress: (weight) => {
+                        this.logWeight(weight);
+                    }
+                },
+            ],
+            'plain-text',
+            '',
+            'numeric'
+        );
+    }
+
+    logWeight(weight) {
+        this.setState({
+            weight: Math.round(+weight),
+        });
+    }
+
+    render() {
+        return(
+            <SafeAreaView style={styles.containerIOS}>
+                <View style={styles.loggingContainer}>
+                    <View style={styles.numberContainer}>
+                        <Text style={styles.trackingNumber}>{this.state.weight}</Text>
+                        <Text style={styles.trackingText}>lbs</Text>
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.trackingButton}
+                            onPress={this.enterWeight.bind(this)}
+                        >
+                            <Text style={styles.buttonText}>Log Weight</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

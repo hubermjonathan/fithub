@@ -17,7 +17,7 @@ import SearchScreen from '../screens/Search';
 import SelectWorkoutScreen from '../screens/SelectWorkout';
 import DefaultWorkoutsScreen from '../screens/DefaultWorkouts';
 import CustomWorkoutsScreen from '../screens/CustomWorkouts';
-import NutritionScreen from '../screens/Nutrition'
+import { CalorieScreen, WeightScreen } from '../screens/Nutrition';
 
 
 const HomeStack = createStackNavigator({
@@ -45,8 +45,37 @@ const LoggerStack = createStackNavigator({
   SelectExercises: SelectExercisesScreen
 });
 
+const NutritionTabs = createMaterialTopTabNavigator(
+  {
+    Calories: {
+      screen: CalorieScreen,
+    },
+    Weight: {
+      screen: WeightScreen,
+    },
+  },
+  {
+    swipeEnabled: true,
+    tabBarOptions: {
+      upperCaseLabel: false,
+      tabStyle: {
+        backgroundColor: '#00adf5'
+      },
+      indicatorStyle: {
+        display: 'none',
+      }
+    }
+  }
+);
+
 const NutritionStack = createStackNavigator({
-  Nutrition: NutritionScreen,
+  Nutrition: {
+    screen: NutritionTabs,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Nutrition',
+      headerTintColor: '#00adf5',
+    }),
+  }
 });
 
 const WorkoutTabs = createMaterialTopTabNavigator(
