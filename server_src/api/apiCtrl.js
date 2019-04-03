@@ -1358,6 +1358,18 @@ let stats = function stats(req, res){
   */
 }
 
+let getCalories = async function getCalories(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  res.status(200).send(user.calories);
+}
+
+let getWeight = async function getWeight(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  res.status(200).send(user.weight);
+}
+
 
 let apiCtrl = {
   login: login,
@@ -1388,6 +1400,9 @@ let apiCtrl = {
   newLog: newLog,
   logWeight: logWeight,
   logCalories: logCalories,
+  getCalories: getCalories,
+  getWeight: getWeight,
+
 
   users: users,                     //Returns all users
   publicWorkouts: publicWorkouts,   //Returns all public workouts and filters
