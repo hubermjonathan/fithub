@@ -557,6 +557,88 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   return res.status(200).send({ "message": "Successfully set workout " + workoutId + " to " + isPublic } );
 }
 
+let logWeight = async function logWeight(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  req.body.date = req.body.date.substring(0, 10);
+  //if(req.body.date instanceof Date){
+    let new_weight = {
+      date: req.body.date,
+      weight: req.body.weight
+    }
+    /*
+    for(let i = 0; i < user.weight.length; i++){
+      let pair = user.weight[i];
+      if(pair.date == req.body.date){
+        user.weight[i] = new_weight;
+        console.log(user.weight[i]);
+        await user.save()
+        .catch(err => {res.status(500).send({ "message": "Error saving new weight"}); console.log(err)});
+        console.log(user);
+        return res.status(200).send({"message": "logWeight: Failure!"});
+      }
+    }
+    */
+
+    for(let i = 0; i < user.weight.length; i++){
+      let pair = user.weight[i];
+      if(pair.date == req.body.date){
+        user.weight.pop();
+      }
+    }
+
+    user.weight.push(new_weight);
+    await user.save()
+    .catch(err => {res.status(500).send({ "message": "Error saving new weight"}); console.log(err)});
+    res.status(200).send({"message": "logWeight: Success!"});
+  //}
+  //res.status(500).send({"message": "logWeight: Incorrect input"});
+}
+
+let logCalories = async function logWeight(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  req.body.date = req.body.date.substring(0, 10);
+  //if(req.body.date instanceof Date){
+    let new_calories = {
+      date: req.body.date,
+      calories: req.body.calories
+    }
+    /*
+    for(let i = 0; i < user.calories.length; i++){
+      let pair = user.calories[i];
+      if(pair.date == req.body.date){
+        user.calories[i] = new_calories;
+        console.log(user.calories[i]);
+        await user.save()
+        .catch(err => {res.status(500).send({ "message": "Error saving new calories"}); console.log(err)});
+        console.log(user);
+        return res.status(200).send({"message": "logWeight: Failure!"});
+      }
+    }
+    */
+
+    for(let i = 0; i < user.calories.length; i++){
+      let pair = user.calories[i];
+      if(pair.date == req.body.date){
+        user.calories.pop();
+      }
+    }
+
+    user.calories.push(new_calories);
+    await user.save()
+    .catch(err => {res.status(500).send({ "message": "Error saving new calories"}); console.log(err)});
+    res.status(200).send({"message": "logCalories: Success!"});
+  //}
+  //res.status(500).send({"message": "logWeight: Incorrect input"});
+}
+
+
+
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
   if(!isConnected(req, res)){ return console.log("DB is offline"); };
@@ -1304,6 +1386,8 @@ let apiCtrl = {
   logs: logs,
   editLog: editLog,
   newLog: newLog,
+  logWeight: logWeight,
+  logCalories: logCalories,
 
   users: users,                     //Returns all users
   publicWorkouts: publicWorkouts,   //Returns all public workouts and filters
