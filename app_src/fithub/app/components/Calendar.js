@@ -46,6 +46,8 @@ export default class Calendar extends React.Component {
 
   getCurrentDate() {
     let date = new Date();
+    let offsetInHours = date.getTimezoneOffset() / 60;
+    date.setHours(date.getHours() - offsetInHours);
     return date.toJSON().slice(0, 10);
   }
 
