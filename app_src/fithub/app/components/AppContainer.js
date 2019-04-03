@@ -17,6 +17,7 @@ import SearchScreen from '../screens/Search';
 import SelectWorkoutScreen from '../screens/SelectWorkout';
 import DefaultWorkoutsScreen from '../screens/DefaultWorkouts';
 import CustomWorkoutsScreen from '../screens/CustomWorkouts';
+import NutritionScreen from '../screens/Nutrition'
 
 
 const HomeStack = createStackNavigator({
@@ -101,10 +102,16 @@ const FeedStack = createStackNavigator({
 
 const AppContainer = createAppContainer(createBottomTabNavigator(
   {
-    Logger: {
-      screen: LoggerStack,
+    // Logger: {
+    //   screen: LoggerStack,
+    //   navigationOptions: {
+    //     tabBarIcon: <Icon name="add" type="material" size={35} />
+    //   }
+    // },
+    Nutrition: {
+      screen: NutritionScreen,
       navigationOptions: {
-        tabBarIcon: <Icon name="add" type="material" size={35} />
+        tabBarIcon: <Icon name="restaurant" type="material" size={35} />
       }
     },
     Workouts: {
