@@ -45,6 +45,10 @@ const LoggerStack = createStackNavigator({
   SelectExercises: SelectExercisesScreen
 });
 
+const NutritionStack = createStackNavigator({
+  Nutrition: NutritionScreen,
+});
+
 const WorkoutTabs = createMaterialTopTabNavigator(
   {
     CustomWorkouts: {
@@ -109,7 +113,7 @@ const AppContainer = createAppContainer(createBottomTabNavigator(
     //   }
     // },
     Nutrition: {
-      screen: NutritionScreen,
+      screen: NutritionStack,
       navigationOptions: {
         tabBarIcon: <Icon name="restaurant" type="material" size={35} />
       }
