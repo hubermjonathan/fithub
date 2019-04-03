@@ -6,6 +6,7 @@ import {
     SafeAreaView,
     Dimensions,
     TouchableOpacity,
+    AlertIOS,
 } from 'react-native';
 
 export default class NutritionScreen extends React.Component {
@@ -18,31 +19,62 @@ export default class NutritionScreen extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            calories: 0,
+        };
     }
 
-    logCalories() {
-        console.log("log");
+    enterCalories() {
+        AlertIOS.prompt(
+            'Add Calories',
+            'How many calories do you want to log?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+                {
+                    text: 'Add',
+                    onPress: (calories) => {
+                        this.logCalories(calories);
+                    }
+                },
+            ],
+            'plain-text',
+            '',
+            'numeric'
+        );
+    }
+
+    logCalories(calories) {
+        this.setState({
+            calories: this.state.calories += Math.round(+calories),
+        });
     }
 
     render() {
         return(
-            <SafeAreaView style={styles.containerIOS} >
+            <SafeAreaView style={styles.containerIOS}>
                 <View style={styles.loggingContainer}>
                     <View style={styles.numberContainer}>
-                        <Text style={styles.trackingNumber}>1250</Text>
+                        <Text style={styles.trackingNumber}>{this.state.calories}</Text>                    
                         <Text style={styles.trackingText}>calories today</Text>
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.trackingButton}
-                            onPress={this.logCalories.bind(this)}
+                            onPress={this.enterCalories.bind(this)}
                         >
                             <Text style={styles.buttonText}>Log Calories</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.graphsContainer}>
-                    <View style={styles.graphCard}></View>
+                    <View style={styles.graphCard}>
+                        <Text style={styles.graphLabel}>This Week</Text>
+                    </View>
                 </View>
             </SafeAreaView>
         );
@@ -98,9 +130,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     graphCard: {
+        padding: 15,
         height: '90%',
         width: '90%',
         borderRadius: 5,
         backgroundColor: '#fff',
-    }
+    },
+    graphLabel: {
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
 });
