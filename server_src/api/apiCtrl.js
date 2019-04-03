@@ -246,8 +246,8 @@ let newLog = async function newLog(req, res) {
   //no clue wtf any of this is dont blame me if it breaks
   let gitLog;
   if(req.body.date instanceof Date){
-    const day = req.body.getDate();
-    const month = req.body.getMonth()+1;
+    const day = req.body.date.getDate();
+    const month = req.body.date.getMonth()+1;
     const year = req.body.date.getFullYear();
     gitLog = `${year}-${month}-${day}`;
   }
