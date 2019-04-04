@@ -34,8 +34,8 @@ let Profile = new Schema({
   logs: [{ type: Schema.Types.ObjectId, ref: "WorkoutData"}],         //Workout data
   selected_stat1: { type: String, default: "Total Volume", required: true },                                  //default stat1
   selected_stat2: { type: String, default: "Max Bench Press", required: true },                               //default stat2
-  calories: { type: [Object], default: [], required: true }                                                   //calories (date : integer)
-  bodyweight: { type: [Object], default: [], required: true }                                                 //bodyweight (bodyweight : integer)
+  calories: { type: [Object], default: [], required: true },                                                   //calories (date : integer)
+  weight: { type: [Object], default: [], required: true }                                                 //bodyweight (bodyweight : integer)
 });
 
 //Schema for creating a new workout plan
