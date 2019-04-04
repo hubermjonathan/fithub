@@ -8,14 +8,48 @@ import {
     TouchableOpacity,
     AlertIOS,
 } from 'react-native';
+import { getUserID } from '../lib/AccountFunctions';
+import { getCalories, editCalories, getWeight, editWeight } from '../lib/NutritionFunctions';
 
 export class CalorieScreen extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            loaded: false,
             calories: 0,
         };
+    }
+
+    componentDidMount() {
+        getUserID().then(id => {
+            this.setState({
+                loaded: true,
+                id: id
+            });
+            this.loader();
+        });
+    }
+
+    loader() {
+        if(this.state.loaded) {
+            getCalories(this.state.id).then(calories => {
+                let date = new Date();
+                let offsetInHours = date.getTimezoneOffset() / 60;
+                date.setHours(date.getHours() - offsetInHours);
+                let dateString = date.toJSON().slice(0, 10);
+
+                if(calories[calories.length-1].date === dateString) {
+                    this.setState({
+                        calories: calories[calories.length-1].calories,
+                    });
+                } else {
+                    this.setState({
+                        calories: 0,
+                    });
+                }
+            });
+        }
     }
 
     enterCalories() {
@@ -41,9 +75,21 @@ export class CalorieScreen extends React.Component {
         );
     }
 
-    logCalories(calories) {
-        this.setState({
-            calories: this.state.calories += Math.round(+calories),
+    async logCalories(calories) {
+        let date = new Date();
+        let offsetInHours = date.getTimezoneOffset() / 60;
+        date.setHours(date.getHours() - offsetInHours);
+        let dateString = date.toJSON().slice(0, 10);
+
+        let newCalories = {
+            date: dateString,
+            calories: +this.state.calories + +calories
+        }
+
+        editCalories(newCalories).then(() => {
+            setTimeout(() => {
+                this.loader();
+            }, 300);
         });
     }
 
@@ -52,7 +98,7 @@ export class CalorieScreen extends React.Component {
             <SafeAreaView style={styles.containerIOS}>
                 <View style={styles.loggingContainer}>
                     <View style={styles.numberContainer}>
-                        <Text style={styles.trackingNumber}>{this.state.calories}</Text>
+                        <Text style={styles.trackingNumber}>{this.state.loaded ? this.state.calories : 0}</Text>
                         <Text style={styles.trackingText}>calories today</Text>
                     </View>
                     <View style={styles.buttonContainer}>
