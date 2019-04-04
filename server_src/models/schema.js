@@ -82,6 +82,16 @@ let SetData = new Schema({
   isWarmup: {type: Boolean, required: true} 
 });
 
+let WeightLog = new Schema ({
+  weight: {type: number, required: true},
+  date: {type: Date, required: true}
+})
+
+let CaloricLog = new Schema ({
+  calories: {type: number, required: true},
+  date: {type: Date, required: true}  
+})
+
 //map the schemas to mongo collections
 let schemaCtrl = {
     Profile: mongoose.model("Profile", Profile),
@@ -91,6 +101,8 @@ let schemaCtrl = {
     WorkoutData: mongoose.model("WorkoutData", WorkoutData),
     ExerciseData: mongoose.model("ExerciseData", ExerciseData),
     SetData: mongoose.model("SetData", SetData),
+    CaloricLog: mongoose.model("CaloricLog", CaloricLog),
+    WeightLog: mongoose.model("WeightLog", WeightLog),
 }
 
 module.exports = schemaCtrl;

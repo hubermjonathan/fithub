@@ -1055,6 +1055,53 @@ let profile = function profile(req, res) {
   });
 }
 
+//Get a user's logs from the database
+let weights = async function weights(req, res) {
+  if(!isConnected(req, res))
+  {
+    return;
+  }
+
+  let bodyWeight = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  ({
+    path: "bodyWeight",
+    select: "-__v",
+    model: "WeightLog"
+  }).sort({"bodyWeight.date":-1}).catch(err => {
+    return console.log("Weight: invalid id");
+  });
+  if(!bodyWeight){
+    res.status(404).send({ "message": "Database Error: User not found" });
+    return
+  } else {
+    res.status(200).send(bodyWeight);
+  }
+  //end populate
+}
+
+//Get a user's logs from the database
+let calories = async function calories(req, res) {
+  if(!isConnected(req, res)){
+    return;
+  }
+
+  let calories = await schemaCtrl.Profile.findById(req.params.id, 'calories').populate
+  ({
+    path: "calories",
+    select: "-__v",
+    model: "CaloricLog"
+  }).sort({"calories.date":-1}).catch(err => {
+    return console.log("logs: invalid id");
+  });
+  if(!calories){
+    res.status(404).send({ "message": "Database Error: User not found" });
+    return
+  } else {
+    res.status(200).send(calories);
+  }
+  //end populate
+}
+
 let selected_stats = function selected_stats(req, res) {
   if(!isConnected(req, res))
   {
