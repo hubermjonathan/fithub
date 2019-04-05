@@ -114,7 +114,6 @@ export default class FeedScreen extends React.Component {
         let builtWorkouts = [];
         let s = JSON.stringify(data);
         let array = JSON.parse(s);
-        console.log(array);
         for (let x = 0; x < array.length; x++) {
           if (array[x].public == true) { 
           let exercises = [];
@@ -153,7 +152,6 @@ export default class FeedScreen extends React.Component {
           })
         }
       }//for
-        console.log(builtWorkouts);
     this.setState({ workouts: builtWorkouts })
 
 
