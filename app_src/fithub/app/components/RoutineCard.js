@@ -9,9 +9,9 @@ export default class RoutineCard extends React.Component {
 
     render() {
         return(
-            <TouchableOpacity 
-                onPress={() => this._onWorkoutPress(this.props.workout) }
-            >
+            // <TouchableOpacity 
+            //     onPress={() => this._onWorkoutPress(this.props.workout) }
+            // >
                 <View style={styles.card}>
                     <View style={styles.cardTitle}>
                         <Text style={styles.titleText}>
@@ -36,7 +36,7 @@ export default class RoutineCard extends React.Component {
                         /> 
                     </View>
                 </View>
-            </TouchableOpacity>
+            // </TouchableOpacity>
         );
     }
 
