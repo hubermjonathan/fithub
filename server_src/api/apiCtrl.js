@@ -243,109 +243,113 @@ let newLog = async function newLog(req, res) {
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
 
-  //validate setData json input
-
+  //no clue wtf any of this is dont blame me if it breaks
   let gitLog;
   if(req.body.date instanceof Date){
     const day = req.body.date.getDate();
     const month = req.body.date.getMonth()+1;
     const year = req.body.date.getFullYear();
-    gitLog = `${year}-${month}-${day}`
-  } else {
+    gitLog = `${year}-${month}-${day}`;
+  }
+  else{
     gitLog = req.body.date;
   }
 
-  let exerciseData_ids = [];
   let newActivity;
-  if(gitLog in user.dates) {
-    user.dates[gitLog]++; 
-  } else {
+  if(gitLog in user.dates){
+    user.dates[gitLog]++;
+  }
+  else{
     user.dates[gitLog] = 1;
   }
-  //Construct the exerciseData objects
-  for(let i = 0; i < req.body.exercises.length; i++){
+
+  //
+
+  //create each exercise
+  let all_exercises = []; //all the new exercise data that will be necessary for creating the log
+  let exercise_validate_promises = []; //all the promises that will be used to validate each exercise
+  let exercise_save_promises = []; //all the promises that will be used to save each exercise
+
+  let all_sets = []; //global tracker for all sets
+  let set_save_promises = []; //global tracker for all promises during saving of all sets
+
+  //validation for sets are done inside the exercise loop because we need to validate them locally before attempting to create an exercise and validate an exercise object
+
+  for(let i = 0; i < req.body.exercises.length; i++){ //for each exercise
     let exercise = req.body.exercises[i];
 
-    exercise.sets.forEach(set =>
-    {
-      //For keeping track of user maxes
+    let set_validate_promises = []; //promises used to validate the local sets
+    let local_sets = []; //sets pertaining to the current exercise
+
+    exercise.sets.forEach(set => { //create the set and push to validation array
+      //keep track of maxes
       if(exercise.name in user.maxes){
         if(user.maxes[exercise.name] < set.weight){
           newActivity = `${user.name} has achieved a new max of ${set.weight} on ${exercise.name}`;
           user.maxes[exercise.name] = set.weight;
         }
-      } else {
+      }
+      else{
         user.maxes[exercise.name] = set.weight;
         newActivity = `${user.name} has done ${exercise.name} for the first time!`;
       }
+      //end
+
+      let new_set = new schemaCtrl.SetData(set);
+      let promise = new_set.validate().catch(err => {res.status(500).send({"message": "newLog: validation error creating sets"}); return console.log(err)});
+      set_validate_promises.push(promise);
+      all_sets.push(new_set); //push to global sets for saving later
+      local_sets.push(new_set); //keep track of local sets to construct current exercise
     });
-    
-    if(newActivity==null){
-      newActivity = `${user.name} worked out on ${req.body.date}!`
-    }
+    let ensure_sets_validated = await Promise.all(set_validate_promises); //ensure all local sets have been validated
 
-    //build setData objects for the current exercise
-    let setData_ids = [];
-    for(let j = 0; j < exercise.sets.length; j++){
-      let set = exercise.sets[j];
-
-      let newSetData; 
-      try{
-      newSetData = await schemaCtrl.SetData.create(set);
-      }catch(validation_err){ console.log("Input Error: invalid json input at SetData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing setData" })};
-
-      newSetData.save((err, newSetData) => {
-        if (err) {
-          console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving exercise set log" });
-        } 
-      }); //end save
-      setData_ids.push(mongoose.Types.ObjectId(newSetData._id));
-    }; //end forEach set
-
-    //build exerciseData objects for the workoutData
-    let newExerciseData;
-    try{
-      newExerciseData = await schemaCtrl.ExerciseData.create({
+    let new_exercise = new schemaCtrl.ExerciseData //create new exercise object with validated sets
+    ({
         name: exercise.name,
         muscle_groups: exercise.muscle_groups,
-        sets: setData_ids
-      });
-    }catch(validation_err){ console.log("Input Error: validation error creating ExerciseData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing exerciseData" })};
+        sets: local_sets
+    }); 
 
-    //save the exerciseData
-    newExerciseData.save((err, newExerciseData) => {
-      if (err) {
-        console.log(err); return res.status(500).send({ "message": "Database Error: Error while saving exercise log" });
-      } 
-    }); //end save
-    exerciseData_ids.push(mongoose.Types.ObjectId(newExerciseData._id));
-  }; //end forEach exercise, all exerciseData documents have been built and saved
+    //fire off validation for the exercise and save to the exercise list
+    let promise = new_exercise.validate().catch(err => {res.status(500).send({"message": "newLog: validation error creating exercises"}); return console.log(err)});
+    exercise_validate_promises.push(promise);
+    all_exercises.push(new_exercise);
+  }
+  let ensure_exercises_validated = await Promise.all(exercise_validate_promises);
 
-  //Construct the workoutData object, catch validation error
-  let newWorkoutData;
-  try{
-    newWorkoutData = await schemaCtrl.WorkoutData.create({
+  //create new log and fire off validate promise
+  let new_log = new schemaCtrl.WorkoutData
+  ({
     name: req.body.name,
     date: req.body.date,
-    exercises: exerciseData_ids
-    });
-  }catch(validation_err){ console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" })};
+    exercises: all_exercises,
+  })
+  let log_validate = await new_log.validate().catch(err => {res.status(500).send({"message": "newLog: error creating log object"}); return console.log(err);});
 
-    user.updateOne({$set: {maxes: user.maxes, dates: user.dates}}, {}, (err, raw) => {});
-    //Push the newWorkout log to the user profile
-    user.updateOne({$push: {logs: newWorkoutData, activity: newActivity}}, {},(err, raw) => 
-    {
-      if (err) 
-      {
-        res.status(500).send({"message": "Error: Log addition unsuccessful"});
-        return;
-      } 
-      else 
-      {
-        res.status(200).send({"message": "Log added successfully "});
-        return;
-      }
-    }); //end updateOne*/
+  //everything has been created and validated, start saving and hope nothing goes wrong after this line
+
+  all_sets.forEach(set => { //save all sets
+    let promise = set.save().catch(err => {res.status(500).send({"message": "newLog: error saving sets"}); return console.log(err)});
+    set_save_promises.push(promise);
+  });
+
+  all_exercises.forEach(exercise => { //save all exercises
+    let promise = exercise.save().catch(err => {res.status(500).send({"message": "newLog: error saving exercises"}); return console.log(err)});
+    exercise_save_promises.push(promise);
+  });
+
+  let ensure_sets_saved = await Promise.all(set_save_promises);
+  let ensure_exercises_saved = await Promise.all(exercise_save_promises);
+  let ensure_log_saved = await new_log.save().catch(err => {res.status(500).send({"message": "newLog: error saving log object"}); return console.log(err);});
+
+  //user activity and max
+  await user.updateOne({$set: {maxes: user.maxes, dates: user.dates}})
+  .catch(err => {res.status(500).send({"message": "newLog: error updating user max"}); return console.log(err);});
+  await user.updateOne({$push: {logs: new_log._id, activity: newActivity}})
+  .catch(err => {res.status(500).send({"message": "newLog: pushing id and error updating user activity"}); return console.log(err);});
+
+  res.status(200).send({"message": "newLog: Success!"});
+  //console.log(new_log);
 } //end newLog
 
 let newExercise = async function newExercise(req, res) {
@@ -552,6 +556,88 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
   }
   return res.status(200).send({ "message": "Successfully set workout " + workoutId + " to " + isPublic } );
 }
+
+let logWeight = async function logWeight(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  req.body.date = req.body.date.substring(0, 10);
+  //if(req.body.date instanceof Date){
+    let new_weight = {
+      date: req.body.date,
+      weight: req.body.weight
+    }
+    /*
+    for(let i = 0; i < user.weight.length; i++){
+      let pair = user.weight[i];
+      if(pair.date == req.body.date){
+        user.weight[i] = new_weight;
+        console.log(user.weight[i]);
+        await user.save()
+        .catch(err => {res.status(500).send({ "message": "Error saving new weight"}); console.log(err)});
+        console.log(user);
+        return res.status(200).send({"message": "logWeight: Failure!"});
+      }
+    }
+    */
+
+    for(let i = 0; i < user.weight.length; i++){
+      let pair = user.weight[i];
+      if(pair.date == req.body.date){
+        user.weight.pop();
+      }
+    }
+
+    user.weight.push(new_weight);
+    await user.save()
+    .catch(err => {res.status(500).send({ "message": "Error saving new weight"}); console.log(err)});
+    res.status(200).send({"message": "logWeight: Success!"});
+  //}
+  //res.status(500).send({"message": "logWeight: Incorrect input"});
+}
+
+let logCalories = async function logWeight(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  req.body.date = req.body.date.substring(0, 10);
+  //if(req.body.date instanceof Date){
+    let new_calories = {
+      date: req.body.date,
+      calories: req.body.calories
+    }
+    /*
+    for(let i = 0; i < user.calories.length; i++){
+      let pair = user.calories[i];
+      if(pair.date == req.body.date){
+        user.calories[i] = new_calories;
+        console.log(user.calories[i]);
+        await user.save()
+        .catch(err => {res.status(500).send({ "message": "Error saving new calories"}); console.log(err)});
+        console.log(user);
+        return res.status(200).send({"message": "logWeight: Failure!"});
+      }
+    }
+    */
+
+    for(let i = 0; i < user.calories.length; i++){
+      let pair = user.calories[i];
+      if(pair.date == req.body.date){
+        user.calories.pop();
+      }
+    }
+
+    user.calories.push(new_calories);
+    await user.save()
+    .catch(err => {res.status(500).send({ "message": "Error saving new calories"}); console.log(err)});
+    res.status(200).send({"message": "logCalories: Success!"});
+  //}
+  //res.status(500).send({"message": "logWeight: Incorrect input"});
+}
+
+
 
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
@@ -1319,6 +1405,18 @@ let stats = function stats(req, res){
   */
 }
 
+let getCalories = async function getCalories(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  res.status(200).send(user.calories);
+}
+
+let getWeight = async function getWeight(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  res.status(200).send(user.weight);
+}
+
 
 let apiCtrl = {
   login: login,
@@ -1347,6 +1445,11 @@ let apiCtrl = {
   logs: logs,
   editLog: editLog,
   newLog: newLog,
+  logWeight: logWeight,
+  logCalories: logCalories,
+  getCalories: getCalories,
+  getWeight: getWeight,
+
 
   users: users,                     //Returns all users
   publicWorkouts: publicWorkouts,   //Returns all public workouts and filters

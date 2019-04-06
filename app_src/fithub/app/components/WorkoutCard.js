@@ -36,7 +36,6 @@ export default class WorkoutCard extends React.Component {
                 this.setState({
                     user: data.name,
                 });
-                console.log(data.name);
             })
             .catch((err) => {
                 console.log(err);

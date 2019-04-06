@@ -431,6 +431,8 @@ class Activity extends React.Component {
     let parsedActivities = [];
 
     for (let i = 0; i < activities.length; i++) {
+      if(activities[i] === null) continue;
+
       let icon = "";
       if (activities[i].includes("new max of")) {
         icon = "star";
