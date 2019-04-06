@@ -85,12 +85,12 @@ let SetData = new Schema({
 });
 
 let WeightLog = new Schema ({
-  weight: {type: number, required: true},
+  weight: {type: Number, required: true},
   date: {type: Date, required: true}
 })
 
 let CaloricLog = new Schema ({
-  calories: {type: number, required: true},
+  calories: {type: Number, required: true},
   date: {type: Date, required: true}  
 })
 
