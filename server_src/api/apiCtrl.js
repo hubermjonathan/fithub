@@ -1373,6 +1373,29 @@ let follow = async function follow(req,res){
   res.status(200).send({message: "Success"});
 }
 
+let unfollow = async function unfollow(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
+    res.status(400).send();
+    console.log("invalid id");
+    return;
+  });
+  if(user==null){
+    res.status(404).send({message: "User not found"});
+    return;
+  }
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+  let index = user.following.find(function(element){
+    return element==req.body.followid
+  });
+  if(index!==undefined){
+    user.following.splice(index, 1);
+    await user.updateOne({ following : user.following });
+    res.status(400).send({message: "Not following specified user"});
+  }
+  res.status(200).send({message: "Success"});
+}
+
 let followingWorkouts = async function followingWorkouts(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
   let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {
@@ -1444,6 +1467,7 @@ let apiCtrl = {
   selected_stats: selected_stats,
   editStats:editStats,
   follow : follow,
+  unfollow : unfollow,
   followingWorkouts : followingWorkouts,
 
   delExercise: delExercise,

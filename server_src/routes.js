@@ -19,6 +19,7 @@ router.get('/profile/:id/selected_stats', apiCtrl.selected_stats);          //ge
 router.post('/profile/editName', apiCtrl.editUsername);          //Get a users CUSTOM exercises
 router.post('/profile/editStats', apiCtrl.editStats);          //edit a user's selected stats
 router.post('/profile/follow/', apiCtrl.follow);          //edit a user's selected stats
+router.post('/profile/unfollow/', apiCtrl.unfollow);          //edit a user's selected stats
 
 router.get('/workouts/following/:id', apiCtrl.followingWorkouts);          //edit a user's selected stats
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans
