@@ -10,6 +10,25 @@ import {
 } from 'react-native';
 import { getUserID } from '../lib/AccountFunctions';
 import { getCalories, editCalories, getWeight, editWeight } from '../lib/NutritionFunctions';
+import { ContributionGraph, LineChart } from 'react-native-chart-kit';
+
+const chartConfig = {
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    strokeWidth: 3 // optional, default 3
+}
+
+const screenWidth = Dimensions.get('window').width
+
+let weightData = {
+    labels: ["1"],
+    datasets: [{
+        data: [1],
+        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+        strokeWidth: 2 // optional
+    }]
+}
 
 export class CalorieScreen extends React.Component {
     constructor(props) {
@@ -29,19 +48,20 @@ export class CalorieScreen extends React.Component {
             });
             this.loader();
         });
+
     }
 
     loader() {
-        if(this.state.loaded) {
+        if (this.state.loaded) {
             getCalories(this.state.id).then(calories => {
                 let date = new Date();
                 let offsetInHours = date.getTimezoneOffset() / 60;
                 date.setHours(date.getHours() - offsetInHours);
                 let dateString = date.toJSON().slice(0, 10);
 
-                if(calories[calories.length-1].date === dateString) {
+                if (calories[calories.length - 1].date === dateString) {
                     this.setState({
-                        calories: calories[calories.length-1].calories,
+                        calories: calories[calories.length - 1].calories,
                     });
                 } else {
                     this.setState({
@@ -50,8 +70,8 @@ export class CalorieScreen extends React.Component {
                 }
             });
         }
-    }
 
+    }
     enterCalories() {
         AlertIOS.prompt(
             'Log Calories',
@@ -59,7 +79,7 @@ export class CalorieScreen extends React.Component {
             [
                 {
                     text: 'Cancel',
-                    onPress: () => {},
+                    onPress: () => { },
                     style: 'cancel',
                 },
                 {
@@ -94,7 +114,7 @@ export class CalorieScreen extends React.Component {
     }
 
     render() {
-        return(
+        return (
             <SafeAreaView style={styles.containerIOS}>
                 <View style={styles.loggingContainer}>
                     <View style={styles.numberContainer}>
@@ -121,12 +141,82 @@ export class CalorieScreen extends React.Component {
 }
 
 export class WeightScreen extends React.Component {
+
     constructor(props) {
         super(props);
 
         this.state = {
             weight: 180,
+            weightStats: {
+                data: weightData.datasets[0].data,
+                min: 0,
+                max: 0,
+                average: 0
+            },
         };
+    }
+
+    componentDidMount() {
+        getUserID().then(id => {
+            this.setState({
+                loaded: true,
+                id: id
+            });
+            this.loader();
+        });
+
+    }
+
+    loader() {
+        if (this.state.loaded) {
+            this.loadWeightData();
+        }
+    }
+
+    async loadWeightData() {
+        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/weight`)
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => {
+
+                if (weightData.labels.length > 0) {
+                    weightData.labels = [];
+                    weightData.datasets[0].data = [];
+                }
+                for (let x = 0; x < data.length; x++) {
+                    weightData.labels.push(data[x].date.slice(5));
+                    weightData.datasets[0].data.push(data[x].weight);
+                }
+                this.setState({ weightStats: this.calcWeightStats(weightData.datasets[0]) });
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+
+    calcWeightStats(obj) {
+        let min = obj.data[0];
+        let max = obj.data[0];
+        let average = parseInt(obj.data[0]);
+
+
+        for (let x = 1; x < obj.data.length; x++) {
+            if (obj.data[x] < min) {
+                min = obj.data[x];
+            }
+            if (obj.data[x] > max) {
+                max = obj.data[x];
+            }
+            average += parseInt(obj.data[x]);
+
+        }
+        average = average / obj.data.length;
+
+        let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
+
+
+        return newobj;
     }
 
     enterWeight() {
@@ -136,7 +226,7 @@ export class WeightScreen extends React.Component {
             [
                 {
                     text: 'Cancel',
-                    onPress: () => {},
+                    onPress: () => { },
                     style: 'cancel',
                 },
                 {
@@ -159,7 +249,7 @@ export class WeightScreen extends React.Component {
     }
 
     render() {
-        return(
+        return (
             <SafeAreaView style={styles.containerIOS}>
                 <View style={styles.loggingContainer}>
                     <View style={styles.numberContainer}>
@@ -177,7 +267,28 @@ export class WeightScreen extends React.Component {
                 </View>
                 <View style={styles.graphsContainer}>
                     <View style={styles.graphCard}>
-                        <Text style={styles.graphLabel}>This Week</Text>
+                        <Text style={styles.graphText}>History</Text>
+                        <View>
+                            <LineChart
+                                data={weightData}
+                                width={screenWidth * .80}
+                                height={190}
+                                chartConfig={chartConfig}
+                            />
+
+                        </View>
+
+                    </View>
+                    <View style={styles.graphStats}>
+                        <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
+                            Min: {this.state.weightStats.min} lbs
+                                </Text>
+                        <Text style={{ fontSize: 18, color: 'white' }}>
+                            Max: {this.state.weightStats.max} lbs
+                                </Text>
+                        <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
+                            Average: {this.state.weightStats.average} lbs
+                                </Text>
                     </View>
                 </View>
             </SafeAreaView>
@@ -244,4 +355,22 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
     },
+    graphStats: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: 'white',
+        width: '100%',
+        backgroundColor: '#00adf5',
+        borderRadius: 5,
+    },
+    graphTitle: {
+        backgroundColor: 'white',
+    },
+    graphText: {
+        fontSize: 22,
+        color: '#333',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        textDecorationLine: 'underline'
+    }
 });

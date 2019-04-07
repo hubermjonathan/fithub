@@ -24,15 +24,6 @@ const chartConfig = {
   strokeWidth: 3 // optional, default 3
 }
 //delete this later
-let weightData = {
-  labels: [],
-  datasets: [{
-    data: [],
-    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-    strokeWidth: 2 // optional
-  }]
-}
-//delete this later
 const garbageVolumeData = {
   labels: ['03-04', '03-05', '03-10', '04-04', '04-09', '04-21'],
   datasets: [{
@@ -84,12 +75,7 @@ export default class ProfileScreen extends React.Component {
         name: "Stat 2",
         data: 0,
       },
-      weightStats: {
-        data: weightData.datasets[0].data,
-        min: 0,
-        max: 0,
-        average: 0
-      },
+  
       volumeStats:{
         data:garbageVolumeData.datasets[0].data,
         min:0,
@@ -107,36 +93,34 @@ export default class ProfileScreen extends React.Component {
       this.loadUserStats();
       this.loadWorkoutActivity();
       this.loadWorkoutDates();
-      this.loadWeightData();
-      this.setState({volumeStats:this.calcWeightStats(this.state.volumeStats)});
+      this.setState({volumeStats:this.calcStats(this.state.volumeStats)});
 
       
     }
   }
 
-  calcWeightStats(obj) {
+  calcStats(obj) {
     let min = obj.data[0];
     let max = obj.data[0];
     let average = parseInt(obj.data[0]);
 
 
     for (let x = 1; x < obj.data.length; x++) {
-      if (obj.data[x] < min) {
-        min = obj.data[x];
-      }
-      if (obj.data[x] > max) {
-        max = obj.data[x];
-      }
-      average += parseInt(obj.data[x]);
-      
+        if (obj.data[x] < min) {
+            min = obj.data[x];
+        }
+        if (obj.data[x] > max) {
+            max = obj.data[x];
+        }
+        average += parseInt(obj.data[x]);
+
     }
     average = average / obj.data.length;
 
     let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
     
-
     return newobj;
-  }
+}
 
   async loadUserStats() {
     let stats = await getProfileStats(this.state.id);
@@ -239,26 +223,7 @@ export default class ProfileScreen extends React.Component {
       });
   }
 
-  async loadWeightData() {
-    fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/weight`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        if(weightData.labels.length > 0){
-          weightData.labels = [];
-          weightData.datasets[0].data = [];
-        }
-        for(let x = 0; x < data.length;x++){
-          weightData.labels.push(data[x].date.slice(5));
-          weightData.datasets[0].data.push(data[x].weight);
-        }
-        this.setState({weightStats:this.calcWeightStats(weightData.datasets[0])});
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-  }
+ 
 
   componentDidMount() {
     getUserID().then(id => {
@@ -334,28 +299,6 @@ export default class ProfileScreen extends React.Component {
               </View>
               <View style={styles.subContainer}>
                 <ScrollView>
-                  <View style={{ paddingTop: '3%' }}>
-                    <View style = {styles.graphTitle}>
-                      <Text style={styles.graphText}>Bodyweight History</Text>
-                    </View>
-                    <LineChart
-                      data={weightData}
-                      width={screenWidth}
-                      height={220}
-                      chartConfig={chartConfig}
-                    />
-                    <View style={styles.graphStats}>
-                      <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
-                        Min: {this.state.weightStats.min} lbs
-                      </Text>
-                      <Text style={{ fontSize: 18, color: 'white' }}>
-                        Max: {this.state.weightStats.max} lbs
-                      </Text>
-                      <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
-                        Average: {this.state.weightStats.average} lbs
-                      </Text>
-                    </View>
-                  </View>
 
                   <View style={{ paddingTop: '3%' }}>
                     <View style = {styles.graphTitle}>
