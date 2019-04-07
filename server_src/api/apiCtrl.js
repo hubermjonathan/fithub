@@ -1359,20 +1359,32 @@ let follow = async function follow(req,res){
     console.log("invalid id");
     return;
   });
+  if(user==null){
+    res.status(404).send({message: "User not found"});
+    return;
+  }
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
-  let follow = await schemaCtrl.Profile.findById(req.body.followid).catch(err => {
-    res.status(400).send();
+  let ufollow = await schemaCtrl.Profile.findById(req.body.followid).catch(err => {
+    res.status(404).send();
     console.log("invalid id");
     return;
   });
-  await user.updateOne({$push: { following: follow.id }});
+  await user.updateOne({$push: { following: ufollow.id }});
   res.status(200).send({message: "Success"});
 }
 
 let followingWorkouts = async function followingWorkouts(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
-  let workouts = await schemaCtrl.WorkoutPlan.find({ownerid: {$in : user.following}}).select('-__v').populate({
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {
+    console.log("invalid id"); 
+    res.status(400).send({message: "Invalid id"}); 
+    return
+  });
+  if(user==null){
+    res.status(404).send({message: "User not found"});
+    return;
+  }
+  let workouts = await schemaCtrl.WorkoutPlan.find({ownerUID: {$in : user.following}}).select('-__v').populate({
     path: "exercises",
     select: "-__v",
     populate:
@@ -1382,6 +1394,7 @@ let followingWorkouts = async function followingWorkouts(req,res){
       select: "-__v",
     }
   }).sort({"date":-1});
+  res.status(200).send(workouts);
 }
 
 let stats = function stats(req, res){
