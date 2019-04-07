@@ -9,72 +9,33 @@ export default class RoutineCard extends React.Component {
 
     render() {
         return(
-            // <TouchableOpacity 
-            //     onPress={() => this._onWorkoutPress(this.props.workout) }
-            // >
-                <View style={styles.card}>
-                    <View style={styles.cardTitle}>
-                        <Text style={styles.titleText}>
-                            {this.props.workout.name}
-                        </Text>
-                    </View>
-                    <View style={styles.cardBody}>
-                        <FlatList
-                            scrollEnabled={false}
-                            data={this.props.workout.exercises}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={(item) =>  
-                                <View style={styles.cardRow}>
-                                    <Text style={styles.exerciseText}>
-                                        {item.item.name}
-                                    </Text>
-                                    <Text style={styles.equipmentTypeText}>
-                                        {item.item.equipment_type}
-                                    </Text>
-                                </View>
-                            }
-                        /> 
-                    </View>
+            <View style={styles.card}>
+                <View style={styles.cardTitle}>
+                    <Text style={styles.titleText}>
+                        {this.props.workout.name}
+                    </Text>
                 </View>
-            // </TouchableOpacity>
-        );
-    }
-
-    _onWorkoutPress(workout) {
-        //console.log("WORKOUT: ", workout);
-        Alert.alert(
-            `${workout.name}`,
-            `Would you like to add this workout to today's workout?`,
-            [
-                //Buttons are in the order: (Neutral), Negative, Positive
-                {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-                {text: 'Yes', onPress: () => {
-                    const newWorkout = {
-                            name: workout.name, 
-                            id: workout.id,
-                            exercises: workout.exercises
-                    };
-                    //console.log(workout.exercises);
-                    postWorkout(
-                        {
-                            token: '',
-                            id: '',
-                            uid: '',
-                            name: workout.name,
-                            muscle_groups:[],
-                            date: new Date().toJSON().slice(0, 10),
-                            description: "Predefined workout",
-                            exercises: workout.exercises,
-                            public:false,
-
-                            //likes: 0
+                <View style={styles.cardBody}>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={this.props.workout.exercises}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={(item) =>  
+                            <View style={styles.cardRow}>
+                                <Text style={styles.exerciseText}>
+                                    {item.item.name}
+                                </Text>
+                                <Text style={styles.equipmentTypeText}>
+                                    {item.item.equipment_type}
+                                </Text>
+                            </View>
                         }
-                    );
-                    }
-                },
-            ]
+                    /> 
+                </View>
+            </View>
+
         );
-    }
+    } 
 }
 
 const styles = StyleSheet.create({
@@ -96,10 +57,11 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
+        alignContent: 'center',
         marginBottom: 10,
     },
     titleText: {
-        textAlign: 'center',
+        flexDirection: 'row',
         fontSize: 40,
         color: '#333',
     },

@@ -107,18 +107,18 @@ const WorkoutStack = createStackNavigator(
 {
   AddWorkout: {
     screen: WorkoutTabs,
+    navigationOptions: ({navigation}) => { 
+      return {
+      title: 'Workouts',
+      headerRight: <Icon name="add" type="material" size={35} onPress={() => { navigation.push('CreateWorkout')} } />
+      }
+    }
   },
   CreateWorkout: {
     screen: CreateWorkoutScreen,
   },
 },
 {
-  defaultNavigationOptions: ({navigation}) => { 
-    return {
-    title: 'Workouts',
-    headerRight: <Icon name="add" type="material" size={35} onPress={() => { navigation.push('CreateWorkout')} } />
-    }
-  }
 },
 );
 

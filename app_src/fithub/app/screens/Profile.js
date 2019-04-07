@@ -24,10 +24,10 @@ const chartConfig = {
   strokeWidth: 3 // optional, default 3
 }
 //delete this later
-const garbageWeightData = {
-  labels: ['03-04', '03-05', '03-10', '04-04', '04-09', '04-21'],
+let weightData = {
+  labels: [],
   datasets: [{
-    data: [140, 140, 142, 147, 146, 144],
+    data: [],
     color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
     strokeWidth: 2 // optional
   }]
@@ -85,7 +85,7 @@ export default class ProfileScreen extends React.Component {
         data: 0,
       },
       weightStats: {
-        data: garbageWeightData.datasets[0].data,
+        data: weightData.datasets[0].data,
         min: 0,
         max: 0,
         average: 0
@@ -107,15 +107,17 @@ export default class ProfileScreen extends React.Component {
       this.loadUserStats();
       this.loadWorkoutActivity();
       this.loadWorkoutDates();
-      this.setState({weightStats:this.calcWeightStats(this.state.weightStats)});
+      this.loadWeightData();
       this.setState({volumeStats:this.calcWeightStats(this.state.volumeStats)});
+
+      
     }
   }
 
   calcWeightStats(obj) {
     let min = obj.data[0];
     let max = obj.data[0];
-    let average = obj.data[0];
+    let average = parseInt(obj.data[0]);
 
 
     for (let x = 1; x < obj.data.length; x++) {
@@ -125,13 +127,13 @@ export default class ProfileScreen extends React.Component {
       if (obj.data[x] > max) {
         max = obj.data[x];
       }
-      average += obj.data[x];
+      average += parseInt(obj.data[x]);
+      
     }
     average = average / obj.data.length;
 
-    console.log("length", obj.data.length)
-
     let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
+    
 
     return newobj;
   }
@@ -238,12 +240,20 @@ export default class ProfileScreen extends React.Component {
   }
 
   async loadWeightData() {
-    fetch('route-for-weightdata')
+    fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/weight`)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        //get the data and set state here
+        if(weightData.labels.length > 0){
+          weightData.labels = [];
+          weightData.datasets[0].data = [];
+        }
+        for(let x = 0; x < data.length;x++){
+          weightData.labels.push(data[x].date.slice(5));
+          weightData.datasets[0].data.push(data[x].weight);
+        }
+        this.setState({weightStats:this.calcWeightStats(weightData.datasets[0])});
       })
       .catch((err) => {
         console.log(err);
@@ -329,7 +339,7 @@ export default class ProfileScreen extends React.Component {
                       <Text style={styles.graphText}>Bodyweight History</Text>
                     </View>
                     <LineChart
-                      data={garbageWeightData}
+                      data={weightData}
                       width={screenWidth}
                       height={220}
                       chartConfig={chartConfig}
