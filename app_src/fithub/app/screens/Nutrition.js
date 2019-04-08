@@ -159,6 +159,9 @@ export class CalorieScreen extends React.Component {
     }
 
     async logCalories(calories) {
+        if(+calories === 0) return;
+        if(+this.state.calories === 10000) return;
+
         let date = new Date();
         let offsetInHours = date.getTimezoneOffset() / 60;
         date.setHours(date.getHours() - offsetInHours);
