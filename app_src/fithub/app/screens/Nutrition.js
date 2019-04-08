@@ -166,7 +166,7 @@ export class CalorieScreen extends React.Component {
 
         let newCalories = {
             date: dateString,
-            calories: Math.round(+this.state.calories + +calories)
+            calories: +this.state.calories + +calories > 10000 ? 10000 : Math.round(+this.state.calories + +calories)
         }
 
         editCalories(newCalories).then(() => {
