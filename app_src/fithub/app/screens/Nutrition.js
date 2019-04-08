@@ -166,7 +166,7 @@ export class CalorieScreen extends React.Component {
 
         let newCalories = {
             date: dateString,
-            calories: +this.state.calories + +calories
+            calories: Math.round(+this.state.calories + +calories)
         }
 
         editCalories(newCalories).then(() => {
