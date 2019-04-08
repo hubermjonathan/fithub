@@ -29,6 +29,37 @@ let weightData = {
         strokeWidth: 2 // optional
     }]
 }
+let calorieData = {
+    labels: ["1"],
+    datasets: [{
+        data: [1],
+        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+        strokeWidth: 2 // optional
+    }]
+}
+
+function calcStats(obj) {
+        let min = obj.data[0];
+        let max = obj.data[0];
+        let average = parseInt(obj.data[0]);
+
+
+        for (let x = 1; x < obj.data.length; x++) {
+            if (obj.data[x] < min) {
+                min = obj.data[x];
+            }
+            if (obj.data[x] > max) {
+                max = obj.data[x];
+            }
+            average += parseInt(obj.data[x]);
+
+        }
+        average = average / obj.data.length;
+
+        let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
+
+        return newobj;
+    }
 
 export class CalorieScreen extends React.Component {
     constructor(props) {
@@ -37,6 +68,12 @@ export class CalorieScreen extends React.Component {
         this.state = {
             loaded: false,
             calories: 0,
+            calorieStats: {
+                data: calorieData.datasets[0].data,
+                min: 0,
+                max: 0,
+                average: 0
+            },
         };
     }
 
@@ -49,6 +86,28 @@ export class CalorieScreen extends React.Component {
             this.loader();
         });
 
+    }
+
+    async loadCalorieData() {
+        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/calories`)
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => {
+               // console.log(data);
+                if (calorieData.labels.length > 0) {
+                    calorieData.labels = [];
+                    calorieData.datasets[0].data = [];
+                }
+                for (let x = 0; x < data.length; x++) {
+                    calorieData.labels.push(data[x].date.slice(5));
+                    calorieData.datasets[0].data.push(data[x].calories);
+                }
+                this.setState({ calorieStats: calcStats(calorieData.datasets[0]) });
+            })
+            .catch((err) => {
+                console.log(err);
+            })
     }
 
     loader() {
@@ -69,6 +128,9 @@ export class CalorieScreen extends React.Component {
                     });
                 }
             });
+
+            this.loadCalorieData();
+
         }
 
     }
@@ -132,7 +194,28 @@ export class CalorieScreen extends React.Component {
                 </View>
                 <View style={styles.graphsContainer}>
                     <View style={styles.graphCard}>
-                        <Text style={styles.graphLabel}>This Week</Text>
+                        <Text style={styles.graphText}>History</Text>
+                        <View>
+                            <LineChart
+                                data={calorieData}
+                                width={screenWidth * .80}
+                                height={190}
+                                chartConfig={chartConfig}
+                            />
+
+                        </View>
+
+                    </View>
+                    <View style={styles.graphStats}>
+                        <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
+                            Min: {this.state.calorieStats.min}
+                                </Text>
+                        <Text style={{ fontSize: 18, color: 'white' }}>
+                            Max: {this.state.calorieStats.max}
+                                </Text>
+                        <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
+                            Average: {this.state.calorieStats.average}
+                                </Text>
                     </View>
                 </View>
             </SafeAreaView>
@@ -188,35 +271,11 @@ export class WeightScreen extends React.Component {
                     weightData.labels.push(data[x].date.slice(5));
                     weightData.datasets[0].data.push(data[x].weight);
                 }
-                this.setState({ weightStats: this.calcWeightStats(weightData.datasets[0]) });
+                this.setState({ weightStats: calcStats(weightData.datasets[0]) });
             })
             .catch((err) => {
                 console.log(err);
             })
-    }
-
-    calcWeightStats(obj) {
-        let min = obj.data[0];
-        let max = obj.data[0];
-        let average = parseInt(obj.data[0]);
-
-
-        for (let x = 1; x < obj.data.length; x++) {
-            if (obj.data[x] < min) {
-                min = obj.data[x];
-            }
-            if (obj.data[x] > max) {
-                max = obj.data[x];
-            }
-            average += parseInt(obj.data[x]);
-
-        }
-        average = average / obj.data.length;
-
-        let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
-
-
-        return newobj;
     }
 
     enterWeight() {
