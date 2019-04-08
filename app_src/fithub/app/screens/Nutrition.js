@@ -134,6 +134,7 @@ export class CalorieScreen extends React.Component {
         }
 
     }
+
     enterCalories() {
         AlertIOS.prompt(
             'Log Calories',
@@ -229,7 +230,8 @@ export class WeightScreen extends React.Component {
         super(props);
 
         this.state = {
-            weight: 180,
+            loaded: false,
+            weight: 0,
             weightStats: {
                 data: weightData.datasets[0].data,
                 min: 0,
@@ -252,6 +254,12 @@ export class WeightScreen extends React.Component {
 
     loader() {
         if (this.state.loaded) {
+            getWeight(this.state.id).then(weight => {
+                this.setState({
+                    weight: weight[weight.length - 1].weight,
+                });
+            });
+
             this.loadWeightData();
         }
     }
@@ -301,9 +309,21 @@ export class WeightScreen extends React.Component {
         );
     }
 
-    logWeight(weight) {
-        this.setState({
-            weight: Math.round(+weight),
+    async logWeight(weight) {
+        let date = new Date();
+        let offsetInHours = date.getTimezoneOffset() / 60;
+        date.setHours(date.getHours() - offsetInHours);
+        let dateString = date.toJSON().slice(0, 10);
+
+        let newWeight = {
+            date: dateString,
+            weight: Math.round(+weight)
+        }
+
+        editWeight(newWeight).then(() => {
+            setTimeout(() => {
+                this.loader();
+            }, 300);
         });
     }
 
@@ -312,7 +332,7 @@ export class WeightScreen extends React.Component {
             <SafeAreaView style={styles.containerIOS}>
                 <View style={styles.loggingContainer}>
                     <View style={styles.numberContainer}>
-                        <Text style={styles.trackingNumber}>{this.state.weight}</Text>
+                        <Text style={styles.trackingNumber}>{this.state.loaded ? this.state.weight : 0}</Text>
                         <Text style={styles.trackingText}>lbs</Text>
                     </View>
                     <View style={styles.buttonContainer}>
