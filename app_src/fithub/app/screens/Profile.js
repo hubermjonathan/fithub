@@ -242,11 +242,11 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.statsRow}>
                 <View style={styles.statContainer}>
                   <Text style={styles.statText}>{this.state.stat1.name}:</Text>
-                  <Text style={styles.statText}>{this.state.stat1.data}</Text>
+                  <Text style={styles.statText}>{this.state.stat1.data === undefined ? 0 : this.state.stat1.data}</Text>
                 </View>
                 <View style={styles.statContainer}>
                   <Text style={styles.statText}>{this.state.stat2.name}:</Text>
-                  <Text style={styles.statText}>{this.state.stat2.data}</Text>
+                  <Text style={styles.statText}>{this.state.stat2.data === undefined ? 0 : this.state.stat2.data}</Text>
                 </View>
               </View>
             </View>
@@ -346,6 +346,8 @@ class Activity extends React.Component {
     let activities = await getProfileActivity(this.state.id);
     activities = activities.activity;
     let parsedActivities = [];
+
+    if(activities === undefined) return;
 
     for (let i = 0; i < activities.length; i++) {
       if(activities[i] === null) continue;
