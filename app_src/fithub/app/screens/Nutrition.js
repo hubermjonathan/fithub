@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
         padding: 15,
         height: '90%',
         width: '90%',
-        borderRadius: 5,
+        borderRadius: 15,
         backgroundColor: '#fff',
     },
     graphLabel: {
