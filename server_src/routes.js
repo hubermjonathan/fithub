@@ -43,6 +43,7 @@ router.post('/logs/edit', apiCtrl.editLog);                   //Post a users wor
 router.post('/logs/weight', apiCtrl.logWeight);                   //Post a users new weight
 router.post('/logs/calories', apiCtrl.logCalories);                   //Post a users new calories
 router.get('/logs/:id/calories', apiCtrl.getCalories);                     //Get a users calorie logs
+router.get('/logs/:id/calorieChart/', apiCtrl.calorieChart);                     //Get a users calorie chart
 router.get('/logs/:id/weight', apiCtrl.getWeight);                     //Get a users weight logs
 
 //router.post('/dev/exercises/new', apiCtrl.devExercise);     //Post a custom standard exercise (DEV ONLY)

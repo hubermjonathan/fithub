@@ -1453,6 +1453,61 @@ let getWeight = async function getWeight(req,res){
   res.status(200).send(user.weight);
 }
 
+let calorieChart = async function calorieChart(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  let rangeA = req.params.from;
+  let rangeB = req.params.to;
+
+  let calories = user.calories;
+
+  let data = [];
+
+  if(rangeA && rangeB){
+    let markerFound = false;
+    calories.forEach(c => {
+      if(c.date == rangeA && !markerFound){
+        markerFound = true;
+      }
+      if(markerFound){
+        data.push(c);
+      }
+      if(c.date == rangeB){
+        return;
+      }
+    });
+  }
+  else if(rangeA && !rangeB){
+    let markerFound = false;
+    calories.forEach(c => {
+      if(c.date == rangeA && !markerFound){
+        markerFound = true;
+      }
+      if(markerFound){
+        data.push(c);
+      }
+    });
+  }
+  else{
+    data = user.calories;
+  }
+
+  let dates= [];
+  let calorie = [];
+
+  data.forEach(d => {
+    dates.push(d.date);
+    calorie.push(d.calories);
+  })
+
+  let chart = {
+    dates: dates,
+    calories: calorie
+  }
+  res.status(200).send(chart);
+}
+
+
 
 let apiCtrl = {
   login: login,
@@ -1486,6 +1541,7 @@ let apiCtrl = {
   logCalories: logCalories,
   getCalories: getCalories,
   getWeight: getWeight,
+  calorieChart: calorieChart,
 
 
   users: users,                     //Returns all users
