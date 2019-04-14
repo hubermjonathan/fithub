@@ -11,7 +11,8 @@ import {
     FlatList,
     TouchableOpacity,
     List,
-    Alert
+    Alert,
+    Button
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
@@ -22,7 +23,7 @@ export default class WorkoutCard extends React.Component {
         super(props);
         this.state = {
             user: '',
-            userPhoto: 'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            likedByUser: false,
         }
     }
 
@@ -42,7 +43,9 @@ export default class WorkoutCard extends React.Component {
             });
     }
 
-
+    changeLike() {
+        //TODO
+    }
 
 
     render() {
@@ -88,6 +91,29 @@ export default class WorkoutCard extends React.Component {
                             renderItem={(exercise) => this.renderExercises(exercise)}
                         />
                     </View>
+
+                    {/* comments of workout */}
+                    <View style={styles.commentsList}>
+                        <FlatList
+                            listKey="comments"
+                            scrollEnabled={false}
+                            data={this.props.comments}
+                            listKey={(item, index) => 'D' + index.toString()}
+                            renderItem={(comment) => this.renderComments(comment)}
+                        />
+                    </View>
+                    {/* commentBox and like button */}
+                    <View style={styles.likeComment}>
+                        <View style={this.state.likedByUser? styles.liked: styles.unliked}>
+                            {console.log(this.state.likedByUser)}
+                            <Button
+                                title="Like"
+                                onPress={()=>{
+                                    this.changeLike();
+                                }}
+                            />
+                        </View>
+                    </View>
                 </View>
             </SafeAreaView >
         );
@@ -101,6 +127,14 @@ export default class WorkoutCard extends React.Component {
             </View>
         );
     }
+
+    renderComments(comment) {
+        return (
+            <View style={styles.comment}>
+                <Text>{comment}</Text>
+            </View>
+        )
+    }
 }
 
 
@@ -110,7 +144,7 @@ const styles = StyleSheet.create({
         height: 'auto',
         margin: 10,
         padding: 5,
-        backgroundColor: 'lightgrey',
+        backgroundColor: 'white',
     },
     user: {
         padding: 0,
@@ -152,10 +186,28 @@ const styles = StyleSheet.create({
     },
     exerciseList: {
         paddingBottom: 10,
-        paddingTop: 10
+        paddingTop: 10,
+        borderBottomWidth: .5,
     },
     exercise: {
         padding: 2,
         fontSize: 15,
-    }
+    },
+    commentsList: {
+
+    },
+    comment: {
+        fontSize: 12,
+    },
+    likeComment: {
+        flexDirection: 'row',
+    },
+    liked: {
+        justifyContent: 'flex-end',
+        color: '#00adf5',
+    },
+    unliked: {
+        justifyContent: 'flex-end',
+        color: 'black',
+    },
 });
