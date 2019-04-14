@@ -96,7 +96,7 @@ export default class Calendar extends React.Component {
     return (
       <TouchableHighlight
         onPress={() => { this.props.navigation.push('Details', item)}}
-        style={styles.item}
+        style={[styles.item, styles.dropShadow]}
         underlayColor='#eee'
       >
         <Text style={{fontWeight: 'bold', fontSize: 24}}>{item.name}</Text>
@@ -107,7 +107,7 @@ export default class Calendar extends React.Component {
   renderEmptyDate() {
     return (
       <View style={styles.empty}>
-        <Text>You missed the gym this day!</Text>
+        <Text>No workout logged...</Text>
       </View>
     );
   }
@@ -132,5 +132,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 15,
     paddingTop: 30
+  },
+  dropShadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+        width: 1,
+        height: 2,
+    },
+    shadowOpacity: .4,
+    shadowRadius: 3,
   },
 });

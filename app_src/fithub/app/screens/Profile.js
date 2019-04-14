@@ -23,15 +23,6 @@ const chartConfig = {
   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
   strokeWidth: 3 // optional, default 3
 }
-//delete this later
-const garbageVolumeData = {
-  labels: ['03-04', '03-05', '03-10', '04-04', '04-09', '04-21'],
-  datasets: [{
-    data: [820, 1320, 990, 1204, 1193, 1002],
-    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-    strokeWidth: 2 // optional
-  }]
-}
 const screenWidth = Dimensions.get('window').width
 
 export default class ProfileScreen extends React.Component {
@@ -74,13 +65,6 @@ export default class ProfileScreen extends React.Component {
       stat2: {
         name: "Stat 2",
         data: 0,
-      },
-  
-      volumeStats:{
-        data:garbageVolumeData.datasets[0].data,
-        min:0,
-        max:0,
-        average:0
       }
     }
 
@@ -92,10 +76,7 @@ export default class ProfileScreen extends React.Component {
       this.loadUserData();
       this.loadUserStats();
       this.loadWorkoutActivity();
-      this.loadWorkoutDates();
-      this.setState({volumeStats:this.calcStats(this.state.volumeStats)});
-
-      
+      this.loadWorkoutDates(); 
     }
   }
 
@@ -118,7 +99,7 @@ export default class ProfileScreen extends React.Component {
     average = average / obj.data.length;
 
     let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
-    
+
     return newobj;
 }
 
@@ -261,11 +242,11 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.statsRow}>
                 <View style={styles.statContainer}>
                   <Text style={styles.statText}>{this.state.stat1.name}:</Text>
-                  <Text style={styles.statText}>{this.state.stat1.data}</Text>
+                  <Text style={styles.statText}>{this.state.stat1.data === undefined ? 0 : this.state.stat1.data}</Text>
                 </View>
                 <View style={styles.statContainer}>
                   <Text style={styles.statText}>{this.state.stat2.name}:</Text>
-                  <Text style={styles.statText}>{this.state.stat2.data}</Text>
+                  <Text style={styles.statText}>{this.state.stat2.data === undefined ? 0 : this.state.stat2.data}</Text>
                 </View>
               </View>
             </View>
@@ -303,23 +284,6 @@ export default class ProfileScreen extends React.Component {
                   <View style={{ paddingTop: '3%' }}>
                     <View style = {styles.graphTitle}>
                       <Text style={styles.graphText}>Volume History</Text>
-                    </View>
-                    <LineChart
-                      data={garbageVolumeData}
-                      width={screenWidth}
-                      height={220}
-                      chartConfig={chartConfig}
-                    />
-                    <View style={styles.graphStats}>
-                      <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
-                        Min: {this.state.volumeStats.min} lbs
-                      </Text>
-                      <Text style={{ fontSize: 18, color: 'white' }}>
-                        Max: {this.state.volumeStats.max} lbs
-                      </Text>
-                      <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
-                        Average: {this.state.volumeStats.average} lbs
-                      </Text>
                     </View>
                   </View>
 
@@ -382,6 +346,8 @@ class Activity extends React.Component {
     let activities = await getProfileActivity(this.state.id);
     activities = activities.activity;
     let parsedActivities = [];
+
+    if(activities === undefined) return;
 
     for (let i = 0; i < activities.length; i++) {
       if(activities[i] === null) continue;

@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert, FlatList, TextInput, Modal, TouchableHighlight } from 'react-native';
+import NavigationActions from 'react-navigation';
 import Swipeout from 'react-native-swipeout'; 
 
 import ExerciseCard from '../components/ExerciseCard';
 import { DefaultExercises } from '../defaults/Exercises';
 
 import SelectExercisesScreen from './SelectExercises';
+import { postWorkout } from '../lib/WorkoutFunctions';
 
 export default class CreateWorkoutScreen extends React.Component {
 
@@ -16,14 +18,13 @@ export default class CreateWorkoutScreen extends React.Component {
                 visible: false,
             },
             workout: {
-                name: undefined,
+                description: undefined,
                 exercises: [],
             }
         }
     }
     
     render() {
-        console.log(this.state);
         return (
             <ScrollView>
                 <View style={styles.page}>
@@ -71,11 +72,11 @@ export default class CreateWorkoutScreen extends React.Component {
                         <View style={styles.cardTitle}> 
                             <TextInput
                                 style={styles.titleText}
-                                placeholder='Workout Name'
+                                placeholder='Workout Description'
                                 //multiline={true}
                                 onChangeText={(text) => 
                                     this.setState(prevState => (
-                                        { ...prevState, name: text }
+                                        { ...prevState, workout: {...prevState.workout, description: text } }
                                     ))
                                 }
                             />
@@ -122,7 +123,7 @@ export default class CreateWorkoutScreen extends React.Component {
                     {/*BUTTONS: Add Exercise and Create*/}
                     <View style={styles.buttonRow}>
                         <View style={styles.buttonView}>
-                            <TouchableOpacity
+                            <TouchableOpacity 
                                 style={styles.button}
                                 onPress={() =>                                  
                                     this.setState(prevState => (
@@ -138,11 +139,25 @@ export default class CreateWorkoutScreen extends React.Component {
                         <View style={styles.buttonView}>
                             <TouchableOpacity
                                 style={styles.button}                                
-                                onPress={() => { 
-                                    //PUSH WORKOUT TO DATABASE HERE
-                                    this.setState(prevState => (
-                                        { ...prevState, modal: {visible: false}})
-                                    )
+                                onPress={() => {
+                                    console.log("Workout description: ", this.state.workout.description);
+                                    if (this.state.workout.description !== undefined) {
+                                        let newWorkout = { 
+                                            name: this.state.workout.description,
+                                            description: this.state.workout.description,
+                                            exercises: this.state.workout.exercises,
+                                        }
+                                        postWorkout(newWorkout);
+                                        this.props.navigation.goBack(null);
+                                    } else {
+                                        Alert.alert(
+                                            'Submission Error',
+                                            'A workout requires a valid description',
+                                            [
+                                                {text: "OK", onPress: () => {}}
+                                            ],
+                                        );
+                                    }
                                 }}
                             >
                                 <Text style={styles.buttonText}>
@@ -165,7 +180,7 @@ const styles = StyleSheet.create({
 
     //Modal
     modal: {
-
+        flex: 1,
     },
     modalHeading: {
         paddingTop: 15,
@@ -179,7 +194,7 @@ const styles = StyleSheet.create({
     
     //Exercise Card
     card: {
-        //flex: 1,
+        flex: 1,
         width: '100%',
         alignContent: 'stretch',
         backgroundColor: '#fff',

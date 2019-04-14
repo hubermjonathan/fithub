@@ -17,10 +17,9 @@ export default class CustomWorkoutsScreen extends React.Component {
 
     async componentWillMount() {
         const id = await getUserID();
-        const workouts = await getWorkouts(id);
-        console.log("Workout response: ", workouts);
+        let response = await getWorkouts(id); 
         this.setState({
-            workouts: workouts,
+            workouts: response.workouts,
         })
     }
  
