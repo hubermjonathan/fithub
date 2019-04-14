@@ -16,26 +16,20 @@ const chartConfig = {
     backgroundGradientFrom: '#ffffff',
     backgroundGradientTo: '#ffffff',
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    strokeWidth: 3 // optional, default 3
+    strokeWidth: 3, // optional, default 3
 }
 
 const screenWidth = Dimensions.get('window').width
 
-let weightData = {
-    labels: ["1"],
-    datasets: [{
-        data: [1],
-        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-        strokeWidth: 2 // optional
-    }]
-}
-let calorieData = {
-    labels: ["1"],
-    datasets: [{
-        data: [1],
+// let calorieData = {
+//     labels: ["1"],
+//     datasets: [{
+//         data: [1],
+//         color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // optional
+//         strokeWidth: 3 // optional
 
-    }]
-}
+//     }]
+// }
 
 function calcStats(obj) {
         let min = obj.data[0];
@@ -68,11 +62,20 @@ export class CalorieScreen extends React.Component {
             loaded: false,
             calories: 0,
             calorieStats: {
-                data: calorieData.datasets[0].data,
+                data: [],
                 min: 0,
                 max: 0,
                 average: 0
             },
+            calorieData:{
+                labels: [],
+                datasets: [{
+                    data: [],
+                    color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // optional
+                    strokeWidth: 3 // optional
+            
+                }]
+            }
         };
     }
 
@@ -84,8 +87,7 @@ export class CalorieScreen extends React.Component {
             });
             this.loader();
         });
-        
-
+    
     }
 
     async loadCalorieData() {
@@ -94,24 +96,24 @@ export class CalorieScreen extends React.Component {
                 return res.json();
             })
             .then((data) => {
-               console.log(data);
-                if (calorieData.labels.length > 0) {
-                    calorieData.labels = [];
-                    calorieData.datasets[0].data = [];
+               //console.log(data);
+                if (this.state.calorieData.labels.length > 0) {
+                    this.state.calorieData.labels = [];
+                    this.state.calorieData.datasets[0].data = [];
                 }
                 if(data.length < 7){
                     for (let x = 0; x < data.length; x++) {
-                        calorieData.labels.push(data[x].date.slice(5));
-                        calorieData.datasets[0].data.push(data[x].calories);
+                        this.state.calorieData.labels.push(data[x].date.slice(5));
+                        this.state.calorieData.datasets[0].data.push(data[x].calories);
                     }
                 }
                 else{
                     for (let x = data.length-6; x < data.length; x++) {
-                        calorieData.labels.push(data[x].date.slice(5));
-                        calorieData.datasets[0].data.push(data[x].calories);
+                        this.state.calorieData.labels.push(data[x].date.slice(5));
+                        this.state.calorieData.datasets[0].data.push(data[x].calories);
                     }
                 }
-                this.setState({ calorieStats: calcStats(calorieData.datasets[0]) });
+                this.setState({ calorieStats: calcStats(this.state.calorieData.datasets[0]) });
             })
             .catch((err) => {
                 console.log(err);
@@ -135,11 +137,10 @@ export class CalorieScreen extends React.Component {
                         calories: 0,
                     });
                 }
-            });
-
+            }); 
             this.loadCalorieData();
-
         }
+        
 
     }
 
@@ -157,6 +158,7 @@ export class CalorieScreen extends React.Component {
                     text: 'Add',
                     onPress: (calories) => {
                         this.logCalories(calories);
+                       
                     }
                 },
             ],
@@ -207,15 +209,21 @@ export class CalorieScreen extends React.Component {
                 <View style={styles.graphsContainer}>
                     <View style={styles.graphCard}>
                         <Text style={styles.graphText}>History</Text>
-                        <View>
+                        <View>{
+                            this.state.calorieData.labels.length > 0?
                             <LineChart
-                                data={calorieData}
+                                data={this.state.calorieData}
                                 width={screenWidth * .80}
                                 height={190}
-                                chartConfig={chartConfig}
-                            />
+                                chartConfig={chartConfig}    
+                            /> :
+                            <Text> Loading... </Text>
+                        }
+                              
                         </View>
                     </View>
+                    {
+                    this.state.calorieStats.data.length > 0?
                     <View style={styles.graphStats}>
                         <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
                             Min: {this.state.calorieStats.min}
@@ -226,7 +234,9 @@ export class CalorieScreen extends React.Component {
                         <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
                             Average: {this.state.calorieStats.average}
                                 </Text>
-                    </View>
+                    </View>:
+                    <Text>Loading...</Text>
+                    }
                 </View>
             </SafeAreaView>
         );
@@ -242,11 +252,19 @@ export class WeightScreen extends React.Component {
             loaded: false,
             weight: 0,
             weightStats: {
-                data: weightData.datasets[0].data,
+                data: [],
                 min: 0,
                 max: 0,
                 average: 0
             },
+            weightData:{
+                labels:[],
+                datasets:[{
+                    data:[],
+                    color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // optional
+                    strokeWidth: 3 // optional
+                }]
+            }
         };
     }
 
@@ -269,9 +287,9 @@ export class WeightScreen extends React.Component {
                     weight: weight[weight.length - 1].weight,
                 });
             });
-
             this.loadWeightData();
         }
+       
     }
 
     async loadWeightData() {
@@ -280,23 +298,23 @@ export class WeightScreen extends React.Component {
                 return res.json();
             })
             .then((data) => {
-                if (weightData.labels.length > 0) {
-                    weightData.labels = [];
-                    weightData.datasets[0].data = [];
+                if (this.state.weightData.labels.length > 0) {
+                    this.state.weightData.labels = [];
+                    this.state.weightData.datasets[0].data = [];
                 }
                 if(data.length < 7){
                     for (let x = 0; x < data.length; x++) {
-                        weightData.labels.push(data[x].date.slice(5));
-                        weightData.datasets[0].data.push(data[x].weight);
+                        this.state.weightData.labels.push(data[x].date.slice(5));
+                        this.state.weightData.datasets[0].data.push(data[x].weight);
                     }
                 }
                 else{
                     for (let x = data.length-6; x < data.length; x++) {
-                        weightData.labels.push(data[x].date.slice(5));
-                        weightData.datasets[0].data.push(data[x].weight);
+                        this.state.weightData.labels.push(data[x].date.slice(5));
+                        this.state.weightData.datasets[0].data.push(data[x].weight);
                     }
                 }
-                this.setState({ weightStats: calcStats(weightData.datasets[0]) });
+                this.setState({ weightStats: calcStats(this.state.weightData.datasets[0]) });
             })
             .catch((err) => {
                 console.log(err);
@@ -364,27 +382,35 @@ export class WeightScreen extends React.Component {
                     <View style={styles.graphCard}>
                         <Text style={styles.graphText}>History</Text>
                         <View>
-                            <LineChart
-                                data={weightData}
-                                width={screenWidth * .80}
-                                height={190}
-                                chartConfig={chartConfig}
-                            />
+                            { 
+                            this.state.weightData.labels.length > 0?
+                                <LineChart
+                                    data={this.state.weightData}
+                                    width={screenWidth * .80}
+                                    height={190}
+                                    chartConfig={chartConfig}
+                                />:
+                            <Text>Loading...</Text>
+                         }
 
                         </View>
 
                     </View>
-                    <View style={styles.graphStats}>
-                        <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
-                            Min: {this.state.weightStats.min} lbs
-                                </Text>
-                        <Text style={{ fontSize: 18, color: 'white' }}>
-                            Max: {this.state.weightStats.max} lbs
-                                </Text>
-                        <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
-                            Average: {this.state.weightStats.average} lbs
-                                </Text>
-                    </View>
+                    {
+                       this.state.weightStats.data.length > 0? 
+                        <View style={styles.graphStats}>
+                            <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
+                                Min: {this.state.weightStats.min} lbs
+                                    </Text>
+                            <Text style={{ fontSize: 18, color: 'white' }}>
+                                Max: {this.state.weightStats.max} lbs
+                                    </Text>
+                            <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
+                                Average: {this.state.weightStats.average} lbs
+                                    </Text>
+                        </View>:
+                    <Text>Loading...</Text>
+                    }
                 </View>
             </SafeAreaView>
         );
