@@ -1456,39 +1456,53 @@ let getWeight = async function getWeight(req,res){
 let calorieChart = async function calorieChart(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
   let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
-  let rangeA = req.params.from;
-  let rangeB = req.params.to;
+  let rangeA;
+  let rangeB;
+  let dateA;
+  let dateB;
+  if(req.params.from){
+    rangeA = req.params.from.split("-");
+    dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
+  }
+  if(req.params.to){
+    rangeB = req.params.to.split("-");
+    dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
+  }
 
   let calories = user.calories;
 
   let data = [];
 
-  if(rangeA && rangeB){
-    let markerFound = false;
+  if(req.params.from && req.params.to){
     calories.forEach(c => {
-      if(c.date == rangeA && !markerFound){
-        markerFound = true;
-      }
-      if(markerFound){
-        data.push(c);
-      }
-      if(c.date == rangeB){
-        return;
-      }
-    });
-  }
-  else if(rangeA && !rangeB){
-    let markerFound = false;
-    calories.forEach(c => {
-      if(c.date == rangeA && !markerFound){
-        markerFound = true;
-      }
-      if(markerFound){
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if(date >= dateA && date <= dateB) {
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("B: " + dateB.toString());
+        console.log("CurrDate: " + date.toString());
+        */
         data.push(c);
       }
     });
   }
-  else{
+  else if(req.params.from && !req.params.to){
+    calories.forEach(c => {
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if (date >= dateA) {
+        data.push(c);
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("CurrDate: " + date.toString());
+        */
+      }
+    });
+  }
+  else {
     data = user.calories;
   }
 
@@ -1497,12 +1511,127 @@ let calorieChart = async function calorieChart(req,res){
 
   data.forEach(d => {
     dates.push(d.date);
-    calorie.push(d.calories);
+    calorie.push(+d.calories);
   })
+
+  let avgCalories;
+  let minCalories;
+  let maxCalories;
+  let sum = 0;
+  if(calorie.length != 0){
+    minCalories = calorie[0];
+    maxCalories = calorie[0];
+    calorie.forEach(c => {
+      sum += +c;
+      if (c < minCalories) {
+        minCalories = c;
+      }
+      if (c > maxCalories) {
+        maxCalories = c;
+      }
+    });
+    avgCalories = (sum / calorie.length);
+  }
 
   let chart = {
     dates: dates,
-    calories: calorie
+    calories: calorie,
+    min: minCalories,
+    max: maxCalories,
+    avg: avgCalories
+  }
+  res.status(200).send(chart);
+}
+
+let weightChart = async function weightChart(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  let rangeA;
+  let rangeB;
+  let dateA;
+  let dateB;
+  if(req.params.from){
+    rangeA = req.params.from.split("-");
+    dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
+  }
+  if(req.params.to){
+    rangeB = req.params.to.split("-");
+    dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
+  }
+
+  let weight = user.weight;
+
+  let data = [];
+
+  if(req.params.from && req.params.to){
+    weight.forEach(c => {
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if(date >= dateA && date <= dateB) {
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("B: " + dateB.toString());
+        console.log("CurrDate: " + date.toString());
+        */
+        data.push(c);
+      }
+    });
+  }
+  else if(req.params.from && !req.params.to){
+    weight.forEach(c => {
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if (date >= dateA) {
+        data.push(c);
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("CurrDate: " + date.toString());
+        */
+      }
+    });
+  }
+  else {
+    data = user.weight;
+  }
+
+  let dates = [];
+  let volume = [];
+
+
+  //console.log(data);
+
+  data.forEach(d => {
+    dates.push(d.date);
+    volume.push(+d.weight);
+  })
+
+  let avgVolume;
+  let minVolume;
+  let maxVolume;
+  let sum = 0;
+  if(volume.length != 0){
+    minVolume = volume[0];
+    maxVolume = volume[0];
+    volume.forEach(c => {
+      sum += +c;
+      if (c < minVolume) {
+        minVolume = c;
+      }
+      if (c > maxVolume) {
+        maxVolume = c;
+      }
+    });
+    avgVolume = (sum / volume.length);
+  }
+
+  let chart = {
+    dates: dates,
+    volume: volume,
+    min: minVolume,
+    max: maxVolume,
+    avg: avgVolume
   }
   res.status(200).send(chart);
 }
@@ -1542,6 +1671,7 @@ let apiCtrl = {
   getCalories: getCalories,
   getWeight: getWeight,
   calorieChart: calorieChart,
+  weightChart: weightChart,
 
 
   users: users,                     //Returns all users
