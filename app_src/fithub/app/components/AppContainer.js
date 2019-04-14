@@ -55,7 +55,7 @@ const NutritionTabs = createMaterialTopTabNavigator(
     },
   },
   {
-    swipeEnabled: true,
+    swipeEnabled: false,
     tabBarOptions: {
       upperCaseLabel: false,
       tabStyle: {

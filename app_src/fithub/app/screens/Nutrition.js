@@ -33,8 +33,7 @@ let calorieData = {
     labels: ["1"],
     datasets: [{
         data: [1],
-        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-        strokeWidth: 2 // optional
+
     }]
 }
 
@@ -85,6 +84,7 @@ export class CalorieScreen extends React.Component {
             });
             this.loader();
         });
+        
 
     }
 
@@ -94,14 +94,22 @@ export class CalorieScreen extends React.Component {
                 return res.json();
             })
             .then((data) => {
-               // console.log(data);
+               console.log(data);
                 if (calorieData.labels.length > 0) {
                     calorieData.labels = [];
                     calorieData.datasets[0].data = [];
                 }
-                for (let x = 0; x < data.length; x++) {
-                    calorieData.labels.push(data[x].date.slice(5));
-                    calorieData.datasets[0].data.push(data[x].calories);
+                if(data.length < 7){
+                    for (let x = 0; x < data.length; x++) {
+                        calorieData.labels.push(data[x].date.slice(5));
+                        calorieData.datasets[0].data.push(data[x].calories);
+                    }
+                }
+                else{
+                    for (let x = data.length-6; x < data.length; x++) {
+                        calorieData.labels.push(data[x].date.slice(5));
+                        calorieData.datasets[0].data.push(data[x].calories);
+                    }
                 }
                 this.setState({ calorieStats: calcStats(calorieData.datasets[0]) });
             })
@@ -206,9 +214,7 @@ export class CalorieScreen extends React.Component {
                                 height={190}
                                 chartConfig={chartConfig}
                             />
-
                         </View>
-
                     </View>
                     <View style={styles.graphStats}>
                         <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
@@ -252,6 +258,7 @@ export class WeightScreen extends React.Component {
             });
             this.loader();
         });
+        
 
     }
 
@@ -273,14 +280,21 @@ export class WeightScreen extends React.Component {
                 return res.json();
             })
             .then((data) => {
-
                 if (weightData.labels.length > 0) {
                     weightData.labels = [];
                     weightData.datasets[0].data = [];
                 }
-                for (let x = 0; x < data.length; x++) {
-                    weightData.labels.push(data[x].date.slice(5));
-                    weightData.datasets[0].data.push(data[x].weight);
+                if(data.length < 7){
+                    for (let x = 0; x < data.length; x++) {
+                        weightData.labels.push(data[x].date.slice(5));
+                        weightData.datasets[0].data.push(data[x].weight);
+                    }
+                }
+                else{
+                    for (let x = data.length-6; x < data.length; x++) {
+                        weightData.labels.push(data[x].date.slice(5));
+                        weightData.datasets[0].data.push(data[x].weight);
+                    }
                 }
                 this.setState({ weightStats: calcStats(weightData.datasets[0]) });
             })
@@ -288,7 +302,6 @@ export class WeightScreen extends React.Component {
                 console.log(err);
             })
     }
-
     enterWeight() {
         AlertIOS.prompt(
             'Log Weight',
