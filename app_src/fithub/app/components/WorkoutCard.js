@@ -124,6 +124,13 @@ export default class WorkoutCard extends React.Component {
                             />
                         </View>
                         <View style={styles.like}>
+                            <Text style={styles.likeText}>{this.props.likes} likes</Text>
+                            <Icon
+                                name="heart"
+                                type="entypo"
+                                size={20}
+                                color='#00adf5'
+                            />
                             <Button
                                 style={this.props.likedByUser? {color: '#00adf5'}: {color: 'black'}}
                                 title="Like"
@@ -211,7 +218,7 @@ const styles = StyleSheet.create({
     },
     exercise: {
         padding: 2,
-        fontSize: 15,
+        fontSize: 18,
     },
     commentsList: {
 
@@ -225,9 +232,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     commentBox: {
+        padding: 4,
         fontSize: 20,
-
     },  
     like: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    likeText: {
+        padding: 4,
+        fontSize: 20,
     }
 });
