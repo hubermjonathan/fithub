@@ -12,7 +12,8 @@ import {
     TouchableOpacity,
     List,
     Alert,
-    Button
+    Button,
+    TextInput
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
@@ -23,7 +24,7 @@ export default class WorkoutCard extends React.Component {
         super(props);
         this.state = {
             user: '',
-            likedByUser: false,
+            comment: '',
         }
     }
 
@@ -41,6 +42,13 @@ export default class WorkoutCard extends React.Component {
             .catch((err) => {
                 console.log(err);
             });
+    }
+
+    submitComment() {
+        //TODO
+        //add server calls to add comment to comment list
+
+        console.log(this.state.comment);
     }
 
     changeLike() {
@@ -102,11 +110,22 @@ export default class WorkoutCard extends React.Component {
                             renderItem={(comment) => this.renderComments(comment)}
                         />
                     </View>
+
                     {/* commentBox and like button */}
                     <View style={styles.likeComment}>
-                        <View style={this.state.likedByUser? styles.liked: styles.unliked}>
-                            {console.log(this.state.likedByUser)}
+                        <View style={styles.commentBox}>
+                            <TextInput
+                                style={styles.commentBox}
+                                placeholder="Add a comment..."
+                                onChangeText={(text) => this.setState({comment: text})}
+                                onSubmitEditing={() => {
+                                    this.submitComment()
+                                }}
+                            />
+                        </View>
+                        <View style={styles.like}>
                             <Button
+                                style={this.props.likedByUser? {color: '#00adf5'}: {color: 'black'}}
                                 title="Like"
                                 onPress={()=>{
                                     this.changeLike();
@@ -141,6 +160,7 @@ export default class WorkoutCard extends React.Component {
 
 const styles = StyleSheet.create({
     card: {
+        flex: 1,
         height: 'auto',
         margin: 10,
         padding: 5,
@@ -200,14 +220,14 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     likeComment: {
+        flex: 1,
         flexDirection: 'row',
+        justifyContent: 'space-between',
     },
-    liked: {
-        justifyContent: 'flex-end',
-        color: '#00adf5',
-    },
-    unliked: {
-        justifyContent: 'flex-end',
-        color: 'black',
-    },
+    commentBox: {
+        fontSize: 20,
+
+    },  
+    like: {
+    }
 });
