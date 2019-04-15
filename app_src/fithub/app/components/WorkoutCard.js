@@ -25,6 +25,7 @@ export default class WorkoutCard extends React.Component {
         this.state = {
             user: '',
             comment: '',
+            likedByUser: this.props.likedByUser,
         }
     }
 
@@ -53,6 +54,12 @@ export default class WorkoutCard extends React.Component {
 
     changeLike() {
         //TODO
+        if (this.state.likedByUser){
+            this.setState({likedByUser: false})
+        }
+        else {
+            this.setState({likedByUser: true})
+        }
     }
 
 
@@ -125,19 +132,18 @@ export default class WorkoutCard extends React.Component {
                         </View>
                         <View style={styles.like}>
                             <Text style={styles.likeText}>{this.props.likes} likes</Text>
-                            <Icon
-                                name="heart"
-                                type="entypo"
-                                size={20}
-                                color='#00adf5'
-                            />
-                            <Button
-                                style={this.props.likedByUser? {color: '#00adf5'}: {color: 'black'}}
-                                title="Like"
+                            <TouchableOpacity
                                 onPress={()=>{
                                     this.changeLike();
                                 }}
-                            />
+                            >
+                                <Icon
+                                    name={this.state.likedByUser? 'heart': 'heart-outlined'}
+                                    type="entypo"
+                                    size={25}
+                                    color={this.state.likedByUser? '#00adf5': 'black'}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
