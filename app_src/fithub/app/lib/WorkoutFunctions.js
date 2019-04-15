@@ -18,7 +18,7 @@ export async function postWorkout(workout) {
     }).then(res => res.json())
         .then((res) => console.log('Success', JSON.stringify(res)))
         .catch(function (e) {
-            console.log('Error');
+            console.log('Error', e);
         });
 }
 
@@ -30,8 +30,7 @@ export async function getWorkouts(id) {
             "Content-Type": "application/json",
         }
     });
-    let json = await response.json;
-    return json;
+    return await response.json();
 }
 
 // Get the public workouts where muscles is an array of muscle

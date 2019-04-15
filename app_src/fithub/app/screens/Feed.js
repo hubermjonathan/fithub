@@ -162,7 +162,7 @@ export default class FeedScreen extends React.Component {
   }
 render() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'lightgrey' }}>
       <View style={styles.header}>
         <View style={styles.title}>
           <Text style={styles.title}>Feed</Text>
@@ -207,6 +207,7 @@ render() {
             user={item.user}
             userPhoto={item.icon}
             exercises={item.exercises}
+            comments={item.comments}
             navigation={this.props.navigation}
           />
         )}

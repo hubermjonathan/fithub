@@ -12,13 +12,13 @@ export default class RoutineCard extends React.Component {
             <View style={styles.card}>
                 <View style={styles.cardTitle}>
                     <Text style={styles.titleText}>
-                        {this.props.workout.name}
+                        {this.props.workout.description}
                     </Text>
                 </View>
                 <View style={styles.cardBody}>
                     <FlatList
                         scrollEnabled={false}
-                        data={this.props.workout.exercises}
+                        data={this.props.workout.exercises} 
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={(item) =>  
                             <View style={styles.cardRow}>
@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     },
     titleText: {
         flexDirection: 'row',
+        textAlign: 'center',
         fontSize: 40,
         color: '#333',
     },

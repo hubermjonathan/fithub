@@ -25,13 +25,14 @@ export default class DefaultWorkoutsScreen extends React.Component {
             <View style={styles.page}>
                 {/*Modal For Scheduling*/}
                 <Modal
+                    style={styles.modal}
                     visible={this.state.modal.visible}
-                    transparent={false}
+                    //transparent={false}
                     animationType="fade"
                     presentationStyle="pageSheet"
-                >
+                > 
                     <View style={styles.modal}>
-                        <View pointerEvents='none'>
+                        <View>
                             <View style={styles.headingContainer}>
                                 <Text style={styles.heading}>
                                     Schedule A Workout
@@ -75,8 +76,7 @@ export default class DefaultWorkoutsScreen extends React.Component {
                                     <TouchableOpacity
                                         style={styles.button}
                                         disabled={this.state.modal.date == undefined ? true : false}                                  
-                                        onPress={() => { 
-                                            //PUSH WORKOUT TO DATABASE HERE
+                                        onPress={() => {
                                             this.setState(prevState => (
                                                 { ...prevState, modal: {visible: false}})
                                             )
@@ -129,8 +129,7 @@ const styles = StyleSheet.create({
         borderRadius: 5.0
     },
 
-    modal: { 
-        //justifyContent: 'center',
+    modal: {
         flex: 1,
         justifyContent: 'center',
     },
