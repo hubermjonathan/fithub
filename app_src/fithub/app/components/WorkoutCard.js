@@ -25,6 +25,7 @@ export default class WorkoutCard extends React.Component {
         this.state = {
             user: '',
             comment: '',
+            likedByUser: this.props.likedByUser,
         }
     }
 
@@ -53,6 +54,12 @@ export default class WorkoutCard extends React.Component {
 
     changeLike() {
         //TODO
+        if (this.state.likedByUser){
+            this.setState({likedByUser: false})
+        }
+        else {
+            this.setState({likedByUser: true})
+        }
     }
 
 
@@ -124,13 +131,19 @@ export default class WorkoutCard extends React.Component {
                             />
                         </View>
                         <View style={styles.like}>
-                            <Button
-                                style={this.props.likedByUser? {color: '#00adf5'}: {color: 'black'}}
-                                title="Like"
+                            <Text style={styles.likeText}>{this.props.likes} likes</Text>
+                            <TouchableOpacity
                                 onPress={()=>{
                                     this.changeLike();
                                 }}
-                            />
+                            >
+                                <Icon
+                                    name={this.state.likedByUser? 'heart': 'heart-outlined'}
+                                    type="entypo"
+                                    size={25}
+                                    color={this.state.likedByUser? '#00adf5': 'black'}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
@@ -211,7 +224,7 @@ const styles = StyleSheet.create({
     },
     exercise: {
         padding: 2,
-        fontSize: 15,
+        fontSize: 18,
     },
     commentsList: {
 
@@ -225,9 +238,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     commentBox: {
+        padding: 4,
         fontSize: 20,
-
     },  
     like: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    likeText: {
+        padding: 4,
+        fontSize: 20,
     }
 });

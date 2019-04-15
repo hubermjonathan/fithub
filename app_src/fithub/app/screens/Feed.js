@@ -208,6 +208,7 @@ render() {
             userPhoto={item.icon}
             exercises={item.exercises}
             comments={item.comments}
+            likes={10}
             navigation={this.props.navigation}
           />
         )}
