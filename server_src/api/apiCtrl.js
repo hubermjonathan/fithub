@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
+const moment = require('moment');
+moment().format();
 
 mongoose.connect(url, {
   useNewUrlParser: true
@@ -1636,6 +1638,63 @@ let weightChart = async function weightChart(req,res){
   res.status(200).send(chart);
 }
 
+let volumeChart = async function volumeChart(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  ({
+    path: "logs",
+    populate : {
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        model: "SetData",
+        select: "-__v"
+      }
+    }
+    }
+  ).sort({"logs.date":1}).catch(err => {console.log("invalid id");});
+  
+  volumes = [];
+  dates = [];
+
+  user.logs.forEach(log => {
+
+    let day = log.date.getDate();
+    let month = log.date.getMonth()+1;
+    let year = log.date.getFullYear();
+
+    if(!moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
+      return;
+    }
+
+    if(month<10){
+      month = "0" + month;
+    }
+    if(day<10){
+      day = "0" + day;
+    }
+    let date = `${year}-${month}-${day}`
+
+    let volume = 0;
+    log.exercises.forEach(exercise => {
+      exercise.sets.forEach(set => { 
+        volume += set.reps * set.weight;
+      });
+    });
+    let pos = dates.find(elm => elm === date);
+    if(pos==undefined){
+      dates.push(date);
+      volumes.push(volume);
+    } else {
+      volumes[pos] += volume;
+    }
+
+  });
+  res.status(200).send({dates : dates, volumes : volumes});
+   //end populate
+}
 
 
 let apiCtrl = {
@@ -1672,7 +1731,7 @@ let apiCtrl = {
   getWeight: getWeight,
   calorieChart: calorieChart,
   weightChart: weightChart,
-
+  volumeChart: volumeChart,
 
   users: users,                     //Returns all users
   publicWorkouts: publicWorkouts,   //Returns all public workouts and filters
