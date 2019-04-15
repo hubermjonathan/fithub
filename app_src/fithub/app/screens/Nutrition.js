@@ -21,39 +21,6 @@ const chartConfig = {
 
 const screenWidth = Dimensions.get('window').width
 
-// let calorieData = {
-//     labels: ["1"],
-//     datasets: [{
-//         data: [1],
-//         color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // optional
-//         strokeWidth: 3 // optional
-
-//     }]
-// }
-
-function calcStats(obj) {
-        let min = obj.data[0];
-        let max = obj.data[0];
-        let average = parseInt(obj.data[0]);
-
-
-        for (let x = 1; x < obj.data.length; x++) {
-            if (obj.data[x] < min) {
-                min = obj.data[x];
-            }
-            if (obj.data[x] > max) {
-                max = obj.data[x];
-            }
-            average += parseInt(obj.data[x]);
-
-        }
-        average = average / obj.data.length;
-
-        let newobj = { data: obj.data, min: min, max: max, average: average.toFixed(1) };
-
-        return newobj;
-    }
-
 export class CalorieScreen extends React.Component {
     constructor(props) {
         super(props);
@@ -62,18 +29,17 @@ export class CalorieScreen extends React.Component {
             loaded: false,
             calories: 0,
             calorieStats: {
-                data: [],
                 min: 0,
                 max: 0,
                 average: 0
             },
-            calorieData:{
+            calorieData: {
                 labels: [],
                 datasets: [{
                     data: [],
                     color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // optional
                     strokeWidth: 3 // optional
-            
+
                 }]
             }
         };
@@ -87,33 +53,30 @@ export class CalorieScreen extends React.Component {
             });
             this.loader();
         });
-    
+
     }
 
     async loadCalorieData() {
-        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/calories`)
+        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/calorieChart`)
             .then((res) => {
                 return res.json();
             })
             .then((data) => {
-               //console.log(data);
-                if (this.state.calorieData.labels.length > 0) {
-                    this.state.calorieData.labels = [];
-                    this.state.calorieData.datasets[0].data = [];
+                let slicedDates = [];
+                let cals = [];
+
+                for (let x = data.dates.length-6; x < data.dates.length; x++) {
+                    slicedDates.push(data.dates[x].slice(5));
                 }
-                if(data.length < 7){
-                    for (let x = 0; x < data.length; x++) {
-                        this.state.calorieData.labels.push(data[x].date.slice(5));
-                        this.state.calorieData.datasets[0].data.push(data[x].calories);
-                    }
+                for (let x = data.dates.length-6; x < data.dates.length; x++) {
+                    cals.push(data.calories[x]);
                 }
-                else{
-                    for (let x = data.length-6; x < data.length; x++) {
-                        this.state.calorieData.labels.push(data[x].date.slice(5));
-                        this.state.calorieData.datasets[0].data.push(data[x].calories);
-                    }
-                }
-                this.setState({ calorieStats: calcStats(this.state.calorieData.datasets[0]) });
+
+                this.state.calorieData.datasets[0].data = cals;
+                this.state.calorieData.labels = slicedDates;
+
+                let stats = { min: data.min, max: data.max, average: data.avg.toFixed(2) };
+                this.setState({ calorieStats: stats });
             })
             .catch((err) => {
                 console.log(err);
@@ -137,10 +100,10 @@ export class CalorieScreen extends React.Component {
                         calories: 0,
                     });
                 }
-            }); 
+            });
             this.loadCalorieData();
         }
-        
+
 
     }
 
@@ -158,7 +121,7 @@ export class CalorieScreen extends React.Component {
                     text: 'Add',
                     onPress: (calories) => {
                         this.logCalories(calories);
-                       
+
                     }
                 },
             ],
@@ -169,8 +132,8 @@ export class CalorieScreen extends React.Component {
     }
 
     async logCalories(calories) {
-        if(+calories === 0) return;
-        if(+this.state.calories === 10000) return;
+        if (+calories === 0) return;
+        if (+this.state.calories === 10000) return;
 
         let date = new Date();
         let offsetInHours = date.getTimezoneOffset() / 60;
@@ -210,32 +173,32 @@ export class CalorieScreen extends React.Component {
                     <View style={styles.graphCard}>
                         <Text style={styles.graphText}>History</Text>
                         <View>{
-                            this.state.calorieData.labels.length > 0?
-                            <LineChart
-                                data={this.state.calorieData}
-                                width={screenWidth * .80}
-                                height={190}
-                                chartConfig={chartConfig}    
-                            /> :
-                            <Text> Loading... </Text>
+                            this.state.calorieData.labels.length > 0 ?
+                                <LineChart
+                                    data={this.state.calorieData}
+                                    width={screenWidth * .80}
+                                    height={190}
+                                    chartConfig={chartConfig}
+                                /> :
+                                <Text> Loading... </Text>
                         }
-                              
+
                         </View>
                     </View>
                     {
-                    this.state.calorieStats.data.length > 0?
-                    <View style={styles.graphStats}>
-                        <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
-                            Min: {this.state.calorieStats.min}
+                        this.state.calorieData.labels.length > 0 ?
+                            <View style={styles.graphStats}>
+                                <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
+                                    Min: {this.state.calorieStats.min}
                                 </Text>
-                        <Text style={{ fontSize: 18, color: 'white' }}>
-                            Max: {this.state.calorieStats.max}
+                                <Text style={{ fontSize: 18, color: 'white' }}>
+                                    Max: {this.state.calorieStats.max}
                                 </Text>
-                        <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
-                            Average: {this.state.calorieStats.average}
+                                <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
+                                    Average: {this.state.calorieStats.average}
                                 </Text>
-                    </View>:
-                    <Text>Loading...</Text>
+                            </View> :
+                            <Text>Loading...</Text>
                     }
                 </View>
             </SafeAreaView>
@@ -252,15 +215,14 @@ export class WeightScreen extends React.Component {
             loaded: false,
             weight: 0,
             weightStats: {
-                data: [],
                 min: 0,
                 max: 0,
                 average: 0
             },
-            weightData:{
-                labels:[],
-                datasets:[{
-                    data:[],
+            weightData: {
+                labels: [],
+                datasets: [{
+                    data: [],
                     color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // optional
                     strokeWidth: 3 // optional
                 }]
@@ -276,7 +238,7 @@ export class WeightScreen extends React.Component {
             });
             this.loader();
         });
-        
+
 
     }
 
@@ -289,32 +251,30 @@ export class WeightScreen extends React.Component {
             });
             this.loadWeightData();
         }
-       
+
     }
 
     async loadWeightData() {
-        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/weight`)
+        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/weightChart`)
             .then((res) => {
                 return res.json();
             })
             .then((data) => {
-                if (this.state.weightData.labels.length > 0) {
-                    this.state.weightData.labels = [];
-                    this.state.weightData.datasets[0].data = [];
+                let slicedDates = [];
+                let weights = [];
+
+                for (let x = data.dates.length-6; x < data.dates.length; x++) {
+                    slicedDates.push(data.dates[x].slice(5));
                 }
-                if(data.length < 7){
-                    for (let x = 0; x < data.length; x++) {
-                        this.state.weightData.labels.push(data[x].date.slice(5));
-                        this.state.weightData.datasets[0].data.push(data[x].weight);
-                    }
+                for (let x = data.dates.length-6; x < data.dates.length; x++) {
+                    weights.push(data.volume[x]);
                 }
-                else{
-                    for (let x = data.length-6; x < data.length; x++) {
-                        this.state.weightData.labels.push(data[x].date.slice(5));
-                        this.state.weightData.datasets[0].data.push(data[x].weight);
-                    }
-                }
-                this.setState({ weightStats: calcStats(this.state.weightData.datasets[0]) });
+
+                this.state.weightData.datasets[0].data = weights;
+                this.state.weightData.labels = slicedDates;
+
+                let stats = { min: data.min, max: data.max, average: data.avg.toFixed(2) };
+                this.setState({ weightStats: stats });
             })
             .catch((err) => {
                 console.log(err);
@@ -382,34 +342,34 @@ export class WeightScreen extends React.Component {
                     <View style={styles.graphCard}>
                         <Text style={styles.graphText}>History</Text>
                         <View>
-                            { 
-                            this.state.weightData.labels.length > 0?
-                                <LineChart
-                                    data={this.state.weightData}
-                                    width={screenWidth * .80}
-                                    height={190}
-                                    chartConfig={chartConfig}
-                                />:
-                            <Text>Loading...</Text>
-                         }
+                            {
+                                this.state.weightData.labels.length > 0 ?
+                                    <LineChart
+                                        data={this.state.weightData}
+                                        width={screenWidth * .80}
+                                        height={190}
+                                        chartConfig={chartConfig}
+                                    /> :
+                                    <Text>Loading...</Text>
+                            }
 
                         </View>
 
                     </View>
                     {
-                       this.state.weightStats.data.length > 0? 
-                        <View style={styles.graphStats}>
-                            <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
-                                Min: {this.state.weightStats.min} lbs
+                        this.state.weightData.labels.length > 0 ?
+                            <View style={styles.graphStats}>
+                                <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
+                                    Min: {this.state.weightStats.min} lbs
                                     </Text>
-                            <Text style={{ fontSize: 18, color: 'white' }}>
-                                Max: {this.state.weightStats.max} lbs
+                                <Text style={{ fontSize: 18, color: 'white' }}>
+                                    Max: {this.state.weightStats.max} lbs
                                     </Text>
-                            <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
-                                Average: {this.state.weightStats.average} lbs
+                                <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
+                                    Average: {this.state.weightStats.average} lbs
                                     </Text>
-                        </View>:
-                    <Text>Loading...</Text>
+                            </View> :
+                            <Text>Loading...</Text>
                     }
                 </View>
             </SafeAreaView>
