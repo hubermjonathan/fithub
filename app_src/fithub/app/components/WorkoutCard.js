@@ -11,7 +11,9 @@ import {
     FlatList,
     TouchableOpacity,
     List,
-    Alert
+    Alert,
+    Button,
+    TextInput
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
@@ -22,7 +24,8 @@ export default class WorkoutCard extends React.Component {
         super(props);
         this.state = {
             user: '',
-            userPhoto: 'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            comment: '',
+            likedByUser: this.props.likedByUser,
         }
     }
 
@@ -42,7 +45,22 @@ export default class WorkoutCard extends React.Component {
             });
     }
 
+    submitComment() {
+        //TODO
+        //add server calls to add comment to comment list
 
+        console.log(this.state.comment);
+    }
+
+    changeLike() {
+        //TODO
+        if (this.state.likedByUser){
+            this.setState({likedByUser: false})
+        }
+        else {
+            this.setState({likedByUser: true})
+        }
+    }
 
 
     render() {
@@ -88,6 +106,46 @@ export default class WorkoutCard extends React.Component {
                             renderItem={(exercise) => this.renderExercises(exercise)}
                         />
                     </View>
+
+                    {/* comments of workout */}
+                    <View style={styles.commentsList}>
+                        <FlatList
+                            listKey="comments"
+                            scrollEnabled={false}
+                            data={this.props.comments}
+                            listKey={(item, index) => 'D' + index.toString()}
+                            renderItem={(comment) => this.renderComments(comment)}
+                        />
+                    </View>
+
+                    {/* commentBox and like button */}
+                    <View style={styles.likeComment}>
+                        <View style={styles.commentBox}>
+                            <TextInput
+                                style={styles.commentBox}
+                                placeholder="Add a comment..."
+                                onChangeText={(text) => this.setState({comment: text})}
+                                onSubmitEditing={() => {
+                                    this.submitComment()
+                                }}
+                            />
+                        </View>
+                        <View style={styles.like}>
+                            <Text style={styles.likeText}>{this.props.likes} likes</Text>
+                            <TouchableOpacity
+                                onPress={()=>{
+                                    this.changeLike();
+                                }}
+                            >
+                                <Icon
+                                    name={this.state.likedByUser? 'heart': 'heart-outlined'}
+                                    type="entypo"
+                                    size={25}
+                                    color={this.state.likedByUser? '#00adf5': 'black'}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
             </SafeAreaView >
         );
@@ -101,16 +159,25 @@ export default class WorkoutCard extends React.Component {
             </View>
         );
     }
+
+    renderComments(comment) {
+        return (
+            <View style={styles.comment}>
+                <Text>{comment}</Text>
+            </View>
+        )
+    }
 }
 
 
 
 const styles = StyleSheet.create({
     card: {
+        flex: 1,
         height: 'auto',
         margin: 10,
         padding: 5,
-        backgroundColor: 'lightgrey',
+        backgroundColor: 'white',
     },
     user: {
         padding: 0,
@@ -152,10 +219,34 @@ const styles = StyleSheet.create({
     },
     exerciseList: {
         paddingBottom: 10,
-        paddingTop: 10
+        paddingTop: 10,
+        borderBottomWidth: .5,
     },
     exercise: {
         padding: 2,
-        fontSize: 15,
+        fontSize: 18,
+    },
+    commentsList: {
+
+    },
+    comment: {
+        fontSize: 12,
+    },
+    likeComment: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    commentBox: {
+        padding: 4,
+        fontSize: 20,
+    },  
+    like: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    likeText: {
+        padding: 4,
+        fontSize: 20,
     }
 });
