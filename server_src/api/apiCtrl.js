@@ -983,9 +983,11 @@ let gain = async function gain(req, res){
   if(!workout.public){
     return res.status(500).send({ "message": "This is a private workout" });
   }
+  /*
   if(workout.ownerUID == user._id){
     return res.status(500).send({ "message": "You cannot gain your own post!" });
   }
+  */
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
     if(curr_usr == req.body.id){
