@@ -1288,7 +1288,7 @@ let publicWorkouts = function publicWorkouts(req, res){
     });
    return;
   }
-  let query = schemaCtrl.WorkoutPlan.find({}).select('-__v').populate({
+  let query = schemaCtrl.WorkoutPlan.find({public: true}).select('-__v').populate({
     path: "exercises",
     select: "-__v",
     populate:
