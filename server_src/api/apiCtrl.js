@@ -639,7 +639,25 @@ let logCalories = async function logWeight(req, res){
   //res.status(500).send({"message": "logWeight: Incorrect input"});
 }
 
+let addComment = async function addComment(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
+  if(!req.body.workoutId || !req.body.comment){
+    return res.status(500).send({ "message": "addComment: Missing user or comment text" });
+  }
+  let workoutPlan = await schemaCtrl.WorkoutPlan.findById(req.body.workoutId);
+  let comment = {
+    user: user._id,
+    username: user.name,
+    text: req.body.comment
+  }
+  workoutPlan.comments.push(comment);
+  workoutPlan.save().catch(err => {res.status(500).send({ "message": "addComment: Failed to save workout plan" })});
+  return res.status(200).send({"message": "Successfully added comment"});
+}
 
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
@@ -965,13 +983,19 @@ let gain = async function gain(req, res){
   if(!workout.public){
     return res.status(500).send({ "message": "This is a private workout" });
   }
+  /*
   if(workout.ownerUID == user._id){
     return res.status(500).send({ "message": "You cannot gain your own post!" });
   }
+  */
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
     if(curr_usr == req.body.id){
-      return res.status(500).send({ "message": "You have already gained workout!" });
+      //return res.status(500).send({ "message": "You have already gained workout!" });
+      workout.gains--;
+      workout.liked_users.splice(workout.liked_users.indexOf(user._id), 1);
+      workout.save();
+      return res.status(200).send({ "message": "Successfully ungained!" });
     }
   }
   workout.gains++;
@@ -1264,7 +1288,7 @@ let publicWorkouts = function publicWorkouts(req, res){
     });
    return;
   }
-  let query = schemaCtrl.WorkoutPlan.find({}).select('-__v').populate({
+  let query = schemaCtrl.WorkoutPlan.find({public: true}).select('-__v').populate({
     path: "exercises",
     select: "-__v",
     populate:
@@ -1665,16 +1689,17 @@ let volumeChart = async function volumeChart(req, res){
     let month = log.date.getMonth()+1;
     let year = log.date.getFullYear();
 
-    if(!moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
-      return;
-    }
-
     if(month<10){
       month = "0" + month;
     }
     if(day<10){
       day = "0" + day;
     }
+
+    if(req.params.from!=undefined && !moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
+      return;
+    }
+
     let date = `${year}-${month}-${day}`
 
     let volume = 0;
@@ -1690,10 +1715,31 @@ let volumeChart = async function volumeChart(req, res){
     } else {
       volumes[pos] += volume;
     }
-
   });
-  res.status(200).send({dates : dates, volumes : volumes});
+  let min = 100000;
+  let max = 0;
+  let avg = 0;
+  volumes.forEach(vol => {
+    if (vol<min){
+      min = vol;
+    }
+    if (vol>max){
+      max = vol;
+    }
+    avg += vol;
+  });
+  avg = avg / volumes.length-1;
+  res.status(200).send({dates : dates, volumes : volumes, min: min, max: max, avg:avg});
    //end populate
+}
+
+let getWorkoutComments = async function getWorkoutComments(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let workout = await schemaCtrl.WorkoutPlan.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(!workout){
+    res.status(500).send({ message: "getWorkoutComments: workout does not exist"});
+  }
+  res.status(200).send(workout.comments);
 }
 
 
@@ -1712,6 +1758,8 @@ let apiCtrl = {
   follow : follow,
   unfollow : unfollow,
   followingWorkouts : followingWorkouts,
+  addComment: addComment,
+  getWorkoutComments: getWorkoutComments,
 
   delExercise: delExercise,
   delWorkout: delWorkout,
