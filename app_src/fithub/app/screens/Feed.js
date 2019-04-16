@@ -58,7 +58,8 @@ export default class FeedScreen extends React.Component {
       { muscle: "HAMSTRINGS", enum: 17 },
       { muscle: "CALVES", enum: 18 },
       { muscle: "ALL", enum: 99 },
-    ]
+    ],
+    comments: [],
   }
 
   setModalVisible(visible) {
@@ -145,10 +146,12 @@ export default class FeedScreen extends React.Component {
             description: array[x].description,
             name: array[x].name,
             workout: array[x].name,
+            workoutID: array[x]._id,
             user: array[x].ownerUID, //replace with user's profile name later
             icon: "person",
             date: new Date().toJSON().slice(0, 10),
-            exercises: exercises
+            exercises: exercises,
+            gains: array[x].gains,
           })
         }
       }//for
@@ -205,11 +208,12 @@ render() {
                 date: item.date
               }}
               workout={item.workout}
+              workoutID={item.workoutID}
               user={item.user}
               userPhoto={item.icon}
               exercises={item.exercises}
-              comments={item.comments}
-              likes={10} //fill with actual likes of workout {item.likes}
+              comments={this.state.comments}
+              gains={item.gains} //fill with actual likes of workout {item.likes}
               navigation={this.props.navigation}
             />
           )}

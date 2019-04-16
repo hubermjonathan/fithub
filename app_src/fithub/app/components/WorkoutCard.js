@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
+import { getGains, addGains } from '../lib/SocialFunctions';
 
 
 export default class WorkoutCard extends React.Component {
@@ -26,6 +27,7 @@ export default class WorkoutCard extends React.Component {
             user: '',
             comment: '',
             likedByUser: this.props.likedByUser,
+            comments: this.props.comments,
         }
     }
 
@@ -45,21 +47,25 @@ export default class WorkoutCard extends React.Component {
             });
     }
 
-    submitComment() {
+    submitComment(comment) {
         //TODO
         //add server calls to add comment to comment list
-
         console.log(this.state.comment);
+        this.setState({comment: ''});
+        this.state.comments.push(comment);
+
     }
 
     changeLike() {
         //TODO
         if (this.state.likedByUser){
-            this.setState({likedByUser: false})
+            this.setState({likedByUser: false});
         }
         else {
-            this.setState({likedByUser: true})
+            this.setState({likedByUser: true});
         }
+        workout={workout: this.props.workoutID};
+        addGains(workout);
     }
 
 
@@ -126,12 +132,12 @@ export default class WorkoutCard extends React.Component {
                                 placeholder="Add a comment..."
                                 onChangeText={(text) => this.setState({comment: text})}
                                 onSubmitEditing={() => {
-                                    this.submitComment()
+                                    this.submitComment(this.state.comment)
                                 }}
                             />
                         </View>
                         <View style={styles.like}>
-                            <Text style={styles.likeText}>{this.props.likes} likes</Text>
+                            <Text style={styles.likeText}>{this.props.gains} gains</Text>
                             <TouchableOpacity
                                 onPress={()=>{
                                     this.changeLike();
