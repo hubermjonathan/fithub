@@ -1665,16 +1665,17 @@ let volumeChart = async function volumeChart(req, res){
     let month = log.date.getMonth()+1;
     let year = log.date.getFullYear();
 
-    if(!moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
-      return;
-    }
-
     if(month<10){
       month = "0" + month;
     }
     if(day<10){
       day = "0" + day;
     }
+
+    if(req.params.from!=undefined && !moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
+      return;
+    }
+
     let date = `${year}-${month}-${day}`
 
     let volume = 0;
@@ -1690,9 +1691,21 @@ let volumeChart = async function volumeChart(req, res){
     } else {
       volumes[pos] += volume;
     }
-
   });
-  res.status(200).send({dates : dates, volumes : volumes});
+  let min = 100000;
+  let max = 0;
+  let avg = 0;
+  volumes.forEach(vol => {
+    if (vol<min){
+      min = vol;
+    }
+    if (vol>max){
+      max = vol;
+    }
+    avg += vol;
+  });
+  avg = avg / volumes.length-1;
+  res.status(200).send({dates : dates, volumes : volumes, min: min, max: max, avg:avg});
    //end populate
 }
 
