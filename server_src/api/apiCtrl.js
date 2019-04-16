@@ -639,7 +639,25 @@ let logCalories = async function logWeight(req, res){
   //res.status(500).send({"message": "logWeight: Incorrect input"});
 }
 
+let addComment = async function addComment(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
+  if(!req.body.workoutId || !req.body.comment){
+    return res.status(500).send({ "message": "addComment: Missing user or comment text" });
+  }
+  let workoutPlan = await schemaCtrl.WorkoutPlan.findById(req.body.workoutId);
+  let comment = {
+    user: user._id,
+    username: user.name,
+    text: req.body.comment
+  }
+  workoutPlan.comments.push(comment);
+  workoutPlan.save().catch(err => {res.status(500).send({ "message": "addComment: Failed to save workout plan" })});
+  return res.status(200).send({"message": "Successfully added comment"});
+}
 
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
@@ -1709,6 +1727,15 @@ let volumeChart = async function volumeChart(req, res){
    //end populate
 }
 
+let getWorkoutComments = async function getWorkoutComments(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let workout = await schemaCtrl.WorkoutPlan.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(!workout){
+    res.status(500).send({ message: "getWorkoutComments: workout does not exist"});
+  }
+  res.status(200).send(workout.comments);
+}
+
 
 let apiCtrl = {
   login: login,
@@ -1725,6 +1752,8 @@ let apiCtrl = {
   follow : follow,
   unfollow : unfollow,
   followingWorkouts : followingWorkouts,
+  addComment: addComment,
+  getWorkoutComments: getWorkoutComments,
 
   delExercise: delExercise,
   delWorkout: delWorkout,

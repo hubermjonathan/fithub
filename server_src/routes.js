@@ -24,12 +24,14 @@ router.post('/profile/unfollow/', apiCtrl.unfollow);          //edit a user's se
 router.get('/workouts/following/:id', apiCtrl.followingWorkouts);          //edit a user's selected stats
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans
 router.get('/workouts/public/:id', apiCtrl.social);             //get comments and gains for a workout plan
+router.get('/workouts/comments/:id', apiCtrl.getWorkoutComments);               //Get the standard exercises
 router.post('/workouts/public', apiCtrl.publicWorkouts);
 router.post('/workouts/new', apiCtrl.newWorkout);           //Post a new workout plan
 router.post('/workouts/delete', apiCtrl.delWorkout);         //Post a workout deletion to a user profile
 router.post('/workouts/setpublic', apiCtrl.editWorkoutPublic);         //Post a workout deletion to a user profile
 router.post('/workouts/edit', apiCtrl.editWorkout);          //edit a user's workout
 router.post('/workouts/gain', apiCtrl.gain);          //gain a workout
+router.post('/workouts/addComment', apiCtrl.addComment);          //add a comment to a workout
 
 router.get('/exercises/', apiCtrl.exercises);               //Get the standard exercises
 router.get('/exercises/:id', apiCtrl.uExercises);          //Get a users CUSTOM exercises
