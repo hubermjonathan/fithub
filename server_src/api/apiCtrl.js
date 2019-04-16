@@ -989,7 +989,11 @@ let gain = async function gain(req, res){
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
     if(curr_usr == req.body.id){
-      return res.status(500).send({ "message": "You have already gained workout!" });
+      //return res.status(500).send({ "message": "You have already gained workout!" });
+      workout.gains--;
+      workout.liked_users.splice(workout.liked_users.indexOf(user._id), 1);
+      workout.save();
+      return res.status(200).send({ "message": "Successfully ungained!" });
     }
   }
   workout.gains++;
