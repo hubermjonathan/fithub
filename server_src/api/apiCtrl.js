@@ -1356,7 +1356,20 @@ let social = function social(req, res){
       res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
-    res.status(200).send({gains: data.gains});
+    let response = data.gains;
+    if(req.params.user){
+      let likedbyyou = false;
+      for(let i = 0; i < data.liked_users.length; i++){
+        if(data.liked_users[i]._id == req.params.user) {
+          likedbyyou = true;
+        }
+      }
+    response = {
+      liked: likedbyyou,
+      gains: data.gains,
+    }
+  }
+    res.status(200).send(response);
   });
 }
 
