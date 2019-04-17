@@ -9,17 +9,24 @@ export async function postWorkout(workout) {
     workout.uid = uid;
     workout.id = id;
     workout.token = token;
+
+    let date = new Date();
+    let offsetInHours = date.getTimezoneOffset() / 60;
+    date.setHours(date.getHours() - offsetInHours);
+    workout.date = date.toJSON().slice(0, 10);
+ 
+    console.log(JSON.stringify(workout));
     fetch('https://fithub-server.herokuapp.com/workouts/new', {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(workout)
-    }).then(res => res.json())
-        .then((res) => console.log('Success', JSON.stringify(res)))
-        .catch(function (e) {
-            console.log('Error');
-        });
+    }).then(res => {
+        console.log(res);
+    }).catch(err => {
+        console.log(err);
+    })
 }
 
 // Return a users workout plans where id is the id of the user
@@ -30,8 +37,7 @@ export async function getWorkouts(id) {
             "Content-Type": "application/json",
         }
     });
-    let json = await response.json;
-    return json;
+    return await response.json();
 }
 
 // Get the public workouts where muscles is an array of muscle

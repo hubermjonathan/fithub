@@ -6,6 +6,8 @@ import RoutineCard from '../components/RoutineCard';
 
 import { DefaultWorkouts } from '../defaults/Workouts';
 
+import { postLog } from '../lib/LogFunctions';
+
 export default class DefaultWorkoutsScreen extends React.Component {
 
     constructor(props) {
@@ -25,71 +27,71 @@ export default class DefaultWorkoutsScreen extends React.Component {
             <View style={styles.page}>
                 {/*Modal For Scheduling*/}
                 <Modal
+                    style={styles.modal}
                     visible={this.state.modal.visible}
-                    transparent={false}
                     animationType="fade"
                     presentationStyle="pageSheet"
-                >
+                > 
                     <View style={styles.modal}>
-                        <View pointerEvents='none'>
-                            <View style={styles.headingContainer}>
-                                <Text style={styles.heading}>
-                                    Schedule A Workout
-                                </Text>
-                            </View>
-                            <View style={styles.datePickerContainer}>
-                                <DatePicker
-                                    style={{width: '100%'}}
-                                    date={this.state.modal.date}
-                                    mode="date"
-                                    placeholder="Please Select Date"
-                                    format="YYYY-MM-DD"
-                                    minDate="2015-01-01"
-                                    maxDate="2025-12-31"
-                                    confirmBtnText="Confirm"
-                                    cancelBtnText="Cancel"
-                                    onDateChange={(date) => { 
+                        <View style= {{ height: 200 }}>
+                        </View>
+                        <View style={styles.headingContainer}>
+                            <Text style={styles.heading}>
+                                Schedule A Workout
+                            </Text>
+                        </View>
+                        <View style={styles.datePickerContainer}>
+                            <DatePicker
+                                style={{width: '100%'}}
+                                date={this.state.modal.date}
+                                mode="date"
+                                placeholder="Please Select Date"
+                                format="YYYY-MM-DD"
+                                minDate="2015-01-01"
+                                maxDate="2025-12-31"
+                                confirmBtnText="Confirm"
+                                cancelBtnText="Cancel"
+                                onDateChange={(date) => { 
+                                    this.setState(prevState => (
+                                        { ...prevState, modal: { ...prevState.modal, date: date } })
+                                    )
+                                }}
+                            />
+                        </View>
+                        <View style={styles.row}>
+                            <View style={styles.buttonView}>
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    onPress={() =>                                  
                                         this.setState(prevState => (
-                                            { ...prevState, modal: { ...prevState.modal, date: date } })
-                                        )
+                                        { ...prevState, modal: {visible: false}}
+                                        ))
+                                    }
+                                >
+                                    <Text style={styles.buttonText}>
+                                        Cancel
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.buttonView}>
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    disabled={this.state.modal.date == undefined ? true : false}                                  
+                                    onPress={() => {
+                                        this.setState(prevState => (
+                                            { ...prevState, modal: {visible: false}})
+                                        );
+                                        console.log("Workout:", this.state.modal.workout);
+                                        postLog(this.state.modal.workout, this.state.modal.date); 
                                     }}
-                                />
+                                >
+                                    <Text style={styles.buttonText}>
+                                        Schedule
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
-                            <View style={styles.row}>
-                                <View style={styles.buttonView}>
-                                    <TouchableOpacity
-                                        style={styles.button}
-                                        //disabled={false}
-                                        onPress={() =>                                  
-                                            this.setState(prevState => (
-                                            { ...prevState, modal: {visible: false}}
-                                            ))
-                                        }
-                                    >
-                                        <Text style={styles.buttonText}>
-                                            Cancel
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.buttonView}>
-                                    <TouchableOpacity
-                                        style={styles.button}
-                                        disabled={this.state.modal.date == undefined ? true : false}                                  
-                                        onPress={() => { 
-                                            //PUSH WORKOUT TO DATABASE HERE
-                                            this.setState(prevState => (
-                                                { ...prevState, modal: {visible: false}})
-                                            )
-                                        }}
-                                    >
-                                        <Text style={styles.buttonText}>
-                                            Schedule
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            <View style= {{ height: 100 }}>
-                            </View>
+                        </View>
+                        <View style= {{ height: 100 }}>
                         </View>
                     </View>
                 </Modal>
@@ -129,8 +131,7 @@ const styles = StyleSheet.create({
         borderRadius: 5.0
     },
 
-    modal: { 
-        //justifyContent: 'center',
+    modal: {
         flex: 1,
         justifyContent: 'center',
     },

@@ -48,6 +48,7 @@ let WorkoutPlan = new Schema({
   ownerUID : { type: String, required: true },
   gains : { type : Number, default: 0, required: true },
   liked_users : { type : Array, default: 0, required: true },
+  comments : { type : Array, default: [], required: true },
   public : { type : Boolean, default: true, required: true}
 });
 

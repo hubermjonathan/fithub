@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#00adf5',
     borderRadius: 5,
-    width: 80,
+    width: 85,
   },
   statChangeText: {
     color: '#fff',

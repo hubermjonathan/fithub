@@ -28,7 +28,7 @@ export function validateLog(log) {
     }
 }
 
-export async function postLog(workout) {
+export async function postLog(workout, date) {
 
     try {
         const id = await getUserID();
@@ -50,7 +50,8 @@ export async function postLog(workout) {
             id: id,
             uid: uid,
             token: token,
-            date: workout.date,
+            //date: workout.date,
+            date: date,
             name: workout.name,
             exercises: workout.exercises,
         }
@@ -78,7 +79,59 @@ export async function postLog(workout) {
     } catch (e) {
         console.log(e);
     }
+}
 
+export async function editLog(workout) {
+    try {
+        const id = await getUserID();
+        const uid = await getUserUID();
+        const token = await getUserToken();
+
+        let fixedExercises = [];
+        for(let x = 0; x < workout.exercises.length;x++){
+            let eobj = {name:workout.exercises[x].name,muscle_groups:workout.exercises[x].muscle_groups,sets:[]};
+            for(let y = 0; y < workout.exercises[x].sets.length;y++){
+                eobj.sets.push({weight:workout.exercises[x].sets[y].weight,reps:workout.exercises[x].sets[y].reps,isWarmup:workout.exercises[x].sets[y].isWarmup})
+            }
+            fixedExercises.push(eobj);
+            
+        }
+        workout.exercises = fixedExercises;
+        
+        const data = {
+            old_log_id: workout._id, 
+            _id: workout._id,
+            id: id,
+            uid: uid,
+            token: token,
+            date: workout.date,
+            name: workout.name,
+            exercises: workout.exercises,
+        }
+        console.log("DATA", data);
+        //console.log(JSON.stringify(workout));
+
+        fetch('https://fithub-server.herokuapp.com/logs/edit', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json())
+            .then((data) => {
+                console.log('Success', JSON.stringify(data))
+                Alert.alert(
+                    'Success!',
+                    'Workout was logged!'
+                )
+            })
+            .catch(function (e) {
+                console.log('Error');
+            });
+
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 //Returns the logs associated with the logged in user

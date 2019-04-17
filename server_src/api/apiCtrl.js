@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
 const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
+const moment = require('moment');
+moment().format();
 
 mongoose.connect(url, {
   useNewUrlParser: true
@@ -637,7 +639,25 @@ let logCalories = async function logWeight(req, res){
   //res.status(500).send({"message": "logWeight: Incorrect input"});
 }
 
+let addComment = async function addComment(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  //Find the user
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
+  if(!req.body.workoutId || !req.body.comment){
+    return res.status(500).send({ "message": "addComment: Missing user or comment text" });
+  }
+  let workoutPlan = await schemaCtrl.WorkoutPlan.findById(req.body.workoutId);
+  let comment = {
+    user: user._id,
+    username: user.name,
+    text: req.body.comment
+  }
+  workoutPlan.comments.push(comment);
+  workoutPlan.save().catch(err => {res.status(500).send({ "message": "addComment: Failed to save workout plan" })});
+  return res.status(200).send({"message": "Successfully added comment"});
+}
 
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
@@ -963,13 +983,19 @@ let gain = async function gain(req, res){
   if(!workout.public){
     return res.status(500).send({ "message": "This is a private workout" });
   }
+  /*
   if(workout.ownerUID == user._id){
     return res.status(500).send({ "message": "You cannot gain your own post!" });
   }
+  */
   for(let i = 0; i < workout.liked_users.length; i++){
     let curr_usr = workout.liked_users[i]._id;
     if(curr_usr == req.body.id){
-      return res.status(500).send({ "message": "You have already gained workout!" });
+      //return res.status(500).send({ "message": "You have already gained workout!" });
+      workout.gains--;
+      workout.liked_users.splice(workout.liked_users.indexOf(user._id), 1);
+      workout.save();
+      return res.status(200).send({ "message": "Successfully ungained!" });
     }
   }
   workout.gains++;
@@ -1262,7 +1288,7 @@ let publicWorkouts = function publicWorkouts(req, res){
     });
    return;
   }
-  let query = schemaCtrl.WorkoutPlan.find({}).select('-__v').populate({
+  let query = schemaCtrl.WorkoutPlan.find({public: true}).select('-__v').populate({
     path: "exercises",
     select: "-__v",
     populate:
@@ -1330,7 +1356,20 @@ let social = function social(req, res){
       res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
-    res.status(200).send({gains: data.gains});
+    let response = data.gains;
+    if(req.params.user){
+      let likedbyyou = false;
+      for(let i = 0; i < data.liked_users.length; i++){
+        if(data.liked_users[i]._id == req.params.user) {
+          likedbyyou = true;
+        }
+      }
+    response = {
+      liked: likedbyyou,
+      gains: data.gains,
+    }
+  }
+    res.status(200).send(response);
   });
 }
 
@@ -1453,6 +1492,269 @@ let getWeight = async function getWeight(req,res){
   res.status(200).send(user.weight);
 }
 
+let calorieChart = async function calorieChart(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  let rangeA;
+  let rangeB;
+  let dateA;
+  let dateB;
+  if(req.params.from){
+    rangeA = req.params.from.split("-");
+    dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
+  }
+  if(req.params.to){
+    rangeB = req.params.to.split("-");
+    dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
+  }
+
+  let calories = user.calories;
+
+  let data = [];
+
+  if(req.params.from && req.params.to){
+    calories.forEach(c => {
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if(date >= dateA && date <= dateB) {
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("B: " + dateB.toString());
+        console.log("CurrDate: " + date.toString());
+        */
+        data.push(c);
+      }
+    });
+  }
+  else if(req.params.from && !req.params.to){
+    calories.forEach(c => {
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if (date >= dateA) {
+        data.push(c);
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("CurrDate: " + date.toString());
+        */
+      }
+    });
+  }
+  else {
+    data = user.calories;
+  }
+
+  let dates= [];
+  let calorie = [];
+
+  data.forEach(d => {
+    dates.push(d.date);
+    calorie.push(+d.calories);
+  })
+
+  let avgCalories;
+  let minCalories;
+  let maxCalories;
+  let sum = 0;
+  if(calorie.length != 0){
+    minCalories = calorie[0];
+    maxCalories = calorie[0];
+    calorie.forEach(c => {
+      sum += +c;
+      if (c < minCalories) {
+        minCalories = c;
+      }
+      if (c > maxCalories) {
+        maxCalories = c;
+      }
+    });
+    avgCalories = (sum / calorie.length);
+  }
+
+  let chart = {
+    dates: dates,
+    calories: calorie,
+    min: minCalories,
+    max: maxCalories,
+    avg: avgCalories
+  }
+  res.status(200).send(chart);
+}
+
+let weightChart = async function weightChart(req,res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  let rangeA;
+  let rangeB;
+  let dateA;
+  let dateB;
+  if(req.params.from){
+    rangeA = req.params.from.split("-");
+    dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
+  }
+  if(req.params.to){
+    rangeB = req.params.to.split("-");
+    dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
+  }
+
+  let weight = user.weight;
+
+  let data = [];
+
+  if(req.params.from && req.params.to){
+    weight.forEach(c => {
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if(date >= dateA && date <= dateB) {
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("B: " + dateB.toString());
+        console.log("CurrDate: " + date.toString());
+        */
+        data.push(c);
+      }
+    });
+  }
+  else if(req.params.from && !req.params.to){
+    weight.forEach(c => {
+      let range = c.date.split("-");
+      let date = new Date(range[0], range[1] - 1, range[2]);
+      //console.log("CurrDate: " + date.toString());
+      if (date >= dateA) {
+        data.push(c);
+        /*
+        console.log("A: " + dateA.toString());
+        console.log("CurrDate: " + date.toString());
+        */
+      }
+    });
+  }
+  else {
+    data = user.weight;
+  }
+
+  let dates = [];
+  let volume = [];
+
+
+  //console.log(data);
+
+  data.forEach(d => {
+    dates.push(d.date);
+    volume.push(+d.weight);
+  })
+
+  let avgVolume;
+  let minVolume;
+  let maxVolume;
+  let sum = 0;
+  if(volume.length != 0){
+    minVolume = volume[0];
+    maxVolume = volume[0];
+    volume.forEach(c => {
+      sum += +c;
+      if (c < minVolume) {
+        minVolume = c;
+      }
+      if (c > maxVolume) {
+        maxVolume = c;
+      }
+    });
+    avgVolume = (sum / volume.length);
+  }
+
+  let chart = {
+    dates: dates,
+    volume: volume,
+    min: minVolume,
+    max: maxVolume,
+    avg: avgVolume
+  }
+  res.status(200).send(chart);
+}
+
+let volumeChart = async function volumeChart(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let user = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  ({
+    path: "logs",
+    populate : {
+      path: "exercises",
+      select: "-__v",
+      populate:
+      {
+        path: "sets",
+        model: "SetData",
+        select: "-__v"
+      }
+    }
+    }
+  ).sort({"logs.date":1}).catch(err => {console.log("invalid id");});
+  
+  volumes = [];
+  dates = [];
+
+  user.logs.forEach(log => {
+
+    let day = log.date.getDate();
+    let month = log.date.getMonth()+1;
+    let year = log.date.getFullYear();
+
+    if(month<10){
+      month = "0" + month;
+    }
+    if(day<10){
+      day = "0" + day;
+    }
+
+    if(req.params.from!=undefined && !moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
+      return;
+    }
+
+    let date = `${year}-${month}-${day}`
+
+    let volume = 0;
+    log.exercises.forEach(exercise => {
+      exercise.sets.forEach(set => { 
+        volume += set.reps * set.weight;
+      });
+    });
+    let pos = dates.find(elm => elm === date);
+    if(pos==undefined){
+      dates.push(date);
+      volumes.push(volume);
+    } else {
+      volumes[pos] += volume;
+    }
+  });
+  let min = 100000;
+  let max = 0;
+  let avg = 0;
+  volumes.forEach(vol => {
+    if (vol<min){
+      min = vol;
+    }
+    if (vol>max){
+      max = vol;
+    }
+    avg += vol;
+  });
+  avg = avg / volumes.length-1;
+  res.status(200).send({dates : dates, volumes : volumes, min: min, max: max, avg:avg});
+   //end populate
+}
+
+let getWorkoutComments = async function getWorkoutComments(req, res){
+  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let workout = await schemaCtrl.WorkoutPlan.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(!workout){
+    res.status(500).send({ message: "getWorkoutComments: workout does not exist"});
+  }
+  res.status(200).send(workout.comments);
+}
+
 
 let apiCtrl = {
   login: login,
@@ -1469,6 +1771,8 @@ let apiCtrl = {
   follow : follow,
   unfollow : unfollow,
   followingWorkouts : followingWorkouts,
+  addComment: addComment,
+  getWorkoutComments: getWorkoutComments,
 
   delExercise: delExercise,
   delWorkout: delWorkout,
@@ -1486,7 +1790,9 @@ let apiCtrl = {
   logCalories: logCalories,
   getCalories: getCalories,
   getWeight: getWeight,
-
+  calorieChart: calorieChart,
+  weightChart: weightChart,
+  volumeChart: volumeChart,
 
   users: users,                     //Returns all users
   publicWorkouts: publicWorkouts,   //Returns all public workouts and filters

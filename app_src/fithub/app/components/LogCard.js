@@ -98,19 +98,28 @@ export default class LogCard extends React.Component {
                                 onPress={() => this.setState({ modalCheckbox: !this.state.modalCheckbox })}
                         />
 
-                        <View style={styles.buttonView}>
+                        {/* <View style={styles.buttonView}>
                             <TouchableOpacity onPress={() => this._modalOKButton() }>
                                 <Text style={styles.buttonText}>
                                     Add Set
                                 </Text>
                             </TouchableOpacity>
-                        </View>
+                        </View> */}
+                        <View style={styles.buttonView}>
+                            <TouchableOpacity 
+                                style={styles.button}                                  
+                                onPress={() => this._modalOKButton()}
+                            >
+                                <Text style={styles.buttonText}>
+                                    Add Set
+                                </Text>
+                            </TouchableOpacity>
+                        </View>                        
                     </View>
                 </Modal>
 
                 {/*LogCard rendering*/}
                 <View style={styles.card} key={null}>
-
                     <View>
                         <Swipeout
                         style={{backgroundColor: '#fff'}}
@@ -151,13 +160,25 @@ export default class LogCard extends React.Component {
                         <Text style={styles.exerciseText}>{totalReps} reps</Text>
                         <Text style={styles.exerciseText}>{totalWeight} lbs</Text>
                     </View> 
-                    
-                    <View style={styles.buttonView}>
-                        <TouchableOpacity onPress={() => 
+                        {/* <TouchableOpacity onPress={() => 
                             this.setState({ 
                                 modalMode: "add",
                                 modalVisible: true 
                             })}
+                        >
+                            <Text style={styles.buttonText}>
+                                Add Set
+                            </Text>
+                        </TouchableOpacity> */}
+                    <View style={styles.buttonView}>
+                        <TouchableOpacity 
+                            style={styles.button}                                  
+                            onPress={() => {
+                                this.setState({ 
+                                    modalMode: "add",
+                                    modalVisible: true 
+                                }); 
+                            }}
                         >
                             <Text style={styles.buttonText}>
                                 Add Set
@@ -218,8 +239,11 @@ export default class LogCard extends React.Component {
     //HANDLER FUNCTIONS
     _modalOKButton() {
         //console.log("LOG CARD: ", this.props);
+        // weight: {type: Number, required: true},
+        // reps: {type: Number, required: true},
+        // isWarmup: {type: Boolean, required: true} 
         if (this.state.modalReps !== undefined && this.state.modalWeight !== undefined) {
-            const set = {"weight": this.state.modalWeight, "reps": this.state.modalReps, "warmup": this.state.modalCheckbox};
+            const set = {"weight": this.state.modalWeight, "reps": this.state.modalReps, "isWarmup": this.state.modalCheckbox};
             if (this.state.modalMode === "add") {
                 this.props.dispatch({type: "AddSet", payload: {set, exerciseIndex: this.props.index}});
                 //this.props.addSet(this.props.index, set);
@@ -342,21 +366,41 @@ const styles = StyleSheet.create({
         fontSize: 18,
         paddingTop: 6,
     },
+    // buttonView: {
+    //     flex: 0,
+    //     paddingTop: 5,
+    //     paddingBottom: 5,
+    //     justifyContent: 'center',
+    //     flexDirection: 'row',
+    //     alignItems: 'center',
+    //     backgroundColor: '#dedad6',
+    //     borderTopWidth: 0.5,
+    //     borderBottomWidth: 0.5,
+    //     borderTopColor: '#333',
+    // },
+    // buttonText: {
+    //     fontWeight: 'bold',
+    //     fontSize: 18,
+    //     color: '#00adf5'
+    // }
     buttonView: {
-        flex: 0,
-        paddingTop: 5,
-        paddingBottom: 5,
-        justifyContent: 'center',
-        flexDirection: 'row',
+        paddingBottom: 15,
+        height: 50,
+        width: '100%',
         alignItems: 'center',
-        backgroundColor: '#dedad6',
-        borderTopWidth: 0.5,
-        borderBottomWidth: 0.5,
-        borderTopColor: '#333',
     },
+
     buttonText: {
+        color: '#fff',
+        fontSize: 16,
         fontWeight: 'bold',
-        fontSize: 18,
-        color: '#00adf5'
+        textAlign: 'center',
+    },
+    button: {
+        height: '100%',
+        width: '100%',
+        borderRadius: 5,
+        backgroundColor: '#00adf5',
+        justifyContent: 'center',
     }
 });
