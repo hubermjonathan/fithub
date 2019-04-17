@@ -564,6 +564,9 @@ let logWeight = async function logWeight(req, res){
   //Find the user
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  if(!req.body.weight || !req.body.date){
+    res.status(500).send({ "message": "logWeight: missing fields"});
+  }
   req.body.date = req.body.date.substring(0, 10);
   //if(req.body.date instanceof Date){
     let new_weight = {
@@ -604,6 +607,10 @@ let logCalories = async function logWeight(req, res){
   //Find the user
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+
+  if(!req.body.calories || !req.body.date){
+    res.status(500).send({ "message": "logWeight: missing fields"});
+  }
   req.body.date = req.body.date.substring(0, 10);
   //if(req.body.date instanceof Date){
     let new_calories = {
