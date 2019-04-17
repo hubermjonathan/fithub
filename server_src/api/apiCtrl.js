@@ -1595,7 +1595,7 @@ let calorieChart = async function calorieChart(req,res){
     avg: avgCalories
   }
 
-  if(user.calories.length == 0){
+  if(calorie.length == 0){
     chart = {
       message: "There are no calorie statistics to display",
       dates: dates,
