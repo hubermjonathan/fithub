@@ -1,6 +1,7 @@
 export const DefaultWorkouts = [
     {
         uid: undefined,
+        name: "Chest",
         description: "Chest Day",
         exercises: [
             {name: "Bench Press", equipment_type: "Barbell", muscle_groups:[], sets: []},
@@ -12,6 +13,7 @@ export const DefaultWorkouts = [
     },
     { 
         uid: undefined,
+        name: "Back and Shoulders",
         description: "Back & Shoulder Day",
         exercises: [
             {name: "Lat Pulldown", equipment_type: "Cable Machine", muscle_groups:[],sets: []},
@@ -24,6 +26,7 @@ export const DefaultWorkouts = [
     },
     {
         uid: undefined,
+        name: "Arms",
         description: "Arm Day",
         exercises: [
             {name: "Curls", equipment_type: "Dumbbell", muscle_groups:[],sets: []},
@@ -36,7 +39,8 @@ export const DefaultWorkouts = [
     },
     {
         uid: undefined,
-        description: 'Leg Day',
+        name: "Legs",
+        description: "Leg Day",
         exercises: [
             {name: "Back Squat", equipment_type: "Barbell", muscle_groups:[], sets: []},
             {name: "Hamstring Exensions", equipment_type: "Other", muscle_groups:[], sets: []},

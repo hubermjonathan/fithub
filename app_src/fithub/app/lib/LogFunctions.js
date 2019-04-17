@@ -28,7 +28,7 @@ export function validateLog(log) {
     }
 }
 
-export async function postLog(workout) {
+export async function postLog(workout, date) {
 
     try {
         const id = await getUserID();
@@ -50,7 +50,8 @@ export async function postLog(workout) {
             id: id,
             uid: uid,
             token: token,
-            date: workout.date,
+            //date: workout.date,
+            date: date,
             name: workout.name,
             exercises: workout.exercises,
         }
@@ -78,7 +79,6 @@ export async function postLog(workout) {
     } catch (e) {
         console.log(e);
     }
-
 }
 
 //Returns the logs associated with the logged in user

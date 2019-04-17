@@ -2,11 +2,6 @@ import { createStore } from "redux";
 import { cloneDeep } from "lodash";
 
 const initialState = {
-    // workout: {
-    //     name: undefined,
-    //     id: undefined,
-    //     exercises: [],
-    // }
     workout: {
         uid: '12345678910',
         name: 'Chest Day Boi',
@@ -38,10 +33,6 @@ const initialState = {
 
 const reducer = function(state=initialState, action) {
     const newState = cloneDeep(state);
-    //console.log("NEW STATE: ", newState);
-    //console.log("ACTION: ", action);
-    // const exerciseIndex = action.payload.exerciseIndex;
-    // const setIndex = action.payload.setIndex;
     
     switch(action.type) {
         case "AddExercise":
