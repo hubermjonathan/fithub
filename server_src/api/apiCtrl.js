@@ -1393,21 +1393,35 @@ let dates = function dates(req, res){
 
 let follow = async function follow(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
+  let error = false;
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
-    res.status(400).send();
-    console.log("invalid id");
+    res.status(400).send({message: "Invalid user id"});
+    error = true;
     return;
   });
+  if (error) return;
   if(user==null){
     res.status(404).send({message: "User not found"});
     return;
   }
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let ufollow = await schemaCtrl.Profile.findById(req.body.followid).catch(err => {
-    res.status(404).send();
-    console.log("invalid id");
+    res.status(400).send({message: "Invalid user id"});
+    error = true;
     return;
   });
+  if (error) return;  
+  if(ufollow==null){
+    res.status(404).send({message: "User not found"});
+    return;
+  }
+  let index = user.following.find(function(element){
+    return element==req.body.followid
+  });
+  if(index!=undefined){
+    res.status(200).send({message: "Already following this user"});
+    return;
+  }
   await user.updateOne({$push: { following: ufollow.id }});
   res.status(200).send({message: "Success"});
 }
@@ -1437,16 +1451,16 @@ let unfollow = async function unfollow(req,res){
 
 let followingWorkouts = async function followingWorkouts(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
     console.log("invalid id"); 
-    res.status(400).send({message: "Invalid id"}); 
     return
   });
   if(user==null){
     res.status(404).send({message: "User not found"});
     return;
   }
-  let workouts = await schemaCtrl.WorkoutPlan.find({ownerUID: {$in : user.following}}).select('-__v').populate({
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+  let workouts = await schemaCtrl.WorkoutPlan.find({ownerUID: {$in: user.following}}).select('-__v').populate({
     path: "exercises",
     select: "-__v",
     populate:

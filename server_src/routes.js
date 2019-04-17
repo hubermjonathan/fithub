@@ -21,7 +21,7 @@ router.post('/profile/editStats', apiCtrl.editStats);          //edit a user's s
 router.post('/profile/follow/', apiCtrl.follow);          //edit a user's selected stats
 router.post('/profile/unfollow/', apiCtrl.unfollow);          //edit a user's selected stats
 
-router.get('/workouts/following/:id', apiCtrl.followingWorkouts);          //edit a user's selected stats
+router.post('/workouts/following/', apiCtrl.followingWorkouts);          //edit a user's selected stats
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans
 router.get('/workouts/public/:id', apiCtrl.social);             //get comments and gains for a workout plan
 router.get('/workouts/public/:user/:id', apiCtrl.social);             //get comments and gains for a workout plan
