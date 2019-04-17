@@ -17,6 +17,7 @@ export default class DetailScreen extends React.Component {
     return {
       title: navigation.getParam('name', 'Workout'),
       headerTintColor: '#00adf5',
+      headerRight: <Icon name="add" type="material" containerStyle={{ paddingRight: 10 }} size={30} onPress={() => { navigation.push('Logger') }}/>
     };
   };
 

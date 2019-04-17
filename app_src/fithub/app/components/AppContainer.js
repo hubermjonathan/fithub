@@ -28,7 +28,7 @@ const HomeStack = createStackNavigator({
     }
   },
   Details: DetailScreen,
-  DetailsEdit: WorkoutLogEditScreen
+  Logger: LoggerScreen,
 });
 
 const ProfileStack = createStackNavigator({
