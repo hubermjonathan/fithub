@@ -1691,7 +1691,7 @@ let weightChart = async function weightChart(req,res){
 
 let volumeChart = async function volumeChart(req, res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  let user = await schemaCtrl.Profile.findById(req.body.id).populate
   ({
     path: "logs",
     populate : {
@@ -1706,7 +1706,12 @@ let volumeChart = async function volumeChart(req, res){
     }
     }
   ).sort({"logs.date":1}).catch(err => {console.log("invalid id");});
-  
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+
+  if(user.logs.size==0){
+    res.status(204).send({message: "No logs"});
+  }
+
   volumes = [];
   dates = [];
 
@@ -1723,7 +1728,7 @@ let volumeChart = async function volumeChart(req, res){
       day = "0" + day;
     }
 
-    if(req.params.from!=undefined && !moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
+    if(req.body.from!=undefined && !moment(`${year}-${month}-${day}`).isBetween(req.body.from, req.body.to)){
       return;
     }
 
@@ -1756,6 +1761,7 @@ let volumeChart = async function volumeChart(req, res){
     avg += vol;
   });
   avg = avg / volumes.length-1;
+
   res.status(200).send({dates : dates, volumes : volumes, min: min, max: max, avg:avg});
    //end populate
 }

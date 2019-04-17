@@ -49,9 +49,7 @@ router.get('/logs/:id/calories', apiCtrl.getCalories);                     //Get
 router.get('/logs/:id/calorieChart/', apiCtrl.calorieChart);                     //Get a users calorie chart for all dates
 router.get('/logs/:id/calorieChart/:from', apiCtrl.calorieChart);                     //Get a users calorie chart starting at a date
 router.get('/logs/:id/calorieChart/:from/:to', apiCtrl.calorieChart);                     //Get a users calorie chart for a range
-router.get('/logs/:id/volumeChart/', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
-router.get('/logs/:id/volumeChart/:from', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
-router.get('/logs/:id/volumeChart/:from/:to', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
+router.post('/logs/volumeChart/', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
 router.get('/logs/:id/weightChart/', apiCtrl.weightChart);                     //Get a users weight chart for all dates
 router.get('/logs/:id/weightChart/:from', apiCtrl.weightChart);                     //Get a users weight chart starting at a date
 router.get('/logs/:id/weightChart/:from/:to', apiCtrl.weightChart);                     //Get a users weight chart for a range
