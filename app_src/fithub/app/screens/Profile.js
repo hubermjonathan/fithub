@@ -400,6 +400,7 @@ class Activity extends React.Component {
     let activities = [];
 
     for (let i = 0; i < this.state.algoData.length; i++) {
+      if(this.state.algoData[i] === undefined) continue;
       activities.push(
         <View style={[styles.record, this.state.shadowProps]} key={i}>
           <Icon name={this.state.algoData[i].icon} type="material" size={30} />
