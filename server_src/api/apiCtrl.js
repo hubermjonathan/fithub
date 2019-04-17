@@ -1508,17 +1508,18 @@ let getWeight = async function getWeight(req,res){
 
 let calorieChart = async function calorieChart(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ return console.log("Unauthorized request"); }
   let rangeA;
   let rangeB;
   let dateA;
   let dateB;
-  if(req.params.from){
-    rangeA = req.params.from.split("-");
+  if(req.body.from){
+    rangeA = req.body.from.split("-");
     dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
   }
-  if(req.params.to){
-    rangeB = req.params.to.split("-");
+  if(req.body.to){
+    rangeB = req.body.to.split("-");
     dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
   }
 
@@ -1526,7 +1527,7 @@ let calorieChart = async function calorieChart(req,res){
 
   let data = [];
 
-  if(req.params.from && req.params.to){
+  if(req.body.from && req.body.to){
     calories.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
@@ -1541,7 +1542,7 @@ let calorieChart = async function calorieChart(req,res){
       }
     });
   }
-  else if(req.params.from && !req.params.to){
+  else if(req.body.from && !req.body.to){
     calories.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
@@ -1593,22 +1594,35 @@ let calorieChart = async function calorieChart(req,res){
     max: maxCalories,
     avg: avgCalories
   }
+
+  if(user.calories.length == 0){
+    chart = {
+      message: "There are no calorie statistics to display",
+      dates: dates,
+      calories: calorie,
+      min: minCalories,
+      max: maxCalories,
+      avg: avgCalories
+    }
+  }
   res.status(200).send(chart);
 }
 
 let weightChart = async function weightChart(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ return console.log("Unauthorized request"); }
+
   let rangeA;
   let rangeB;
   let dateA;
   let dateB;
-  if(req.params.from){
-    rangeA = req.params.from.split("-");
+  if(req.body.from){
+    rangeA = req.body.from.split("-");
     dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
   }
-  if(req.params.to){
-    rangeB = req.params.to.split("-");
+  if(req.body.to){
+    rangeB = req.body.to.split("-");
     dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
   }
 
@@ -1616,22 +1630,16 @@ let weightChart = async function weightChart(req,res){
 
   let data = [];
 
-  if(req.params.from && req.params.to){
+  if(req.body.from && req.body.to){
     weight.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
-      //console.log("CurrDate: " + date.toString());
       if(date >= dateA && date <= dateB) {
-        /*
-        console.log("A: " + dateA.toString());
-        console.log("B: " + dateB.toString());
-        console.log("CurrDate: " + date.toString());
-        */
         data.push(c);
       }
     });
   }
-  else if(req.params.from && !req.params.to){
+  else if(req.body.from && !req.body.to){
     weight.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
@@ -1651,7 +1659,6 @@ let weightChart = async function weightChart(req,res){
 
   let dates = [];
   let volume = [];
-
 
   //console.log(data);
 
@@ -1685,6 +1692,17 @@ let weightChart = async function weightChart(req,res){
     min: minVolume,
     max: maxVolume,
     avg: avgVolume
+  }
+
+  if(volume.length == 0){
+    chart = {
+      message: "There are no weight statistics to display",
+      dates: dates,
+      volume: volume,
+      min: minVolume,
+      max: maxVolume,
+      avg: avgVolume
+    }
   }
   res.status(200).send(chart);
 }
