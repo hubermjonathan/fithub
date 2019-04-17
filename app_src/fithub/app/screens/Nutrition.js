@@ -180,7 +180,7 @@ export class CalorieScreen extends React.Component {
                                     height={190}
                                     chartConfig={chartConfig}
                                 /> :
-                                <Text> Loading... </Text>
+                                <Text>There are no recent logs/Please log to start graph initialization</Text>
                         }
 
                         </View>
@@ -198,7 +198,7 @@ export class CalorieScreen extends React.Component {
                                     Average: {this.state.calorieStats.average}
                                 </Text>
                             </View> :
-                            <Text>Loading...</Text>
+                            <Text>No min/max/avg exist</Text>
                     }
                 </View>
             </SafeAreaView>
@@ -350,7 +350,7 @@ export class WeightScreen extends React.Component {
                                         height={190}
                                         chartConfig={chartConfig}
                                     /> :
-                                    <Text>Loading...</Text>
+                                    <Text>There are no recent logs/Please log to start graph initialization</Text>
                             }
 
                         </View>
@@ -369,7 +369,7 @@ export class WeightScreen extends React.Component {
                                     Average: {this.state.weightStats.average} lbs
                                     </Text>
                             </View> :
-                            <Text>Loading...</Text>
+                            <Text>No min/max/avg exist</Text>
                     }
                 </View>
             </SafeAreaView>
