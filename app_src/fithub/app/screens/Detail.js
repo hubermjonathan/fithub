@@ -12,10 +12,12 @@ import BottomBar from '../components/BottomBar';
 import { Icon, Button } from 'react-native-elements';
 import { postLog } from '../lib/LogFunctions';
 
-export default class DetailScreen extends React.Component {
+import { connect } from 'react-redux';
+
+class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('name', 'Workout'),
+      title: navigation.getParam('name', 'Logger'),
       headerTintColor: '#00adf5',
       headerRight: <Icon name="add" type="material" containerStyle={{ paddingRight: 10 }} size={30} onPress={() => { navigation.push('Logger') }}/>
     };
@@ -28,6 +30,13 @@ export default class DetailScreen extends React.Component {
       name: this.props.navigation.getParam('name', 'Workout'),
       exercises: this.props.navigation.getParam('exercises', []),
     }
+  }
+
+  componentDidMount() {
+    //console.log("Payload: ", this.state.exercises);
+    console.log(this.props.navigation.state.params);
+    const workout = this.props.navigation.state.params;
+    this.props.dispatch({type: "SetWorkout", payload: workout});
   }
 
   getCurrentDate() {
@@ -68,6 +77,8 @@ export default class DetailScreen extends React.Component {
     }
   }
 }
+
+export default connect()(DetailScreen);
 
 class SummaryCard extends React.Component {
   render() {
