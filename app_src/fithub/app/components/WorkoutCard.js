@@ -53,7 +53,7 @@ export default class WorkoutCard extends React.Component {
         console.log(this.state.comment);
         this.setState({comment: ''});
         this.state.comments.push(comment);
-
+        console.log(this.state.comments)
     }
 
     changeLike() {
@@ -72,12 +72,24 @@ export default class WorkoutCard extends React.Component {
     render() {
         return (
             <SafeAreaView style={{flex: 1}}>
-                <View style={styles.card}>
+                <View style={[styles.card, styles.shadowProps]}>
                     {/* show user at top of card */}
                     <View style={styles.user}>
                         {/* print user of workout */}
-                        <TouchableOpacity onPress={() => this.props.navigation.push('Profile', {id: this.props.user})}>
+                        <TouchableOpacity 
+                            onPress={() => this.props.navigation.push('Profile', {id: this.props.user})}
+                            style={styles.userName}
+                        >
                             <Text style={styles.userName}>{this.state.user}</Text>
+                        </TouchableOpacity>
+                        {/* follower button */}
+                        <TouchableOpacity
+                            onPress={() => this.follow()}
+                            disabled={this.props.following}
+                        >
+                            <View style={styles.follow}>
+                                <Text style={styles.followText}>Follow</Text>
+                            </View>
                         </TouchableOpacity>
                     </View>
 
@@ -108,21 +120,20 @@ export default class WorkoutCard extends React.Component {
                         <FlatList
                             scrollEnabled={false}
                             data={this.props.exercises}
-                            keyExtractor={(item, index) => index.toString()}
+                            keyExtractor={(item) => item._id}
                             renderItem={(exercise) => this.renderExercises(exercise)}
                         />
                     </View>
 
                     {/* comments of workout */}
-                    <View style={styles.commentsList}>
+                    {/* <View style={styles.commentsList}>
                         <FlatList
-                            listKey="comments"
                             scrollEnabled={false}
-                            data={this.props.comments}
-                            listKey={(item, index) => 'D' + index.toString()}
+                            data={this.state.comments}
+                            keyExtractor={(item, index) => item.id}
                             renderItem={(comment) => this.renderComments(comment)}
                         />
-                    </View>
+                    </View> */}
 
                     {/* commentBox and like button */}
                     <View style={styles.likeComment}>
@@ -183,18 +194,43 @@ const styles = StyleSheet.create({
         height: 'auto',
         margin: 10,
         padding: 5,
+        borderRadius: 15,
         backgroundColor: 'white',
     },
+    shadowProps: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 1,
+          height: 2,
+        },
+        shadowOpacity: .4,
+        shadowRadius: 3,
+    },
     user: {
-        padding: 0,
+        padding: 3,
         margin: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         borderBottomWidth: 0.5,
     },
     userName: {
         //fontSize: 'bold',
+        flex: 5,
         fontSize: 25,
+    },
+    follow: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#00adf5',
+        borderRadius: 15,
+        padding: 5,
+    },
+    followText: {
+        textAlign: 'center',
+        color: '#00adf5',
     },
     workout: {
         flexDirection: 'column',
@@ -220,6 +256,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        alignItems: 'center',
         //right: 0,
         //bottom: 30,
     },
