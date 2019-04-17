@@ -14,7 +14,7 @@ import {
 import { Icon, Button } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
 import { getProfileStats, getProfileActivity, getSelectedStats } from '../lib/ProfileFunctions';
-import { getUserID } from '../lib/AccountFunctions';
+import { getUserID, getUserUID, getUserToken } from '../lib/AccountFunctions';
 import { ContributionGraph, LineChart } from 'react-native-chart-kit';
 
 const chartConfig = {
@@ -222,20 +222,43 @@ export default class ProfileScreen extends React.Component {
   }
 
   async loadVolumeData() {
-    fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/volumeChart`)
+    const id = await getUserID();
+    const uid = await getUserUID();
+    const token = await getUserToken();
+    let postobj = { id: id, uid: uid, token: token };
+
+    fetch(`https://fithub-server.herokuapp.com/logs/volumeChart`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(postobj)
+    })
       .then((res) => {
         return res.json();
       })
       .then((data) => {
+        console.log(data);
         let slicedDates = [];
         let vol = [];
 
-        for (let x = data.dates.length - 6; x < data.dates.length; x++) {
-          slicedDates.push(data.dates[x].slice(5));
+        if (data.dates.length > 6) {
+          for (let x = data.dates.length - 6; x < data.dates.length; x++) {
+            slicedDates.push(data.dates[x].slice(5));
+          }
+          for (let x = data.dates.length - 6; x < data.dates.length; x++) {
+            vol.push(data.volumes[x]);
+          }
         }
-        for (let x = data.dates.length - 6; x < data.dates.length; x++) {
-          vol.push(data.volumes[x]);
+        else {
+          for (let x = 0; x < data.dates.length; x++) {
+            slicedDates.push(data.dates[x].slice(5));
+          }
+          for (let x = 0; x < data.dates.length; x++) {
+            vol.push(data.volumes[x]);
+          }
         }
+
 
         this.state.volumeData.datasets[0].data = vol;
         this.state.volumeData.labels = slicedDates;
@@ -330,29 +353,29 @@ export default class ProfileScreen extends React.Component {
                       <Text style={styles.graphText}>Volume History</Text>
                       <View>
                         {
-                          this.state.volumeData.labels.length > 0?
-                          <View>
-                          <LineChart
-                            data={this.state.volumeData}
-                            width={screenWidth}
-                            height={190}
-                            chartConfig={chartConfig}
-                          />
-                          <View style={styles.graphStats}>
-                            <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
-                                Min: {this.state.volumeStats.min} lbs
+                          this.state.volumeData.labels.length > 0 ?
+                            <View>
+                              <LineChart
+                                data={this.state.volumeData}
+                                width={screenWidth}
+                                height={190}
+                                chartConfig={chartConfig}
+                              />
+                              <View style={styles.graphStats}>
+                                <Text style={{ paddingLeft: '1%', fontSize: 18, color: 'white' }}>
+                                  Min: {this.state.volumeStats.min} lbs
                             </Text>
-                            <Text style={{ fontSize: 18, color: 'white' }}>
-                                Max: {this.state.volumeStats.max} lbs
+                                <Text style={{ fontSize: 18, color: 'white' }}>
+                                  Max: {this.state.volumeStats.max} lbs
                             </Text>
-                            <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
-                                Average: {this.state.volumeStats.average} lbs
+                                <Text style={{ paddingRight: '1%', fontSize: 18, color: 'white' }}>
+                                  Average: {this.state.volumeStats.average} lbs
                             </Text>
-                          </View>
-                          </View>
-                          
-                          :
-                        <Text>There are no recent logs/Please log to start graph initialization</Text>
+                              </View>
+                            </View>
+
+                            :
+                            <Text>There are no recent logs/Please log to start graph initialization</Text>
                         }
                       </View>
                     </View>
@@ -400,7 +423,7 @@ class Activity extends React.Component {
     let activities = [];
 
     for (let i = 0; i < this.state.algoData.length; i++) {
-      if(this.state.algoData[i] === undefined) continue;
+      if (this.state.algoData[i] === undefined) continue;
       activities.push(
         <View style={[styles.record, this.state.shadowProps]} key={i}>
           <Icon name={this.state.algoData[i].icon} type="material" size={30} />

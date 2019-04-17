@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     AlertIOS,
 } from 'react-native';
-import { getUserID } from '../lib/AccountFunctions';
+import { getUserID, getUserToken, getUserUID } from '../lib/AccountFunctions';
 import { getCalories, editCalories, getWeight, editWeight } from '../lib/NutritionFunctions';
 import { ContributionGraph, LineChart } from 'react-native-chart-kit';
 
@@ -57,7 +57,18 @@ export class CalorieScreen extends React.Component {
     }
 
     async loadCalorieData() {
-        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/calorieChart`)
+        const id = await getUserID();
+        const uid = await getUserUID();
+        const token = await getUserToken();
+
+        let postobj = { id: id, uid: uid, token: token };
+        fetch(`https://fithub-server.herokuapp.com/logs/calorieChart`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postobj)
+        })
             .then((res) => {
                 return res.json();
             })
@@ -65,12 +76,23 @@ export class CalorieScreen extends React.Component {
                 let slicedDates = [];
                 let cals = [];
 
-                for (let x = data.dates.length-6; x < data.dates.length; x++) {
-                    slicedDates.push(data.dates[x].slice(5));
+                if (data.dates.length > 6) {
+                    for (let x = data.dates.length - 6; x < data.dates.length; x++) {
+                        slicedDates.push(data.dates[x].slice(5));
+                    }
+                    for (let x = data.dates.length - 6; x < data.dates.length; x++) {
+                        cals.push(data.calories[x]);
+                    }
                 }
-                for (let x = data.dates.length-6; x < data.dates.length; x++) {
-                    cals.push(data.calories[x]);
+                else{
+                    for (let x = 0; x < data.dates.length; x++) {
+                        slicedDates.push(data.dates[x].slice(5));
+                    }
+                    for (let x = 0; x < data.dates.length; x++) {
+                        cals.push(data.calories[x]);
+                    }
                 }
+
 
                 this.state.calorieData.datasets[0].data = cals;
                 this.state.calorieData.labels = slicedDates;
@@ -255,20 +277,41 @@ export class WeightScreen extends React.Component {
     }
 
     async loadWeightData() {
-        fetch(`https://fithub-server.herokuapp.com/logs/${this.state.id}/weightChart`)
-            .then((res) => {
-                return res.json();
-            })
+        const uid = await getUserUID();
+        const token = await getUserToken();
+
+        let postobj = { id: this.state.id, uid: uid, token: token };
+        fetch(`https://fithub-server.herokuapp.com/logs/weightChart`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postobj)
+        }).then((res) => {
+            return res.json();
+        })
             .then((data) => {
+                console.log(postobj);
                 let slicedDates = [];
                 let weights = [];
 
-                for (let x = data.dates.length-6; x < data.dates.length; x++) {
-                    slicedDates.push(data.dates[x].slice(5));
+                if (data.dates.length > 6) {
+                    for (let x = data.dates.length - 6; x < data.dates.length; x++) {
+                        slicedDates.push(data.dates[x].slice(5));
+                    }
+                    for (let x = data.dates.length - 6; x < data.dates.length; x++) {
+                        weights.push(data.volume[x]);
+                    }
                 }
-                for (let x = data.dates.length-6; x < data.dates.length; x++) {
-                    weights.push(data.volume[x]);
+                else {
+                    for (let x = 0; x < data.dates.length; x++) {
+                        slicedDates.push(data.dates[x].slice(5));
+                    }
+                    for (let x = 0; x < data.dates.length; x++) {
+                        weights.push(data.volume[x]);
+                    }
                 }
+
 
                 this.state.weightData.datasets[0].data = weights;
                 this.state.weightData.labels = slicedDates;
