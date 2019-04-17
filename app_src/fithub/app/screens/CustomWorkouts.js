@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableHighlight, ScrollView, Alert, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TouchableHighlight, ScrollView, Alert, FlatList, RefreshControl } from 'react-native';
 
 import RoutineCard from '../components/RoutineCard';
 
@@ -16,10 +16,15 @@ export default class CustomWorkoutsScreen extends React.Component {
     }
 
     async componentWillMount() {
+        await this.fetchWorkouts();
+    }
+
+    fetchWorkouts = async () => {
         const id = await getUserID();
         let response = await getWorkouts(id); 
         this.setState({
             workouts: response.workouts,
+            refreshing: false,
         })
     }
  
@@ -28,7 +33,14 @@ export default class CustomWorkoutsScreen extends React.Component {
             <View style={styles.page}> 
                 <View>
                     <FlatList
-                        data={this.state.workouts} 
+                        data={this.state.workouts}
+                        refreshControl={    
+                            <RefreshControl
+                                colors={["#9Bd35A", "#689F38"]}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.fetchWorkouts}
+                            />
+                        }
                         keyExtractor={(item, index) => index.toString()}
                         contentContainerStyle={styles.list}
                         renderItem={(item) => 
