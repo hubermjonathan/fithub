@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
-import { getGains, addGains, addComment, following, unfollowUser } from '../lib/SocialFunctions';
+import { getGains, addGains, addComment, following, followUser, unfollowUser } from '../lib/SocialFunctions';
 import { getUserID, getUserName, getUserGivenName } from '../lib/AccountFunctions';
 
 
@@ -34,7 +34,8 @@ export default class WorkoutCard extends React.Component {
             likedByUser: this.props.likedByUser,
             comments: this.props.comments,
             gains: this.props.gains,
-            following: [],
+            usersFollowing: [],
+            followingUser: false,
         }
     }
 
@@ -66,8 +67,17 @@ export default class WorkoutCard extends React.Component {
         const currUser = await getUserGivenName();
         this.setState({currUser: currUser});
         
+        //get list of all users currUser is following
         const usersFollowing = await following(id);
-        console.log(usersFollowing);
+        this.setState({usersFollowing: usersFollowing});
+
+        //check if user is following
+        if(this.state.usersFollowing.indexOf(this.state.id) == -1){
+            this.setState({followingUser: false})
+        }
+        else{
+            this.setState({followingUser: true})
+        }
     }
 
     async submitComment(comment) {
@@ -108,7 +118,7 @@ export default class WorkoutCard extends React.Component {
 
     follow() {
         userToFollow={followid: this.props.user}
-        if(this.state.usersFollowing.indexOf(this.state.id) == -1){
+        if(!this.state.followingUser){
             followUser(userToFollow);
         }
         else{
@@ -136,8 +146,8 @@ export default class WorkoutCard extends React.Component {
                             onPress={() => this.follow()}
                             disabled={this.props.following}
                         >
-                            <View style={styles.follow}>
-                                <Text style={styles.followText}>Follow</Text>
+                            <View style={this.state.followingUser? styles.following: styles.notFollowing}>
+                                <Text style={this.state.followingUser? styles.followingText: styles.notFollowingText}>Follow</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -267,7 +277,7 @@ const styles = StyleSheet.create({
         flex: 5,
         fontSize: 25,
     },
-    follow: {
+    following: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -276,9 +286,22 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 5,
     },
-    followText: {
+    notFollowing: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: 'black',
+        borderRadius: 15,
+        padding: 5,
+    },
+    followingText: {
         textAlign: 'center',
         color: '#00adf5',
+    },
+    notFollowingText: {
+        textAlign: 'center',
+        color: 'black',
     },
     workout: {
         flexDirection: 'column',

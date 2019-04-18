@@ -238,7 +238,6 @@ export default class ProfileScreen extends React.Component {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         let slicedDates = [];
         let vol = [];
 
@@ -280,7 +279,7 @@ export default class ProfileScreen extends React.Component {
         id: this.props.navigation.getParam('id', id)
       });
       this.loader();
-    });
+    })
   }
 
   renderPagination(index, total, context) {
