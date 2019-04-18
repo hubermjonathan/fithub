@@ -88,7 +88,7 @@ export default class WorkoutCard extends React.Component {
         }
         itemtoSend = {
             comment: comment,
-            workoutId: this.props.workoutID, //yeah because this isn't confusing
+            workoutId: this.props.workoutID, 
         };
         addComment(itemtoSend);
         
@@ -99,8 +99,9 @@ export default class WorkoutCard extends React.Component {
             username: this.state.currUser,
             text: comment,
         }
-        this.setState({comment: ''});
+        this.TextInput.clear();
         this.state.comments.push(commentForState);
+        this.setState({comment: ''})
     }
 
     changeLike() {
@@ -197,6 +198,7 @@ export default class WorkoutCard extends React.Component {
                     <View style={styles.likeComment}>
                         <View style={styles.commentBox}>
                             <TextInput
+                                ref={input => {this.TextInput = input }}
                                 style={styles.commentBox}
                                 placeholder="Add a comment..."
                                 onChangeText={(text) => this.setState({comment: text})}
@@ -341,9 +343,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     commentsList: {
-
+        flex: 1,
+        flexGrow: 1,
     },
     comment: {
+        flex: 1,
+        flexWrap: 'wrap',
         flexDirection: 'row',
         justifyContent: 'flex-start',
         fontSize: 12,

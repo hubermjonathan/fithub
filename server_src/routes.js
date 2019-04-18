@@ -34,6 +34,7 @@ router.post('/workouts/setpublic', apiCtrl.editWorkoutPublic);         //Post a 
 router.post('/workouts/edit', apiCtrl.editWorkout);          //edit a user's workout
 router.post('/workouts/gain', apiCtrl.gain);          //gain a workout
 router.post('/workouts/addComment', apiCtrl.addComment);          //add a comment to a workout
+router.post('/workouts/delComment', apiCtrl.delComment);          //delete a comment in a workout
 
 router.get('/exercises/', apiCtrl.exercises);               //Get the standard exercises
 router.get('/exercises/:id', apiCtrl.uExercises);          //Get a users CUSTOM exercises

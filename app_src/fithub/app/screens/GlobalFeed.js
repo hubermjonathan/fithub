@@ -24,7 +24,6 @@ export default class GlobalFeedScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.setModalVisible = this.setModalVisible.bind(this);
   }
 
   state = {
@@ -159,6 +158,15 @@ export default class GlobalFeedScreen extends React.Component {
 render() {
   return (
     <SafeAreaView style={{ flex: 1}}>
+      {/* <View style={styles.filter}>
+        <Icon 
+          style={{ right: 10 }} 
+          name="filter" 
+          type="MaterialDesignIcons" 
+          size={30} 
+          onPress={() => {this.setModalVisible(true)}}
+        />
+      </View> */}
       {/* feed after the header */}
       <View style={styles.feed}>
         <FlatList
@@ -232,21 +240,9 @@ render() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    height: 45,
-    padding: 10,
-  },
-  title: {
-    fontSize: 25,
-    left: 5,
-  },
-  search: {
-    flex: 1,
+  filter: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    right: 15,
-    //bottom: 30,
   },
   feed: {
     backgroundColor: '#eee',
