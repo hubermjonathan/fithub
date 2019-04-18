@@ -18,13 +18,14 @@ import Dash from 'react-native-dash';
 import { Icon, Button } from 'react-native-elements';
 import WorkoutCard from '../components/WorkoutCard';
 import { getPublicWorkouts } from '../lib/WorkoutFunctions';
+import FeedScreen from './Feed';
 
 export default class GlobalFeedScreen extends React.Component {
   
 
   constructor(props) {
     super(props);
-    this.setModalVisible = this.setModalVisible.bind(this);
+    this.selectedFilter=this.selectedFilter.bind(this);
   }
 
   state = {
@@ -57,7 +58,7 @@ export default class GlobalFeedScreen extends React.Component {
     this.setState({ modalVisible: visible });
   }
 
-  selectedFilter(muscleEnum) {
+  selectedFilter = (muscleEnum) => {
     let muscles = { muscles: [] };
     if (muscleEnum === 99) {
       for (let i = i; i < 19; i++) {
@@ -158,75 +159,14 @@ export default class GlobalFeedScreen extends React.Component {
   }
 render() {
   return (
-    <SafeAreaView style={{ flex: 1}}>
-      {/* feed after the header */}
-      <View style={styles.feed}>
-        <FlatList
-          listKey={(item, index) => index.toString()}
-          data={this.state.workouts}
-          renderItem={({ item }) => (
-            <WorkoutCard
-              fullWorkout={{
-                id: "",
-                uid: "",
-                token: "",
-                public: false,
-                description: item.description,
-                name: item.name,
-                exercises: item.exercises,
-                date: item.date
-              }}
-              workout={item.workout}
-              workoutID={item.workoutID}
-              user={item.user}
-              userPhoto={item.icon}
-              exercises={item.exercises}
-              comments={item.comments}
-              gains={item.gains}
-              liked_users={item.liked_users}
-              navigation={this.props.navigation}
-            />
-          )}
-        />
-        
-        <Modal
-          animationType="fade"
-          transparent={false}
-          visible={this.state.modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}
-          style={{ flex: 1 }}>
-
-          <SafeAreaView style={{ flex: 1 }}>
-            <View style={{ flex: 10 }}>
-              <FlatList
-                keyExtractor={(item, index) => index.toString()}
-                data={this.state.muscleGroups}
-                renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => this.selectedFilter(item.enum)}>
-                    <Text style={{ fontSize: 30 }}>
-                      {item.muscle}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-            <View style={{ flex: 1, paddingTop: 10 }}>
-              <Button
-                style={{ allignItems: 'flex-end' }}
-                buttonStyle={{ backgroundColor: '#e04a21' }}
-                title="Cancel"
-                onPress={() => {
-                  this.setModalVisible(false);
-                }}
-              />
-            </View>
-          </SafeAreaView>
-
-        </Modal>
-      </View>
+    <SafeAreaView style={{flex:1}}>
+      <FeedScreen
+        workouts={this.state.workouts}
+        muscleGroups={this.state.muscleGroups}
+        selectedFilter={this.selectedFilter}
+      />
     </SafeAreaView>
+    
   )
 }
 }
