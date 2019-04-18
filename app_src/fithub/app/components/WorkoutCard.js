@@ -17,14 +17,17 @@ import {
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
-import { getGains, addGains } from '../lib/SocialFunctions';
-import { getUserID } from '../lib/AccountFunctions';
+import { getGains, addGains, addComment } from '../lib/SocialFunctions';
+import { getUserID, getUserName } from '../lib/AccountFunctions';
 
 
 export default class WorkoutCard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            id: '',
+            name: '',
+            photo: '',
             user: '',
             comment: '',
             likedByUser: this.props.likedByUser,
@@ -50,6 +53,7 @@ export default class WorkoutCard extends React.Component {
 
         //code to tell if current user has liked the workout
         const id = await getUserID();
+        this.setState({id: id});
         if(this.props.liked_users.indexOf(id) != -1){
             this.setState({likedByUser: true});
         }
@@ -58,12 +62,27 @@ export default class WorkoutCard extends React.Component {
         }
     }
 
-    submitComment(comment) {
+    async submitComment(comment) {
         //TODO
         //add server calls to add comment to comment list
-        console.log(this.state.comment);
+        if (!comment){
+            return;
+        }
+        itemtoSend = {
+            comment: comment,
+            workoutId: this.props.workoutID, //yeah because this isn't confusing
+        };
+        addComment(itemtoSend);
+        
+        //need to update state to update render
+        const user = await getUserID();
+        commentForState = {
+            user: user,
+            username: this.state.name,
+            text: comment,
+        }
         this.setState({comment: ''});
-        this.state.comments.push(comment);
+        this.state.comments.push(commentForState);
         console.log(this.state.comments)
     }
 
@@ -78,6 +97,10 @@ export default class WorkoutCard extends React.Component {
         }
         workout={workout: this.props.workoutID};
         addGains(workout);
+    }
+
+    follow() {
+        
     }
 
 
@@ -131,20 +154,20 @@ export default class WorkoutCard extends React.Component {
                         <FlatList
                             scrollEnabled={false}
                             data={this.props.exercises}
-                            keyExtractor={(item,index) => index.toString()}
+                            listKey={(item2, index) => 'E' + index.toString()}
                             renderItem={(exercise) => this.renderExercises(exercise)}
                         />
                     </View>
 
                     {/* comments of workout */}
-                    {/* <View style={styles.commentsList}>
+                    <View style={styles.commentsList}>
                         <FlatList
                             scrollEnabled={false}
                             data={this.state.comments}
-                            keyExtractor={(item, index) => item.id}
+                            listKey={(item2, index) => 'C' + index.toString()}
                             renderItem={(comment) => this.renderComments(comment)}
                         />
-                    </View> */}
+                    </View>
 
                     {/* commentBox and like button */}
                     <View style={styles.likeComment}>
@@ -190,7 +213,8 @@ export default class WorkoutCard extends React.Component {
     renderComments(comment) {
         return (
             <View style={styles.comment}>
-                <Text>{comment}</Text>
+                <Text style={{fontWeight: 'bold'}}>{comment.item.username}{": "}</Text>
+                <Text>{comment.item.text}</Text>
             </View>
         )
     }
@@ -283,6 +307,8 @@ const styles = StyleSheet.create({
 
     },
     comment: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
         fontSize: 12,
     },
     likeComment: {
