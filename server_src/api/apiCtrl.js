@@ -1419,9 +1419,10 @@ let unfollow = async function unfollow(req,res){
   if(index!==undefined){
     user.following.splice(index, 1);
     await user.updateOne({ following : user.following });
+    res.status(200).send({message: "Success"});
+  } else {
     res.status(400).send({message: "Not following specified user"});
   }
-  res.status(200).send({message: "Success"});
 }
 
 let followingWorkouts = async function followingWorkouts(req,res){
