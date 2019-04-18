@@ -88,7 +88,7 @@ export default class WorkoutCard extends React.Component {
         }
         itemtoSend = {
             comment: comment,
-            workoutId: this.props.workoutID, //yeah because this isn't confusing
+            workoutId: this.props.workoutID, 
         };
         addComment(itemtoSend);
         
@@ -97,10 +97,11 @@ export default class WorkoutCard extends React.Component {
         commentForState = {
             user: user,
             username: this.state.currUser,
-            text: comment.toString(),
+            text: comment,
         }
-        this.state.comments.push(commentForState);
         this.TextInput.clear();
+        this.state.comments.push(commentForState);
+        this.setState({comment: ''})
     }
 
     changeLike() {
