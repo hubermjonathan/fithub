@@ -97,10 +97,10 @@ export default class WorkoutCard extends React.Component {
         commentForState = {
             user: user,
             username: this.state.currUser,
-            text: comment,
+            text: comment.toString(),
         }
-        this.setState({comment: ''});
         this.state.comments.push(commentForState);
+        this.TextInput.clear();
     }
 
     changeLike() {
@@ -197,6 +197,7 @@ export default class WorkoutCard extends React.Component {
                     <View style={styles.likeComment}>
                         <View style={styles.commentBox}>
                             <TextInput
+                                ref={input => {this.TextInput = input }}
                                 style={styles.commentBox}
                                 placeholder="Add a comment..."
                                 onChangeText={(text) => this.setState({comment: text})}
