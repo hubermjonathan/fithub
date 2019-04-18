@@ -1,11 +1,12 @@
 import React from 'React';
 import { Icon } from 'react-native-elements';
+import { View } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer, createMaterialTopTabNavigator } from 'react-navigation';
 
 import AddWorkoutScreen from '../screens/AddWorkout';
 import LoggerScreen from '../screens/Logger';
 import HomeScreen from '../screens/HomeScreen';
-import FeedScreen from '../screens/Feed';
+import FeedScreen from '../screens/GlobalFeed';
 import ProfileScreen from '../screens/Profile';
 import CreateExercisesScreen from '../screens/CreateExercises';
 import CreateWorkoutScreen from '../screens/CreateWorkout';
@@ -18,6 +19,8 @@ import SelectWorkoutScreen from '../screens/SelectWorkout';
 import DefaultWorkoutsScreen from '../screens/DefaultWorkouts';
 import CustomWorkoutsScreen from '../screens/CustomWorkouts';
 import { CalorieScreen, WeightScreen } from '../screens/Nutrition';
+import GlobalFeedScreen from '../screens/GlobalFeed';
+import FollowerFeedScreen from '../screens/FollowerFeed';
 
 
 const HomeStack = createStackNavigator({
@@ -127,15 +130,51 @@ const WorkoutStack = createStackNavigator(
 },
 );
 
+const FeedTabs = createMaterialTopTabNavigator(
+  {
+    GlobalFeed: {
+      screen: GlobalFeedScreen,
+      navigationOptions: {
+        title: 'Global',
+      }
+    },
+    FollowerFeed: {
+      screen: FollowerFeedScreen,
+      navigationOptions: {
+        title: 'Followers',
+      }
+    }
+  },
+  {
+    swipeEnabled: false,
+    tabBarOptions: {
+      upperCaseLabel: false,
+      tabStyle: {
+        backgroundColor: '#00adf5'
+      },
+      indicatorStyle: {
+        display: 'none',
+      }
+    }
+  }
+)
+
 const FeedStack = createStackNavigator({
   Feed: {
-    screen: FeedScreen, 
-    navigationOptions: {
-      header: null,
+    screen: FeedTabs, 
+    navigationOptions: ({ navigation }) => {
+      return {
+        title: 'Feed',
+        headerRight: 
+          <View style={{flexDirection: 'row'}}>
+            <Icon style={{ right: 10 }} name="filter" type="MaterialDesignIcons" size={30} onPress={() => {this.props.screenProps.setModalVisible(true)}}/>
+            <Icon name="magnifying-glass" type="entypo" size={30} onPress={() => { navigation.push('Search') }}/>
+          </View>
+      }
     }
   },
   Search: SearchScreen,
-  Profile: ProfileScreen
+  Profile: ProfileScreen,
 });
 
 const AppContainer = createAppContainer(createBottomTabNavigator(

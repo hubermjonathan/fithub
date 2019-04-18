@@ -18,21 +18,15 @@ import Dash from 'react-native-dash';
 import { Icon, Button } from 'react-native-elements';
 import WorkoutCard from '../components/WorkoutCard';
 import { getPublicWorkouts } from '../lib/WorkoutFunctions';
+import { getUserToken, getUserID, getUserUID } from '../lib/AccountFunctions';
 
-export default class FeedScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: 'Feed',
-      headerRight: <Icon
-        name="magnifying-glass"
-        type="entypo"
-        size={30}
-        onPress={() => { navigation.push('otherUserProfile') }} />
-    }
-  };
+
+export default class FollowerFeedScreen extends React.Component {
+  
 
   constructor(props) {
     super(props);
+    this.setModalVisible = this.setModalVisible.bind(this);
   }
 
   state = {
@@ -98,13 +92,18 @@ export default class FeedScreen extends React.Component {
     this.setModalVisible(false);
   }
 
-  componentDidMount() {
-    fetch('https://fithub-server.herokuapp.com/workouts/public', {
+  async componentDidMount() {
+    const id = await getUserID();
+    const uid = await getUserUID();
+    const token = await getUserToken();
+    user = {id: id, uid: uid, token: token}
+
+    fetch('https://fithub-server.herokuapp.com/workouts/following/', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ exercises: [] })
+      body: JSON.stringify({ user })
     })
       .then((res) => {
         return res.json();
@@ -167,30 +166,6 @@ export default class FeedScreen extends React.Component {
 render() {
   return (
     <SafeAreaView style={{ flex: 1}}>
-      <View style={styles.header}>
-        <View style={styles.title}>
-          <Text style={styles.title}>Feed</Text>
-        </View>
-        <View style={styles.search}>
-          <TouchableOpacity>
-            <Icon
-              style={{ right: 10 }}
-              name="filter"
-              type="MaterialDesignIcons"
-              size={30}
-              onPress={() => this.setModalVisible(true)}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon
-              name="magnifying-glass"
-              type="entypo"
-              size={30}
-              onPress={() => this.props.navigation.navigate('Search')}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
       {/* feed after the header */}
       <View style={styles.feed}>
         <FlatList
@@ -220,7 +195,7 @@ render() {
             />
           )}
         />
-
+        
         <Modal
           animationType="fade"
           transparent={false}
