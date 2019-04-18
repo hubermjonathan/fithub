@@ -19,7 +19,7 @@ class DetailScreen extends React.Component {
     return {
       title: navigation.getParam('name', 'Logger'),
       headerTintColor: '#00adf5',
-      headerRight: <Icon name="add" type="material" containerStyle={{ paddingRight: 10 }} size={30} onPress={() => { navigation.push('Logger') }}/>
+      headerRight: <Icon name="add" type="material" containerStyle={{ paddingRight: 10 }} size={30} onPress={() => { navigation.push('Logger') }} />
     };
   };
 
@@ -36,7 +36,7 @@ class DetailScreen extends React.Component {
     //console.log("Payload: ", this.state.exercises);
     console.log(this.props.navigation.state.params);
     const workout = this.props.navigation.state.params;
-    this.props.dispatch({type: "SetWorkout", payload: workout});
+    this.props.dispatch({ type: "SetWorkout", payload: workout });
   }
 
   getCurrentDate() {
@@ -53,7 +53,7 @@ class DetailScreen extends React.Component {
             <Cards exercises={this.state.exercises} />
             <Button
               style={{ paddingTop: '5%', paddingBottom: '5%' }}
-              buttonStyle={{ backgroundColor: '#00adf5'}}
+              buttonStyle={{ backgroundColor: '#00adf5' }}
               title={'Log this workout again?'}
               onPress={() => {
 
@@ -152,8 +152,8 @@ class Sets extends React.Component {
         sets.push(
           <View key={"set-" + i} style={styles.cardRow}>
             <Text style={styles.warmupText}>Set {i + 1}</Text>
-            <Text style={styles.warmupText}>{this.props.reps[i]} reps</Text>
-            <Text style={styles.warmupText}>{this.props.weight[i]} lbs</Text>
+            <Text style={styles.warmupText}>{this.props.sets[i].reps} reps</Text>
+            <Text style={styles.warmupText}>{this.props.sets[i].weight} lbs</Text>
           </View>
         );
       } else {
