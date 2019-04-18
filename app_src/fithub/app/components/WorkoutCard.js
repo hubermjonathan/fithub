@@ -78,7 +78,7 @@ export default class WorkoutCard extends React.Component {
         const user = await getUserID();
         commentForState = {
             user: user,
-            username: this.state.name,
+            username: this.state.user,
             text: comment,
         }
         this.setState({comment: ''});
@@ -100,7 +100,7 @@ export default class WorkoutCard extends React.Component {
     }
 
     follow() {
-        
+        userToFollow={followid: this.props.user}
     }
 
 
