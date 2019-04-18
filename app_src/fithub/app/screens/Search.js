@@ -39,9 +39,9 @@ export default class SearchScreen extends React.Component {
     });
     }
 
-    updateSearch = search => {
-        this.setState({ search: search });
-        this.searchFilterFunction(this.state.search);
+    async updateSearch(search) {
+        await this.setState({ search: search });
+        await this.searchFilterFunction(this.state.search.toString());
     };
 
     searchFilterFunction = text => {    
@@ -54,17 +54,6 @@ export default class SearchScreen extends React.Component {
         this.setState({ searchedUsers: newUsers });  
     };
 
-    getSearchResults(search){
-        //console.log(search);
-        this.state.searchedUsers.length = 0;
-        for (let i=0; i < this.state.users.length; i++){
-            console.log(this.state.users[i].pseudonym.includes(search))
-            if(this.state.users[i].pseudonym.includes(search)){
-                this.state.searchedUsers.push(this.state.users[i]);
-            }
-        }
-        //console.log(this.state.searchedUsers);
-    }
 
     render() {
         return(
