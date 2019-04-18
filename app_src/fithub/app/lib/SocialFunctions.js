@@ -24,7 +24,6 @@ export async function addGains(workout) {
     workout.uid = uid;
     workout.id = id;
     workout.token = token;
-    console.log(workout)
     fetch('https://fithub-server.herokuapp.com/workouts/gain', {
         method: 'POST',
         headers: {
