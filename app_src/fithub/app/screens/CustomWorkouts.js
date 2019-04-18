@@ -29,8 +29,12 @@ export default class CustomWorkoutsScreen extends React.Component {
     fetchWorkouts = async () => {
         const id = await getUserID();
         let response = await getWorkouts(id); 
+        let workouts = response.workouts;
+
+        workouts.sort((a, b) => {return a.name > b.name});
+
         this.setState({
-            workouts: response.workouts,
+            workouts: workouts,
             refreshing: false,
         })
     }
