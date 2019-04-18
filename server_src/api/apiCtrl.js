@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const schemaCtrl = require('../models/schema');
-const url = "mongodb://admin:team5310@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const passport = require('../config/passport');
 const moment = require('moment');
 moment().format();
@@ -1344,20 +1344,7 @@ let social = function social(req, res){
       res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
-    let response = data.gains;
-    if(req.params.user){
-      let likedbyyou = false;
-      for(let i = 0; i < data.liked_users.length; i++){
-        if(data.liked_users[i]._id == req.params.user) {
-          likedbyyou = true;
-        }
-      }
-    response = {
-      liked: likedbyyou,
-      gains: data.gains,
-    }
-  }
-    res.status(200).send(response);
+    res.status(200).send({gains: data.gains});
   });
 }
 
@@ -1494,9 +1481,6 @@ let getCalories = async function getCalories(req,res){
 let getWeight = async function getWeight(req,res){
   if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
-  if(!user){
-    res.status(404).send({message: "user not found"});
-  }
   res.status(200).send(user.weight);
 }
 
