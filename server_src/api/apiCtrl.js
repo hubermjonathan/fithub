@@ -1705,14 +1705,6 @@ let volumeChart = async function volumeChart(req, res) {
     ).sort({ "logs.date": 1 }).catch(err => { console.log("invalid id"); });
   if (!isValidated(req, res, user)) { console.log("Unauthorized request"); return; }
 
-<<<<<<< HEAD
-=======
-  if (user.logs.size == undefined) {
-    res.status(200).send({ message: "No logs", dates: [], volumes: [], min: 0, max: 0, avg: 0 });
-    return;
-  }
-
->>>>>>> e2c437f33966e91bd875df1eed4cdbd62b287ab2
   volumes = [];
   dates = [];
 
@@ -1763,7 +1755,6 @@ let volumeChart = async function volumeChart(req, res) {
   });
   avg = avg / volumes.length - 1;
 
-<<<<<<< HEAD
   if(min==100000){
     res.status(200).send({message: "No logs", dates : [], volumes : [], min: 0, max: 0, avg:0});
     return;
@@ -1771,10 +1762,6 @@ let volumeChart = async function volumeChart(req, res) {
 
   res.status(200).send({dates : dates, volumes : volumes, min: min, max: max, avg:avg});
    //end populate
-=======
-  res.status(200).send({ dates: dates, volumes: volumes, min: min, max: max, avg: avg });
-  //end populate
->>>>>>> e2c437f33966e91bd875df1eed4cdbd62b287ab2
 }
 
 let getWorkoutComments = async function getWorkoutComments(req, res) {
