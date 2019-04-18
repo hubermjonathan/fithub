@@ -21,7 +21,7 @@ router.post('/profile/editStats', apiCtrl.editStats);          //edit a user's s
 router.post('/profile/follow/', apiCtrl.follow);          //edit a user's selected stats
 router.post('/profile/unfollow/', apiCtrl.unfollow);          //edit a user's selected stats
 
-router.get('/workouts/following/:id', apiCtrl.followingWorkouts);          //edit a user's selected stats
+router.post('/workouts/following/', apiCtrl.followingWorkouts);          //edit a user's selected stats
 router.get('/workouts/user/:id', apiCtrl.workouts);             //Get a users workout plans
 router.get('/workouts/public/:id', apiCtrl.social);             //get comments and gains for a workout plan
 router.get('/workouts/public/:user/:id', apiCtrl.social);             //get comments and gains for a workout plan
@@ -46,15 +46,9 @@ router.post('/logs/edit', apiCtrl.editLog);                   //Post a users wor
 router.post('/logs/weight', apiCtrl.logWeight);                   //Post a users new weight
 router.post('/logs/calories', apiCtrl.logCalories);                   //Post a users new calories
 router.get('/logs/:id/calories', apiCtrl.getCalories);                     //Get a users calorie logs
-router.get('/logs/:id/calorieChart/', apiCtrl.calorieChart);                     //Get a users calorie chart for all dates
-router.get('/logs/:id/calorieChart/:from', apiCtrl.calorieChart);                     //Get a users calorie chart starting at a date
-router.get('/logs/:id/calorieChart/:from/:to', apiCtrl.calorieChart);                     //Get a users calorie chart for a range
-router.get('/logs/:id/volumeChart/', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
-router.get('/logs/:id/volumeChart/:from', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
-router.get('/logs/:id/volumeChart/:from/:to', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
-router.get('/logs/:id/weightChart/', apiCtrl.weightChart);                     //Get a users weight chart for all dates
-router.get('/logs/:id/weightChart/:from', apiCtrl.weightChart);                     //Get a users weight chart starting at a date
-router.get('/logs/:id/weightChart/:from/:to', apiCtrl.weightChart);                     //Get a users weight chart for a range
+router.post('/logs/volumeChart/', apiCtrl.volumeChart);                     //Get a users weight chart for all dates
+router.post('/logs/calorieChart/', apiCtrl.calorieChart);                     //Get a users calorie chart for all dates
+router.post('/logs/weightChart/', apiCtrl.weightChart);                     //Get a users weight chart for all dates
 router.get('/logs/:id/weight', apiCtrl.getWeight);                     //Get a users weight logs
 
 //router.post('/dev/exercises/new', apiCtrl.devExercise);     //Post a custom standard exercise (DEV ONLY)

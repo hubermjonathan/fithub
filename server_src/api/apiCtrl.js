@@ -149,7 +149,7 @@ let login = function login(req, res) {
 
 //Create a new workout plan under a user
 let newWorkout = async function newWorkout(req, res) {
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let muscles = [];
@@ -241,7 +241,7 @@ let newWorkout = async function newWorkout(req, res) {
 
 //Log a user's workout into the DB
 let newLog = async function newLog(req, res) {
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
 
@@ -355,7 +355,7 @@ let newLog = async function newLog(req, res) {
 } //end newLog
 
 let newExercise = async function newExercise(req, res) {
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   //Find the user
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
@@ -401,7 +401,7 @@ let newExercise = async function newExercise(req, res) {
 //delete exercise
 //TODO: look into deleting residual parent workouts
 let delExercise = async function delExercise(req, res) {
-  if(!isConnected(req, res)){ return console.log("delExercise: DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("delExercise: invalid id");});
   if(!isValidated(req, res, user)){ return console.log("delExercise: Unauthorized request"); };
   
@@ -451,7 +451,7 @@ let delExercise = async function delExercise(req, res) {
 }
 
 let delWorkout = async function delWorkout(req, res) {
-  if(!isConnected(req, res)){ return console.log("delWorkouts: DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {return console.log("delWorkouts: invalid id");});
   if(!isValidated(req, res, user)){ return console.log("delWorkouts: Unauthorized request"); };
   
@@ -515,7 +515,7 @@ let delWorkout = async function delWorkout(req, res) {
 }
 
 let editWorkoutPublic = async function editWorkoutPublic(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
@@ -560,10 +560,13 @@ let editWorkoutPublic = async function editWorkoutPublic(req, res){
 }
 
 let logWeight = async function logWeight(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   //Find the user
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  if(!req.body.weight || !req.body.date){
+    res.status(500).send({ "message": "logWeight: missing fields"});
+  }
   req.body.date = req.body.date.substring(0, 10);
   //if(req.body.date instanceof Date){
     let new_weight = {
@@ -600,10 +603,15 @@ let logWeight = async function logWeight(req, res){
 }
 
 let logCalories = async function logWeight(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+
   //Find the user
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+
+  if(!req.body.calories || !req.body.date){
+    res.status(500).send({ "message": "logWeight: missing fields"});
+  }
   req.body.date = req.body.date.substring(0, 10);
   //if(req.body.date instanceof Date){
     let new_calories = {
@@ -640,7 +648,7 @@ let logCalories = async function logWeight(req, res){
 }
 
 let addComment = async function addComment(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   //Find the user
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
@@ -661,7 +669,7 @@ let addComment = async function addComment(req, res){
 
 /*--------Functions for editing user information--------*/
 let editUsername = async function editUsername(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   //Find the user
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
@@ -677,7 +685,7 @@ let editUsername = async function editUsername(req, res){
 }
 
 let editExercise = async function editExercise(req, res){ //deletes old exercise data and replaces it with new exercise data passed in
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
@@ -721,7 +729,7 @@ let editExercise = async function editExercise(req, res){ //deletes old exercise
 }
 
 let editWorkout = async function editWorkout(req, res){ //deletes old exercise data and replaces it with new exercise data passed in
-  if(!isConnected(req, res)){ return console.log("DB is offline"); };
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
@@ -852,7 +860,7 @@ let editWorkout = async function editWorkout(req, res){ //deletes old exercise d
 }
 
 let editLog = async function editLog(req, res) {
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
 
@@ -976,7 +984,7 @@ let editLog = async function editLog(req, res) {
 } //end newLog
 
 let gain = async function gain(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workout).catch(err => {console.log("error querying post");});
@@ -1005,7 +1013,7 @@ let gain = async function gain(req, res){
 }
 
 let editStats = async function editStats(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   user.selected_stat1 = req.body.stat1;
@@ -1019,10 +1027,7 @@ let editStats = async function editStats(req, res){
 
 //Get a user's logs from the database
 let logs = async function logs(req, res) {
-  if(!isConnected(req, res))
-  {
-    return;
-  }
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
 
   let logs = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
   ({
@@ -1052,10 +1057,7 @@ let logs = async function logs(req, res) {
 
 //Return a users workouts
 let workouts = async function workouts(req, res) {
-  if(!isConnected(req, res))
-  {
-    return;
-  }
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
 
   let workouts = await schemaCtrl.Profile.findById(req.params.id, 'workouts').populate
   ({
@@ -1089,10 +1091,7 @@ let workouts = async function workouts(req, res) {
 
 //Return a users custom private exercises
 let uExercises = function uExercises(req, res) {
-  if(!isConnected(req, res))
-  {
-    return;
-  }
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
 
   let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
   {
@@ -1132,10 +1131,7 @@ let uExercises = function uExercises(req, res) {
 
 //Return a users general profile information
 let profile = function profile(req, res) {
-  if(!isConnected(req, res))
-  {
-    return;
-  }
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
 
   let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
   {
@@ -1169,10 +1165,7 @@ let profile = function profile(req, res) {
 
 //Get a user's logs from the database
 let weights = async function weights(req, res) {
-  if(!isConnected(req, res))
-  {
-    return;
-  }
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
 
   let bodyWeight = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
   ({
@@ -1193,9 +1186,7 @@ let weights = async function weights(req, res) {
 
 //Get a user's logs from the database
 let calories = async function calories(req, res) {
-  if(!isConnected(req, res)){
-    return;
-  }
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
 
   let calories = await schemaCtrl.Profile.findById(req.params.id, 'calories').populate
   ({
@@ -1215,10 +1206,7 @@ let calories = async function calories(req, res) {
 }
 
 let selected_stats = function selected_stats(req, res) {
-  if(!isConnected(req, res))
-  {
-    return;
-  }
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
 
   let data = schemaCtrl.Profile.findById(req.params.id, (err, user) => 
   {
@@ -1356,20 +1344,7 @@ let social = function social(req, res){
       res.status(500).send({ "message": "Error: This workout is private" });
       return
     }
-    let response = data.gains;
-    if(req.params.user){
-      let likedbyyou = false;
-      for(let i = 0; i < data.liked_users.length; i++){
-        if(data.liked_users[i]._id == req.params.user) {
-          likedbyyou = true;
-        }
-      }
-    response = {
-      liked: likedbyyou,
-      gains: data.gains,
-    }
-  }
-    res.status(200).send(response);
+    res.status(200).send({gains: data.gains});
   });
 }
 
@@ -1392,28 +1367,42 @@ let dates = function dates(req, res){
 }
 
 let follow = async function follow(req,res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+  let error = false;
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
-    res.status(400).send();
-    console.log("invalid id");
+    res.status(400).send({message: "Invalid user id"});
+    error = true;
     return;
   });
+  if (error) return;
   if(user==null){
     res.status(404).send({message: "User not found"});
     return;
   }
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
   let ufollow = await schemaCtrl.Profile.findById(req.body.followid).catch(err => {
-    res.status(404).send();
-    console.log("invalid id");
+    res.status(400).send({message: "Invalid user id"});
+    error = true;
     return;
   });
+  if (error) return;  
+  if(ufollow==null){
+    res.status(404).send({message: "User not found"});
+    return;
+  }
+  let index = user.following.find(function(element){
+    return element==req.body.followid
+  });
+  if(index!=undefined){
+    res.status(200).send({message: "Already following this user"});
+    return;
+  }
   await user.updateOne({$push: { following: ufollow.id }});
   res.status(200).send({message: "Success"});
 }
 
 let unfollow = async function unfollow(req,res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
     res.status(400).send();
     console.log("invalid id");
@@ -1437,16 +1426,16 @@ let unfollow = async function unfollow(req,res){
 
 let followingWorkouts = async function followingWorkouts(req,res){
   if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
     console.log("invalid id"); 
-    res.status(400).send({message: "Invalid id"}); 
     return
   });
   if(user==null){
     res.status(404).send({message: "User not found"});
     return;
   }
-  let workouts = await schemaCtrl.WorkoutPlan.find({ownerUID: {$in : user.following}}).select('-__v').populate({
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+  let workouts = await schemaCtrl.WorkoutPlan.find({ownerUID: {$in: user.following}}).select('-__v').populate({
     path: "exercises",
     select: "-__v",
     populate:
@@ -1481,30 +1470,37 @@ let stats = function stats(req, res){
 }
 
 let getCalories = async function getCalories(req,res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(!user){
+    res.status(404).send({message: "user not found"});
+  }
   res.status(200).send(user.calories);
 }
 
 let getWeight = async function getWeight(req,res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(!user){
+    res.status(404).send({message: "user not found"});
+  }
   res.status(200).send(user.weight);
 }
 
 let calorieChart = async function calorieChart(req,res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ return console.log("Unauthorized request"); }
   let rangeA;
   let rangeB;
   let dateA;
   let dateB;
-  if(req.params.from){
-    rangeA = req.params.from.split("-");
+  if(req.body.from){
+    rangeA = req.body.from.split("-");
     dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
   }
-  if(req.params.to){
-    rangeB = req.params.to.split("-");
+  if(req.body.to){
+    rangeB = req.body.to.split("-");
     dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
   }
 
@@ -1512,7 +1508,7 @@ let calorieChart = async function calorieChart(req,res){
 
   let data = [];
 
-  if(req.params.from && req.params.to){
+  if(req.body.from && req.body.to){
     calories.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
@@ -1527,7 +1523,7 @@ let calorieChart = async function calorieChart(req,res){
       }
     });
   }
-  else if(req.params.from && !req.params.to){
+  else if(req.body.from && !req.body.to){
     calories.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
@@ -1579,22 +1575,35 @@ let calorieChart = async function calorieChart(req,res){
     max: maxCalories,
     avg: avgCalories
   }
+
+  if(calorie.length == 0){
+    chart = {
+      message: "There are no calorie statistics to display",
+      dates: dates,
+      calories: calorie,
+      min: minCalories,
+      max: maxCalories,
+      avg: avgCalories
+    }
+  }
   res.status(200).send(chart);
 }
 
 let weightChart = async function weightChart(req,res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ return console.log("Unauthorized request"); }
+
   let rangeA;
   let rangeB;
   let dateA;
   let dateB;
-  if(req.params.from){
-    rangeA = req.params.from.split("-");
+  if(req.body.from){
+    rangeA = req.body.from.split("-");
     dateA = new Date(rangeA[0], rangeA[1] - 1, rangeA[2]);
   }
-  if(req.params.to){
-    rangeB = req.params.to.split("-");
+  if(req.body.to){
+    rangeB = req.body.to.split("-");
     dateB = new Date(rangeB[0], rangeB[1] - 1, rangeB[2]);
   }
 
@@ -1602,22 +1611,16 @@ let weightChart = async function weightChart(req,res){
 
   let data = [];
 
-  if(req.params.from && req.params.to){
+  if(req.body.from && req.body.to){
     weight.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
-      //console.log("CurrDate: " + date.toString());
       if(date >= dateA && date <= dateB) {
-        /*
-        console.log("A: " + dateA.toString());
-        console.log("B: " + dateB.toString());
-        console.log("CurrDate: " + date.toString());
-        */
         data.push(c);
       }
     });
   }
-  else if(req.params.from && !req.params.to){
+  else if(req.body.from && !req.body.to){
     weight.forEach(c => {
       let range = c.date.split("-");
       let date = new Date(range[0], range[1] - 1, range[2]);
@@ -1637,7 +1640,6 @@ let weightChart = async function weightChart(req,res){
 
   let dates = [];
   let volume = [];
-
 
   //console.log(data);
 
@@ -1672,12 +1674,23 @@ let weightChart = async function weightChart(req,res){
     max: maxVolume,
     avg: avgVolume
   }
+
+  if(volume.length == 0){
+    chart = {
+      message: "There are no weight statistics to display",
+      dates: dates,
+      volume: volume,
+      min: minVolume,
+      max: maxVolume,
+      avg: avgVolume
+    }
+  }
   res.status(200).send(chart);
 }
 
 let volumeChart = async function volumeChart(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
-  let user = await schemaCtrl.Profile.findById(req.params.id, 'logs').populate
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+  let user = await schemaCtrl.Profile.findById(req.body.id).populate
   ({
     path: "logs",
     populate : {
@@ -1692,7 +1705,12 @@ let volumeChart = async function volumeChart(req, res){
     }
     }
   ).sort({"logs.date":1}).catch(err => {console.log("invalid id");});
-  
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
+
+  if(user.logs.size==0){
+    res.status(204).send({message: "No logs"});
+  }
+
   volumes = [];
   dates = [];
 
@@ -1709,7 +1727,7 @@ let volumeChart = async function volumeChart(req, res){
       day = "0" + day;
     }
 
-    if(req.params.from!=undefined && !moment(`${year}-${month}-${day}`).isBetween(req.params.from, req.params.to)){
+    if(req.body.from!=undefined && !moment(`${year}-${month}-${day}`).isBetween(req.body.from, req.body.to)){
       return;
     }
 
@@ -1742,12 +1760,13 @@ let volumeChart = async function volumeChart(req, res){
     avg += vol;
   });
   avg = avg / volumes.length-1;
+
   res.status(200).send({dates : dates, volumes : volumes, min: min, max: max, avg:avg});
    //end populate
 }
 
 let getWorkoutComments = async function getWorkoutComments(req, res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let workout = await schemaCtrl.WorkoutPlan.findById(req.params.id).catch(err => {console.log("invalid id");});
   if(!workout){
     res.status(500).send({ message: "getWorkoutComments: workout does not exist"});

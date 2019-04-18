@@ -140,8 +140,8 @@ export default class CreateWorkoutScreen extends React.Component {
                             <TouchableOpacity
                                 style={styles.button}                                
                                 onPress={() => {
-                                    //console.log("Workout description: ", this.state.workout.description);
                                     if (this.state.workout.description !== undefined) {
+                                        console.log("CREATE:", this.state.workout.exercises);
                                         let newWorkout = { 
                                             name: this.state.workout.description,
                                             description: this.state.workout.description,

@@ -28,7 +28,8 @@ const HomeStack = createStackNavigator({
     }
   },
   Details: DetailScreen,
-  DetailsEdit: WorkoutLogEditScreen
+  DetailsEdit: WorkoutLogEditScreen,
+  Logger: LoggerScreen,
 });
 
 const ProfileStack = createStackNavigator({
@@ -94,12 +95,16 @@ const WorkoutTabs = createMaterialTopTabNavigator(
     }
   },
   {
+    swipeEnabled: false,
     tabBarOptions: {
-      style: {
-        backgroundColor: '#00adf5',
+      upperCaseLabel: false,
+      tabStyle: {
+        backgroundColor: '#00adf5'
       },
-
-    },
+      indicatorStyle: {
+        display: 'none',
+      }
+    }
   }
 )
 

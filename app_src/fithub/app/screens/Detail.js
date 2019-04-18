@@ -12,11 +12,14 @@ import BottomBar from '../components/BottomBar';
 import { Icon, Button } from 'react-native-elements';
 import { postLog } from '../lib/LogFunctions';
 
-export default class DetailScreen extends React.Component {
+import { connect } from 'react-redux';
+
+class DetailScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('name', 'Workout'),
+      title: navigation.getParam('name', 'Logger'),
       headerTintColor: '#00adf5',
+      headerRight: <Icon name="add" type="material" containerStyle={{ paddingRight: 10 }} size={30} onPress={() => { navigation.push('Logger') }}/>
     };
   };
 
@@ -29,6 +32,13 @@ export default class DetailScreen extends React.Component {
     }
   }
 
+  componentDidMount() {
+    //console.log("Payload: ", this.state.exercises);
+    console.log(this.props.navigation.state.params);
+    const workout = this.props.navigation.state.params;
+    this.props.dispatch({type: "SetWorkout", payload: workout});
+  }
+
   getCurrentDate() {
     let date = new Date();
     return date.toJSON().slice(0, 10);
@@ -38,11 +48,12 @@ export default class DetailScreen extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <SafeAreaView style={styles.containerIOS}>
-          <ScrollView style={styles.cardsContainer}>
+          <ScrollView style={styles.cardsContainer} contentContainerStyle={{ alignItems: 'center' }}>
             <SummaryCard exercises={this.state.exercises} />
             <Cards exercises={this.state.exercises} />
             <Button
-              style={{ paddingTop: '5%' }}
+              style={{ paddingTop: '5%', paddingBottom: '5%' }}
+              buttonStyle={{ backgroundColor: '#00adf5'}}
               title={'Log this workout again?'}
               onPress={() => {
 
@@ -67,6 +78,8 @@ export default class DetailScreen extends React.Component {
   }
 }
 
+export default connect()(DetailScreen);
+
 class SummaryCard extends React.Component {
   render() {
     let totalSets = 0;
@@ -82,7 +95,7 @@ class SummaryCard extends React.Component {
     }
 
     return (
-      <View style={styles.card} key={"summary-card"}>
+      <View style={[styles.shadow, styles.card]} key={"summary-card"}>
         <Text style={styles.summaryText}>Sets: {totalSets}</Text>
         <Text style={styles.summaryText}>Reps: {totalReps}</Text>
         <Text style={styles.summaryText}>Volume: {totalVolume} lbs</Text>
@@ -101,7 +114,7 @@ class Cards extends React.Component {
 
     for (let i = 0; i < this.props.exercises.length; i++) {
       cards.push(
-        <View style={styles.card} key={"card-" + i}>
+        <View style={[styles.shadow, styles.card]} key={"card-" + i}>
           <View style={styles.cardTitle}>
             <Text style={styles.exerciseLabel}>{this.props.exercises[i].name}</Text>
             <View style={styles.badge}>
@@ -172,6 +185,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#f4f4f4',
     alignItems: 'center',
   },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    shadowOpacity: .4,
+    shadowRadius: 3,
+  },
   containerAND: {
     flex: 1,
     backgroundColor: '#f4f4f4',
@@ -180,10 +202,11 @@ const styles = StyleSheet.create({
   },
   cardsContainer: {
     flex: 1,
-    width: '90%',
+    width: '100%',
   },
   card: {
     flex: 0,
+    width: '90%',
     backgroundColor: '#fff',
     borderRadius: 5,
     padding: 10,

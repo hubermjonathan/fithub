@@ -9,7 +9,7 @@ export default class RoutineCard extends React.Component {
 
     render() {
         return(
-            <View style={styles.card}>
+            <View style={[styles.card, styles.shadow]}>
                 <View style={styles.cardTitle}>
                     <Text style={styles.titleText}>
                         {this.props.workout.description}
@@ -44,12 +44,22 @@ const styles = StyleSheet.create({
         backgroundColor: '#f4f4f4',
         alignItems: 'stretch',           
     },
+    shadow: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 1,
+          height: 2,
+        },
+        shadowOpacity: .4,
+        shadowRadius: 3,
+    },
     card: {
         flex: 1,
-        width: '100%',
+        width: '90%',
+        marginLeft: '5%',
         alignContent: 'stretch',
         backgroundColor: '#fff',
-        borderRadius: 5,
+        borderRadius: 15,
         padding: 10,
         marginTop: 17,
     },
