@@ -1368,7 +1368,7 @@ let dates = function dates(req, res){
 
 let follow = async function follow(req,res){
   if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
-  console.log(req);
+  console.log(req.body);
   let error = false;
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
     res.status(400).send({message: "Invalid user id"});
@@ -1377,7 +1377,7 @@ let follow = async function follow(req,res){
   });
   if (error) return;
   if(user==null){
-    res.status(404).send({message: "User not found"});
+    res.status(404).send({message: "Original user not found"});
     return;
   }
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
