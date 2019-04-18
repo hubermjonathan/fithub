@@ -1764,6 +1764,11 @@ let volumeChart = async function volumeChart(req, res){
   });
   avg = avg / volumes.length-1;
 
+  if(min==100000){
+    res.status(200).send({message: "No logs", dates : [], volumes : [], min: 0, max: 0, avg:0});
+    return;
+  }
+
   res.status(200).send({dates : dates, volumes : volumes, min: min, max: max, avg:avg});
    //end populate
 }
