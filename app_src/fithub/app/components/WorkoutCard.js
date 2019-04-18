@@ -342,9 +342,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     commentsList: {
-
+        flex: 1,
+        flexGrow: 1,
     },
     comment: {
+        flex: 1,
+        flexWrap: 'wrap',
         flexDirection: 'row',
         justifyContent: 'flex-start',
         fontSize: 12,
