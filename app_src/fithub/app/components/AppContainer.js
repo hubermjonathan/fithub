@@ -33,6 +33,7 @@ const HomeStack = createStackNavigator({
   Details: DetailScreen,
   DetailsEdit: WorkoutLogEditScreen,
   Logger: LoggerScreen,
+  SelectExercises: SelectExercisesScreen
 });
 
 const ProfileStack = createStackNavigator({
@@ -112,22 +113,22 @@ const WorkoutTabs = createMaterialTopTabNavigator(
 )
 
 const WorkoutStack = createStackNavigator(
-{
-  AddWorkout: {
-    screen: WorkoutTabs,
-    navigationOptions: ({navigation}) => { 
-      return {
-      title: 'Workouts',
-      headerRight: <Icon name="add" type="material" size={35} onPress={() => { navigation.push('CreateWorkout')} } />
+  {
+    AddWorkout: {
+      screen: WorkoutTabs,
+      navigationOptions: ({ navigation }) => {
+        return {
+          title: 'Workouts',
+          headerRight: <Icon name="add" type="material" size={35} onPress={() => { navigation.push('CreateWorkout') }} />
+        }
       }
-    }
+    },
+    CreateWorkout: {
+      screen: CreateWorkoutScreen,
+    },
   },
-  CreateWorkout: {
-    screen: CreateWorkoutScreen,
+  {
   },
-},
-{
-},
 );
 
 const FeedTabs = createMaterialTopTabNavigator(
@@ -161,14 +162,14 @@ const FeedTabs = createMaterialTopTabNavigator(
 
 const FeedStack = createStackNavigator({
   Feed: {
-    screen: FeedTabs, 
+    screen: FeedTabs,
     navigationOptions: ({ navigation }) => {
       return {
         title: 'Feed',
-        headerRight: 
-          <View style={{flexDirection: 'row'}}>
-            <Icon style={{ right: 10 }} name="filter" type="MaterialDesignIcons" size={30} onPress={() => {this.props.screenProps.setModalVisible(true)}}/>
-            <Icon name="magnifying-glass" type="entypo" size={30} onPress={() => { navigation.push('Search') }}/>
+        headerRight:
+          <View style={{ flexDirection: 'row' }}>
+            <Icon style={{ right: 10 }} name="filter" type="MaterialDesignIcons" size={30} onPress={() => { this.props.screenProps.setModalVisible(true) }} />
+            <Icon name="magnifying-glass" type="entypo" size={30} onPress={() => { navigation.push('Search') }} />
           </View>
       }
     }
