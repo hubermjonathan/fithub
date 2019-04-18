@@ -1404,7 +1404,6 @@ let follow = async function follow(req,res){
 let unfollow = async function unfollow(req,res){
   if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
-    res.status(400).send();
     console.log("invalid id");
     return;
   });
@@ -1426,7 +1425,7 @@ let unfollow = async function unfollow(req,res){
 }
 
 let followingWorkouts = async function followingWorkouts(req,res){
-  if(!isConnected(req, res)){ return console.log("DB is offline");}
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}  
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
     console.log("invalid id"); 
     return
@@ -1714,8 +1713,9 @@ let volumeChart = async function volumeChart(req, res){
   ).sort({"logs.date":1}).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
 
-  if(user.logs.size==0){
-    res.status(204).send({message: "No logs"});
+  if(user.logs.size==undefined){
+    res.status(200).send({message: "No logs", dates : [], volumes : [], min: 0, max: 0, avg:0});
+    return;
   }
 
   volumes = [];
