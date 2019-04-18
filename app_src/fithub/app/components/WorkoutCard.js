@@ -18,6 +18,7 @@ import {
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
 import { getGains, addGains } from '../lib/SocialFunctions';
+import { getUserID } from '../lib/AccountFunctions';
 
 
 export default class WorkoutCard extends React.Component {
@@ -28,10 +29,11 @@ export default class WorkoutCard extends React.Component {
             comment: '',
             likedByUser: this.props.likedByUser,
             comments: this.props.comments,
+            gains: this.props.gains,
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         fetch('https://fithub-server.herokuapp.com/profile/' + this.props.user)
             .then((res) => {
                 return res.json();
@@ -45,6 +47,15 @@ export default class WorkoutCard extends React.Component {
             .catch((err) => {
                 console.log(err);
             });
+
+        //code to tell if current user has liked the workout
+        const id = await getUserID();
+        if(this.props.liked_users.indexOf(id) != -1){
+            this.setState({likedByUser: true});
+        }
+        else{
+            this.setState({likedByUser: false});
+        }
     }
 
     submitComment(comment) {
@@ -57,12 +68,13 @@ export default class WorkoutCard extends React.Component {
     }
 
     changeLike() {
-        //TODO
         if (this.state.likedByUser){
             this.setState({likedByUser: false});
+            this.setState({gains: this.state.gains - 1});
         }
         else {
             this.setState({likedByUser: true});
+            this.setState({gains: this.state.gains + 1});
         }
         workout={workout: this.props.workoutID};
         addGains(workout);
@@ -102,7 +114,6 @@ export default class WorkoutCard extends React.Component {
                         <View style={styles.add}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    console.log(this.props.fullWorkout);
                                     postWorkout(this.props.fullWorkout);
                                     Alert.alert("Workout added");
                                 }}>
@@ -120,7 +131,7 @@ export default class WorkoutCard extends React.Component {
                         <FlatList
                             scrollEnabled={false}
                             data={this.props.exercises}
-                            keyExtractor={(item) => item._id}
+                            keyExtractor={(item,index) => index.toString()}
                             renderItem={(exercise) => this.renderExercises(exercise)}
                         />
                     </View>
@@ -148,7 +159,7 @@ export default class WorkoutCard extends React.Component {
                             />
                         </View>
                         <View style={styles.like}>
-                            <Text style={styles.likeText}>{this.props.gains} gains</Text>
+                            <Text style={styles.likeText}>{this.state.gains} gains</Text>
                             <TouchableOpacity
                                 onPress={()=>{
                                     this.changeLike();
@@ -169,7 +180,6 @@ export default class WorkoutCard extends React.Component {
     }
 
     renderExercises(exercise) {
-        //console.log("exercise in renderExercises: ", exercise)
         return (
             <View style={styles.exercise}>
                 <Text>{exercise.item.name}</Text>

@@ -59,7 +59,6 @@ export default class FeedScreen extends React.Component {
       { muscle: "CALVES", enum: 18 },
       { muscle: "ALL", enum: 99 },
     ],
-    comments: [],
   }
 
   setModalVisible(visible) {
@@ -152,16 +151,18 @@ export default class FeedScreen extends React.Component {
             date: new Date().toJSON().slice(0, 10),
             exercises: exercises,
             gains: array[x].gains,
+            comments: array[x].comments,
+            liked_users: array[x].liked_users,
           })
         }
       }//for
     this.setState({ workouts: builtWorkouts })
 
 
-  })
+    })
       .catch((err) => {
-  console.log(err);
-});
+    console.log(err);
+    });
   }
 render() {
   return (
@@ -212,8 +213,9 @@ render() {
               user={item.user}
               userPhoto={item.icon}
               exercises={item.exercises}
-              comments={this.state.comments}
-              gains={item.gains} //fill with actual likes of workout {item.likes}
+              comments={item.comments}
+              gains={item.gains}
+              liked_users={item.liked_users}
               navigation={this.props.navigation}
             />
           )}
