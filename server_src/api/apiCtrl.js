@@ -1714,11 +1714,6 @@ let volumeChart = async function volumeChart(req, res){
   ).sort({"logs.date":1}).catch(err => {console.log("invalid id");});
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; }
 
-  if(user.logs.size==undefined){
-    res.status(200).send({message: "No logs", dates : [], volumes : [], min: 0, max: 0, avg:0});
-    return;
-  }
-
   volumes = [];
   dates = [];
 
