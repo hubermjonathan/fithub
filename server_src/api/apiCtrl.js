@@ -1368,6 +1368,7 @@ let dates = function dates(req, res){
 
 let follow = async function follow(req,res){
   if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+  console.log(req);
   let error = false;
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {
     res.status(400).send({message: "Invalid user id"});
@@ -1387,7 +1388,7 @@ let follow = async function follow(req,res){
   });
   if (error) return;  
   if(ufollow==null){
-    res.status(404).send({message: "User not found"});
+    res.status(404).send({message: "User to follow not found"});
     return;
   }
   let index = user.following.find(function(element){
@@ -1781,10 +1782,41 @@ let getWorkoutComments = async function getWorkoutComments(req, res){
   res.status(200).send(workout.comments);
 }
 
+let delComment = async function delComment(req, res){
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+  let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
+  if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
+  let index = req.body.comment_index;
+
+  let workout = await schemaCtrl.WorkoutPlan.findById(req.body.workoutId).catch(err => {console.log("invalid id");});
+  if(!workout){
+    return res.status(500).send({ message: "getWorkoutComments: workout does not exist"});
+  }
+  if(workout.comments.length == 0){
+    return res.status(500).send({ message: "getWorkoutComments: workout has no comments to delete"});
+  }
+  let comments = workout.comments;
+  if(index < 0 || index > comments.length){
+    return res.status(500).send({ message: "getWorkoutComments: invalid index"});
+  }
+  if(comments[index].user._id == req.body.id){
+    comments.splice(index, 1);
+  }
+  else{
+    return res.status(401).send({ message: "getWorkoutComments: unauthorized deletion"});
+  }
+  workout.save();
+  return res.status(200).send({ message: "getWorkoutComments: Success!"});
+}
+
+
+
 
 let apiCtrl = {
   login: login,
   editUsername: editUsername,
+
+  delComment: delComment,
 
   workouts: workouts,
   newWorkout: newWorkout,
