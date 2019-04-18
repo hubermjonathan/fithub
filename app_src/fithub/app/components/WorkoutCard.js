@@ -25,6 +25,9 @@ export default class WorkoutCard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            id: '',
+            name: '',
+            photo: '',
             user: '',
             comment: '',
             likedByUser: this.props.likedByUser,
@@ -50,6 +53,7 @@ export default class WorkoutCard extends React.Component {
 
         //code to tell if current user has liked the workout
         const id = await getUserID();
+        this.setState({id: id});
         if(this.props.liked_users.indexOf(id) != -1){
             this.setState({likedByUser: true});
         }
@@ -64,14 +68,22 @@ export default class WorkoutCard extends React.Component {
         if (!comment){
             return;
         }
-        item = {
+        itemtoSend = {
             comment: comment,
             workoutId: this.props.workoutID, //yeah because this isn't confusing
         };
-        addComment(item);
+        addComment(itemtoSend);
         
+        //need to update state to update render
+        const user = await getUserID();
+        commentForState = {
+            user: user,
+            username: this.state.name,
+            text: comment,
+        }
         this.setState({comment: ''});
-        this.state.comments.push(comment);
+        this.state.comments.push(commentForState);
+        console.log(this.state.comments)
     }
 
     changeLike() {
@@ -142,7 +154,7 @@ export default class WorkoutCard extends React.Component {
                         <FlatList
                             scrollEnabled={false}
                             data={this.props.exercises}
-                            keyExtractor={(item,index) => index.toString()}
+                            listKey={(item2, index) => 'E' + index.toString()}
                             renderItem={(exercise) => this.renderExercises(exercise)}
                         />
                     </View>
@@ -152,7 +164,7 @@ export default class WorkoutCard extends React.Component {
                         <FlatList
                             scrollEnabled={false}
                             data={this.state.comments}
-                            keyExtractor={(item, index) => index.toString()}
+                            listKey={(item2, index) => 'C' + index.toString()}
                             renderItem={(comment) => this.renderComments(comment)}
                         />
                     </View>
@@ -201,7 +213,8 @@ export default class WorkoutCard extends React.Component {
     renderComments(comment) {
         return (
             <View style={styles.comment}>
-                <Text>Comment</Text>
+                <Text style={{fontWeight: 'bold'}}>{comment.item.username}{": "}</Text>
+                <Text>{comment.item.text}</Text>
             </View>
         )
     }
@@ -294,6 +307,8 @@ const styles = StyleSheet.create({
 
     },
     comment: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
         fontSize: 12,
     },
     likeComment: {

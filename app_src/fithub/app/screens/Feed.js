@@ -194,7 +194,7 @@ render() {
       {/* feed after the header */}
       <View style={styles.feed}>
         <FlatList
-          keyExtractor={(item, index) => index.toString()}
+          listKey={(item, index) => index.toString()}
           data={this.state.workouts}
           renderItem={({ item }) => (
             <WorkoutCard

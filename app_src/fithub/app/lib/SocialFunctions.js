@@ -51,7 +51,7 @@ export async function addComment(comment) {
         },
         body: JSON.stringify(comment)
     }).then(res => {
-        console.log(res);
+        //console.log(res);
     }).catch(err => {
         console.log(err);
     });
