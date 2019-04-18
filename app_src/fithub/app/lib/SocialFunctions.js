@@ -64,7 +64,8 @@ export async function followUser(user) {
     user.id = id;
     user.uid = uid;
     user.token = token;
-    fetch('https://fithub-server.herokuapp.com/profile/follow', {
+    console.log(user);
+    fetch('https://fithub-server.herokuapp.com/profile/follow/', {
         method: 'POST',
         header: {
             "Content-Type": "application/json",
