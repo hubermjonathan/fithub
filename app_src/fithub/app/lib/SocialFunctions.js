@@ -92,3 +92,11 @@ export async function unfollowUser(user) {
         console.log(err);
     });
 }
+
+export async function following(id) {
+    let response = await fetch('https://fithub-server.herokuapp.com/profile/following/'+id, {
+        method: 'GET'
+    });
+    let json = await response.json();
+    return json;
+}

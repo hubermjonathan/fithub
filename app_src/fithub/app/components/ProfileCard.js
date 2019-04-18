@@ -27,7 +27,7 @@ export default class ProfileCard extends React.Component {
     render() {
         return (
             <SafeAreaView>
-                <View style={styles.card}>
+                <View style={[styles.card, styles.shadowProps]}>
                     <Text style={styles.userName}>{this.props.user}</Text>
                 </View>
             </SafeAreaView>
@@ -40,8 +40,18 @@ const styles = StyleSheet.create({
         height: 'auto',
         margin: 10,
         padding: 5,
-        backgroundColor: 'lightgrey',
+        borderRadius: 15,
+        backgroundColor: 'white',
         flexDirection: 'column',
+    },
+    shadowProps: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 1,
+          height: 2,
+        },
+        shadowOpacity: .4,
+        shadowRadius: 3,
     },
     photo: {
         

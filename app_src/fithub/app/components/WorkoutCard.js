@@ -17,14 +17,15 @@ import {
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
-import { getGains, addGains, addComment } from '../lib/SocialFunctions';
-import { getUserID, getUserName } from '../lib/AccountFunctions';
+import { getGains, addGains, addComment, following, unfollowUser } from '../lib/SocialFunctions';
+import { getUserID, getUserName, getUserGivenName } from '../lib/AccountFunctions';
 
 
 export default class WorkoutCard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            currUser: '',
             id: '',
             name: '',
             photo: '',
@@ -33,6 +34,7 @@ export default class WorkoutCard extends React.Component {
             likedByUser: this.props.likedByUser,
             comments: this.props.comments,
             gains: this.props.gains,
+            following: [],
         }
     }
 
@@ -60,6 +62,12 @@ export default class WorkoutCard extends React.Component {
         else{
             this.setState({likedByUser: false});
         }
+
+        const currUser = await getUserGivenName();
+        this.setState({currUser: currUser});
+        
+        const usersFollowing = await following(id);
+        console.log(usersFollowing);
     }
 
     async submitComment(comment) {
@@ -78,12 +86,11 @@ export default class WorkoutCard extends React.Component {
         const user = await getUserID();
         commentForState = {
             user: user,
-            username: this.state.user,
+            username: this.state.currUser,
             text: comment,
         }
         this.setState({comment: ''});
         this.state.comments.push(commentForState);
-        console.log(this.state.comments)
     }
 
     changeLike() {
@@ -101,6 +108,13 @@ export default class WorkoutCard extends React.Component {
 
     follow() {
         userToFollow={followid: this.props.user}
+        if(this.state.usersFollowing.indexOf(this.state.id) == -1){
+            followUser(userToFollow);
+        }
+        else{
+            unfollowUser(userToFollow);
+        }
+
     }
 
 

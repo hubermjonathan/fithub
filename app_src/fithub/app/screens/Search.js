@@ -97,5 +97,6 @@ export default class SearchScreen extends React.Component {
 const styles = StyleSheet.create({
     searchResults: {
         flex: 1,
+        backgroundColor: '#eee',
     }
 });
