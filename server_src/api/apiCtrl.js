@@ -1589,6 +1589,12 @@ let calorieChart = async function calorieChart(req,res){
   res.status(200).send(chart);
 }
 
+let usersFollowing = async function usersFollowing(req,res){
+  if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
+  let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  res.status(200).send(user.following);
+}
+
 let weightChart = async function weightChart(req,res){
   if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.body.id).catch(err => {console.log("invalid id");});
@@ -1815,6 +1821,7 @@ let apiCtrl = {
 
   users: users,                     //Returns all users
   publicWorkouts: publicWorkouts,   //Returns all public workouts and filters
+  usersFollowing : usersFollowing,
 
   activity: activity,
   dates: dates,                     //Returns all the dates a user has worked out
