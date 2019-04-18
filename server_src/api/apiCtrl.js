@@ -1481,6 +1481,9 @@ let getCalories = async function getCalories(req,res){
 let getWeight = async function getWeight(req,res){
   if(db.readyState==0){res.status(500).send({error: "Database connection is down."});return;}
   let user = await schemaCtrl.Profile.findById(req.params.id).catch(err => {console.log("invalid id");});
+  if(!user){
+    res.status(404).send({message: "user not found"});
+  }
   res.status(200).send(user.weight);
 }
 
