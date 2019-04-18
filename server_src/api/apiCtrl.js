@@ -654,7 +654,7 @@ let addComment = async function addComment(req, res){
   if(!isValidated(req, res, user)){ console.log("Unauthorized request"); return; };
 
   if(!req.body.workoutId || !req.body.comment){
-    return res.status(500).send({ "message": "addComment: Missing user or comment text" });
+    return res.status(500).send({ "message": "addComment: Missing workout or comment text" });
   }
   let workoutPlan = await schemaCtrl.WorkoutPlan.findById(req.body.workoutId);
   let comment = {

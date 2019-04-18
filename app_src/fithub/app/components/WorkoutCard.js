@@ -17,8 +17,8 @@ import {
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
-import { getGains, addGains } from '../lib/SocialFunctions';
-import { getUserID } from '../lib/AccountFunctions';
+import { getGains, addGains, addComment } from '../lib/SocialFunctions';
+import { getUserID, getUserName } from '../lib/AccountFunctions';
 
 
 export default class WorkoutCard extends React.Component {
@@ -58,13 +58,20 @@ export default class WorkoutCard extends React.Component {
         }
     }
 
-    submitComment(comment) {
+    async submitComment(comment) {
         //TODO
         //add server calls to add comment to comment list
-        console.log(this.state.comment);
+        if (!comment){
+            return;
+        }
+        item = {
+            comment: comment,
+            workoutId: this.props.workoutID, //yeah because this isn't confusing
+        };
+        addComment(item);
+        
         this.setState({comment: ''});
         this.state.comments.push(comment);
-        console.log(this.state.comments)
     }
 
     changeLike() {
@@ -78,6 +85,10 @@ export default class WorkoutCard extends React.Component {
         }
         workout={workout: this.props.workoutID};
         addGains(workout);
+    }
+
+    follow() {
+        
     }
 
 
@@ -137,14 +148,14 @@ export default class WorkoutCard extends React.Component {
                     </View>
 
                     {/* comments of workout */}
-                    {/* <View style={styles.commentsList}>
+                    <View style={styles.commentsList}>
                         <FlatList
                             scrollEnabled={false}
                             data={this.state.comments}
-                            keyExtractor={(item, index) => item.id}
+                            keyExtractor={(item, index) => index.toString()}
                             renderItem={(comment) => this.renderComments(comment)}
                         />
-                    </View> */}
+                    </View>
 
                     {/* commentBox and like button */}
                     <View style={styles.likeComment}>
@@ -190,7 +201,7 @@ export default class WorkoutCard extends React.Component {
     renderComments(comment) {
         return (
             <View style={styles.comment}>
-                <Text>{comment}</Text>
+                <Text>Comment</Text>
             </View>
         )
     }
