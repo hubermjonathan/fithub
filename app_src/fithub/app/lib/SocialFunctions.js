@@ -64,13 +64,15 @@ export async function followUser(user) {
     user.id = id;
     user.uid = uid;
     user.token = token;
-    console.log(user);
+    console.log(JSON.stringify(user));
     fetch('https://fithub-server.herokuapp.com/profile/follow/', {
         method: 'POST',
         header: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify(user)
+    }).then(res => {
+        console.log(res);
     }).then(err => {
         console.log(err);
     });
@@ -85,9 +87,9 @@ export async function unfollowUser(user) {
     user.token = token;
     fetch('https://fithub-server.herokuapp.com/profile/unfollow', {
         method: 'POST',
-        header: {
-            "Content-Type": "application/json",
-        },
+        // header: {
+        //     "Content-Type": "application/json",
+        // },
         body: JSON.stringify(user),
     }).then(err => {
         console.log(err);

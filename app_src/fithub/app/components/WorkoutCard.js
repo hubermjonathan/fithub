@@ -117,8 +117,14 @@ export default class WorkoutCard extends React.Component {
         addGains(workout);
     }
 
-    follow() {
-        userToFollow={followid: this.props.user}
+    async follow() {
+        const id = await getUserID();
+        if(id==this.props.user){
+            Alert.alert("Cannot follow yourself")
+            return;
+        }
+        let userToFollow = {};
+        userToFollow.followid= this.props.user;
         if(!this.state.followingUser){
             followUser(userToFollow);
         }
