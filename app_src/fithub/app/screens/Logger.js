@@ -16,21 +16,21 @@ class Logger extends React.Component {
     }
 
     render() {
-        return(
+        return (
             <View style={styles.page}>
                 <View>
                     <FlatList
-                        data={this.props.workout.exercises} 
+                        data={this.props.workout.exercises}
                         keyExtractor={(item, index) => index.toString()}
                         contentContainerStyle={styles.list}
-                        renderItem={(exercise, index) => 
+                        renderItem={(exercise, index) =>
                             <View style={styles.card}>
-                            <LogCard
-                                exercise={exercise.item}
-                                dispatch={this.props.dispatch}
-                                index={exercise.index}
-                            />
-                        </View>}
+                                <LogCard
+                                    exercise={exercise.item}
+                                    dispatch={this.props.dispatch}
+                                    index={exercise.index}
+                                />
+                            </View>}
                     />
                 </View>
             </View>
@@ -42,29 +42,30 @@ class Logger extends React.Component {
 class LoggerScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         return {
-          title: 'Workout',
-          headerRight: <Icon name="add" type="material" size={35} onPress={() => {navigation.push('SelectExercises')} } />
+            title: 'Workout',
+            headerLeft: <Icon name="chevron-left" onPress={() => navigation.navigate('Home')} size={35} color="#00adf5" />,
+            headerRight: <Icon name="add" type="material" size={35} onPress={() => { navigation.push('SelectExercises') }} />
         }
     };
 
     render() {
         //console.log("State: ", this.props);
-        return(
-            <Logger 
+        return (
+            <Logger
                 workout={this.props.workout}
                 dispatch={this.props.dispatch}
             />
         );
     }
 }
-export default connect((state)=> { return {workout: state.workout}})(LoggerScreen);
+export default connect((state) => { return { workout: state.workout } })(LoggerScreen);
 
 const styles = StyleSheet.create({
     page: {
         width: '100%',
         backgroundColor: '#f4f4f4',
-        alignItems: 'stretch',           
-        
+        alignItems: 'stretch',
+
     },
     list: {
     },

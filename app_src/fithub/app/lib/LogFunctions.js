@@ -51,7 +51,7 @@ export async function postLog(workout, date) {
             uid: uid,
             token: token,
             //date: workout.date,
-            date: date,
+            date: workout.date,
             name: workout.name,
             exercises: workout.exercises,
         }

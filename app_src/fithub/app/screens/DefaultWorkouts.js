@@ -81,8 +81,8 @@ export default class DefaultWorkoutsScreen extends React.Component {
                                         this.setState(prevState => (
                                             { ...prevState, modal: {visible: false}})
                                         );
-                                        console.log("Workout:", this.state.modal.workout);
-                                        postLog(this.state.modal.workout, this.state.modal.date); 
+                                        const workout = {...this.state.modal.workout, date: this.state.modal.date }
+                                        postLog(workout); 
                                     }}
                                 >
                                     <Text style={styles.buttonText}>

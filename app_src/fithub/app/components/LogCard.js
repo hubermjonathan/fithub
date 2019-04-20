@@ -228,9 +228,9 @@ export default class LogCard extends React.Component {
                 autoClose={true}
             >
                 <View style={styles.setRow}>
-                    <Text style={set.item.warmup ? styles.warmupText : styles.exerciseText}>Set {set.index + 1}</Text>
-                    <Text style={set.item.warmup ? styles.warmupText : styles.exerciseText}>{set.item.reps} reps</Text>
-                    <Text style={set.item.warmup ? styles.warmupText : styles.exerciseText}>{set.item.weight} lbs</Text>
+                    <Text style={set.item.isWarmup ? styles.warmupText : styles.exerciseText}>Set {set.index + 1}</Text>
+                    <Text style={set.item.isWarmup ? styles.warmupText : styles.exerciseText}>{set.item.reps} reps</Text>
+                    <Text style={set.item.isWarmup ? styles.warmupText : styles.exerciseText}>{set.item.weight} lbs</Text>
                 </View>
             </Swipeout>
         );
