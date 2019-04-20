@@ -98,7 +98,7 @@ export default class FollowerFeedScreen extends React.Component {
     const token = await getUserToken();
     user = {id: id, uid: uid, token: token}
 
-    fetch('https://fithub-server.herokuapp.com/workouts/following/', {
+    fetch('https://fithub-server.herokuapp.com/workouts/following', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -109,6 +109,7 @@ export default class FollowerFeedScreen extends React.Component {
         return res.json();
       })
       .then((data) => {
+        console.log(data)
         this.setState({ savedWorkout: data });
         let builtWorkouts = [];
         let s = JSON.stringify(data);
@@ -156,7 +157,7 @@ export default class FollowerFeedScreen extends React.Component {
         }
       }//for
     this.setState({ workouts: builtWorkouts })
-
+    console.log(this.state.workouts)
 
     })
       .catch((err) => {

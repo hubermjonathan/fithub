@@ -57,6 +57,26 @@ export async function addComment(comment) {
     });
 }
 
+export async function delComment(comment) {
+    const id = await getUserID();
+    const uid = await getUserUID();
+    const token = await getUserToken();
+    comment.uid = uid;
+    comment.id = id;
+    comment.token = token;
+    fetch('https://fithub-server.herokuapp.com/workouts/delComment', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(comment)
+    }).then(res => {
+        //console.log(res);
+    }).catch(err => {
+        console.log(err);
+    });
+}
+
 export async function followUser(user) {
     const id = await getUserID();
     const uid = await getUserUID();
@@ -64,7 +84,7 @@ export async function followUser(user) {
     user.id = id;
     user.uid = uid;
     user.token = token;
-    console.log(JSON.stringify(user));
+    console.log(user);
     fetch('https://fithub-server.herokuapp.com/profile/follow/', {
         method: 'POST',
         header: {
@@ -103,3 +123,4 @@ export async function following(id) {
     let json = await response.json();
     return json;
 }
+
