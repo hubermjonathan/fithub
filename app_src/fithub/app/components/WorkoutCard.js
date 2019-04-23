@@ -103,6 +103,17 @@ export default class WorkoutCard extends React.Component {
         this.setState({comment: ''})
     }
 
+    deleteComment(comment){
+        commentToDelete= {
+            index: comment.index,
+            workoutId: this.props.workoutID,
+        }
+        delComment(commentToDelete)
+
+        this.state.comments.splice(comment.index,1);
+        this.setState({});
+    }
+
     changeLike() {
         if (this.state.likedByUser){
             this.setState({likedByUser: false});
@@ -246,7 +257,7 @@ export default class WorkoutCard extends React.Component {
         if (comment.item.user == this.state.id){
             return this.renderDeleteComment(comment);
         }
-        if (comment.item.user == this.state.user){
+        if (comment.item.user == this.props.user){
             return this.renderDeleteComment(comment);
         }
         else{
@@ -295,15 +306,7 @@ export default class WorkoutCard extends React.Component {
         )
     }
 
-    deleteComment(comment){
-        commentToDelete= {
-            index: comment.index
-        }
-        delComment(commentToDelete)
-
-        this.state.comments.splice(comment.index,1);
-        this.setState({});
-    }
+    
 }
 
 
