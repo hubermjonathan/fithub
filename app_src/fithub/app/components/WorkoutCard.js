@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { postWorkout } from '../lib/WorkoutFunctions';
-import { getGains, addGains, addComment, following, followUser, unfollowUser } from '../lib/SocialFunctions';
+import { getGains, addGains, addComment, following, followUser, unfollowUser, delComment} from '../lib/SocialFunctions';
 import { getUserID, getUserName, getUserGivenName } from '../lib/AccountFunctions';
 
 
@@ -93,9 +93,8 @@ export default class WorkoutCard extends React.Component {
         addComment(itemtoSend);
         
         //need to update state to update render
-        const user = await getUserID();
         commentForState = {
-            user: user,
+            user: this.state.id,
             username: this.state.currUser,
             text: comment,
         }
@@ -117,8 +116,15 @@ export default class WorkoutCard extends React.Component {
         addGains(workout);
     }
 
-    follow() {
-        userToFollow={followid: this.props.user}
+    async follow() {
+        const id = await getUserID();
+        console.log(id);
+        if(id==this.props.user){
+            Alert.alert("Cannot follow yourself")
+            return;
+        }
+        let userToFollow = {};
+        userToFollow.followid= this.props.user;
         if(!this.state.followingUser){
             followUser(userToFollow);
         }
@@ -190,7 +196,7 @@ export default class WorkoutCard extends React.Component {
                             scrollEnabled={false}
                             data={this.state.comments}
                             listKey={(item2, index) => 'C' + index.toString()}
-                            renderItem={(comment) => this.renderComments(comment)}
+                            renderItem={(comment)=> this.renderComments(comment)}
                         />
                     </View>
 
@@ -237,12 +243,66 @@ export default class WorkoutCard extends React.Component {
     }
 
     renderComments(comment) {
+        if (comment.item.user == this.state.id){
+            return this.renderDeleteComment(comment);
+        }
+        if (comment.item.user == this.state.user){
+            return this.renderDeleteComment(comment);
+        }
+        else{
+            return this.renderComment(comment);
+        }
+    }
+
+    renderDeleteComment(comment){
+        return (
+            <View style={{flexDirection: 'row'}}>
+                <View style={styles.comment}>
+                    <Text style={{fontWeight: 'bold'}}>{comment.item.username}{": "}</Text>
+                    <Text>{comment.item.text}</Text>
+                </View>
+                <View style={styles.cross}>
+                    <Icon
+                        name='cross'
+                        type='entypo'
+                        size={20}
+                        color='red'
+                        onPress={() => 
+                            Alert.alert(
+                                'Delete Comment?',
+                                '',
+                                [
+                                  {
+                                    text: 'Cancel',
+                                    style: 'cancel',
+                                  },
+                                  {text: 'OK', onPress: () => this.deleteComment(comment)},
+                                ],
+                                {cancelable: false},
+                            )}
+                    />
+                </View>
+            </View>
+        )
+    }
+
+    renderComment(comment){
         return (
             <View style={styles.comment}>
                 <Text style={{fontWeight: 'bold'}}>{comment.item.username}{": "}</Text>
                 <Text>{comment.item.text}</Text>
             </View>
         )
+    }
+
+    deleteComment(comment){
+        commentToDelete= {
+            index: comment.index
+        }
+        delComment(commentToDelete)
+
+        this.state.comments.splice(comment.index,1);
+        this.setState({});
     }
 }
 
@@ -347,7 +407,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
     comment: {
-        flex: 1,
+        flex: 20,
         flexWrap: 'wrap',
         flexDirection: 'row',
         justifyContent: 'flex-start',
@@ -369,5 +429,9 @@ const styles = StyleSheet.create({
     likeText: {
         padding: 4,
         fontSize: 20,
+    },
+    cross: {
+        flex: 1,
+        justifyContent: 'flex-end',
     }
 });
