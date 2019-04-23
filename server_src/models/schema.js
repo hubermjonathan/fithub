@@ -24,10 +24,10 @@ let Profile = new Schema({
   avatar: { type: String, required: true },                           //User profile picture
   uid: { type: String, required: true },                              //Google unique user id
   token : { type: String, required: true },
-  maxes : { type : Object },
-  dates : { type : Object },
-  volumes : { type : Object },  
-  activity : { type : Object},
+  maxes : { type : Object, default : {}, required : true },
+  dates : { type : Object, default : {}, required : true  },
+  volumes : { type : Object, default : {}, required : true  },  
+  activity : { type : Object, default : {}, required : true },
   following: [{ type: Schema.Types.ObjectId, ref: "Profile"}],         //Workout plans the user has submitted to the master list
   workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutPlan"}],         //Workout plans the user has submitted to the master list
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],         //Private exercises
