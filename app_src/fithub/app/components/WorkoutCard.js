@@ -160,14 +160,14 @@ export default class WorkoutCard extends React.Component {
                             <Text style={styles.userName}>{this.state.user}</Text>
                         </TouchableOpacity>
                         {/* follower button */}
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => this.follow()}
                             disabled={this.props.following}
                         >
                             <View style={this.state.followingUser? styles.following: styles.notFollowing}>
                                 <Text style={this.state.followingUser? styles.followingText: styles.notFollowingText}>Follow</Text>
                             </View>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
 
                     {/* show workout */}

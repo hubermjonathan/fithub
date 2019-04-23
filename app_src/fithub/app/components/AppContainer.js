@@ -139,12 +139,12 @@ const FeedTabs = createMaterialTopTabNavigator(
         title: 'Global',
       }
     },
-    FollowerFeed: {
-      screen: FollowerFeedScreen,
-      navigationOptions: {
-        title: 'Followers',
-      }
-    }
+    // FollowerFeed: {
+    //   screen: FollowerFeedScreen,
+    //   navigationOptions: {
+    //     title: 'Followers',
+    //   }
+    // }
   },
   {
     swipeEnabled: false,
@@ -168,7 +168,7 @@ const FeedStack = createStackNavigator({
         title: 'Feed',
         headerRight:
           <View style={{ flexDirection: 'row' }}>
-            <Icon style={{ right: 10 }} name="filter" type="MaterialDesignIcons" size={30} onPress={() => { this.props.screenProps.setModalVisible(true) }} />
+            {/* <Icon style={{ right: 10 }} name="filter" type="MaterialDesignIcons" size={30} onPress={() => { this.props.screenProps.setModalVisible(true) }} /> */}
             <Icon name="magnifying-glass" type="entypo" size={30} onPress={() => { navigation.push('Search') }} />
           </View>
       }
