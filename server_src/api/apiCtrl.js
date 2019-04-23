@@ -345,7 +345,7 @@ let newLog = async function newLog(req, res) {
   //user activity and max
   await user.updateOne({ $set: { maxes: user.maxes, dates: user.dates } })
     .catch(err => { res.status(500).send({ "message": "newLog: error updating user max" }); return console.log(err); });
-  await user.updateOne({ $push: { logs: new_log._id, activity: newActivity } })
+  await user.updateOne({ $push: { logs: new_log._id } })
     .catch(err => { res.status(500).send({ "message": "newLog: pushing id and error updating user activity" }); return console.log(err); });
 
   res.status(200).send({ "message": "newLog: Success!" });
@@ -904,7 +904,7 @@ let editLog = async function editLog(req, res) {
   //validate setData json input
 
   let exerciseData_ids = [];
-  let newActivity = `${user.name} worked out on ${req.body.date}!`
+  let newActivity = `${user.name} worked out on ${req.body.date}!`;
   if (req.body.date in user.dates) {
     user.dates[req.body.date]++;
   } else {
@@ -976,6 +976,8 @@ let editLog = async function editLog(req, res) {
   } catch (validation_err) { console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" }) };
   newWorkoutData.save().catch(err => { return res.status(500).send({ "message": "editLog: Error saving log" }) });
   user.updateOne({ $set: { maxes: user.maxes, dates: user.dates } }, {}, (err, raw) => { });
+  await user.updateOne({ $push: { activity: newActivity } })
+  .catch(err => { res.status(500).send({ "message": "newLog: pushing id and error updating user activity" }); return console.log(err); });
   return res.status(200).send({ "message": "Successfully edited workout: " + old_log_id });
 } //end newLog
 
