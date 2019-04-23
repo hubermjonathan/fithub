@@ -900,18 +900,16 @@ let editLog = async function editLog(req, res) {
     }
   }
 
-
-  //validate setData json input
-  let day = req.body.date.getDate();
-  let month = req.body.date.getMonth() + 1;
-  let year = req.body.date.getFullYear();
-  if (month < 10) {
-    month = "0" + month;
+  let formatDate;
+  if (req.body.date instanceof Date) {
+    const day = req.body.date.getDate();
+    const month = req.body.date.getMonth() + 1;
+    const year = req.body.date.getFullYear();
+    formatDate = `${year}-${month}-${day}`;
   }
-  if (day < 10) {
-    day = "0" + day;
+  else {
+    formatDate = req.body.date;
   }
-  let formatDate = `${year}-${month}-${day}`
 
   let exerciseData_ids = [];
   let newActivity = `${user.name} worked out on ${formatDate}!`;
