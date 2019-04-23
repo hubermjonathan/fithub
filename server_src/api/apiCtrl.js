@@ -316,7 +316,8 @@ let newLog = async function newLog(req, res) {
     all_exercises.push(new_exercise);
   }
   let ensure_exercises_validated = await Promise.all(exercise_validate_promises);
-
+  
+  //If null, make something up
   if (newActivity == null) {
     newActivity = `${user.name} worked out on ${req.body.date}!`
   }
