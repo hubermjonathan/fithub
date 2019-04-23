@@ -902,9 +902,19 @@ let editLog = async function editLog(req, res) {
 
 
   //validate setData json input
+  let day = req.body.date.getDate();
+  let month = req.body.date.getMonth() + 1;
+  let year = req.body.date.getFullYear();
+  if (month < 10) {
+    month = "0" + month;
+  }
+  if (day < 10) {
+    day = "0" + day;
+  }
+  let formatDate = `${year}-${month}-${day}`
 
   let exerciseData_ids = [];
-  let newActivity = `${user.name} worked out on ${req.body.date}!`;
+  let newActivity = `${user.name} worked out on ${formatDate}!`;
   if (req.body.date in user.dates) {
     user.dates[req.body.date]++;
   } else {
