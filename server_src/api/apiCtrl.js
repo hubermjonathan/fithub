@@ -317,6 +317,10 @@ let newLog = async function newLog(req, res) {
   }
   let ensure_exercises_validated = await Promise.all(exercise_validate_promises);
 
+  if (newActivity == null) {
+    newActivity = `${user.name} worked out on ${req.body.date}!`
+  }
+
   //create new log and fire off validate promise
   let new_log = new schemaCtrl.WorkoutData
     ({
