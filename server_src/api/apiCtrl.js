@@ -908,7 +908,7 @@ let editLog = async function editLog(req, res) {
     formatDate = `${year}-${month}-${day}`;
   }
   else {
-    formatDate = req.body.date;
+    formatDate = req.body.date.substring(0,10);
   }
 
   let exerciseData_ids = [];
