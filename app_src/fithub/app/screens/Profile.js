@@ -9,7 +9,8 @@ import {
   Image,
   TouchableWithoutFeedbackBase,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  RefreshControl
 } from 'react-native';
 import { Icon, Button } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
@@ -325,11 +326,7 @@ export default class ProfileScreen extends React.Component {
           <View style={styles.body}>
             <Swiper activeDotColor='#00adf5' loop={false} renderPagination={this.renderPagination.bind(this)}>
               <View style={styles.subContainer}>
-                <ScrollView>
-                  <View style={styles.subScroller}>
-                    <Activity id={this.state.id} />
-                  </View>
-                </ScrollView>
+                <Activity id={this.state.id} />
               </View>
               <View style={styles.subContainer}>
                 <ScrollView>
@@ -402,6 +399,7 @@ class Activity extends React.Component {
     super(props);
 
     this.state = {
+      refresh: false,
       id: this.props.id,
       algoData: [],
       shadowProps: {
@@ -433,7 +431,23 @@ class Activity extends React.Component {
       );
     }
 
-    return activities;
+    return (
+      <ScrollView refreshControl={
+        <RefreshControl
+          refreshing={this.state.refresh}
+          onRefresh={this.onRefresh.bind(this)}
+        />
+      }>
+        <View style={styles.subScroller}>
+          {activities}
+        </View>
+      </ScrollView>
+    );
+  }
+
+  onRefresh() {
+    this.setState({ refresh: true });
+    this.loadActivities();
   }
 
   async loadActivities() {
@@ -459,6 +473,7 @@ class Activity extends React.Component {
     }
 
     this.setState({
+      refresh: false,
       algoData: parsedActivities
     });
   }
