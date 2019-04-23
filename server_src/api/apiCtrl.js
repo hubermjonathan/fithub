@@ -304,21 +304,21 @@ let newLog = async function newLog(req, res) {
       all_sets.push(new_set); //push to global sets for saving later
       local_sets.push(new_set); //keep track of local sets to construct current exercise
     });
-    // let ensure_sets_validated = await Promise.all(set_validate_promises); //ensure all local sets have been validated
+    let ensure_sets_validated = await Promise.all(set_validate_promises); //ensure all local sets have been validated
 
-    // let new_exercise = new schemaCtrl.ExerciseData //create new exercise object with validated sets
-    //   ({
-    //     name: exercise.name,
-    //     muscle_groups: exercise.muscle_groups,
-    //     sets: local_sets
-    //   });
+    let new_exercise = new schemaCtrl.ExerciseData //create new exercise object with validated sets
+      ({
+        name: exercise.name,
+        muscle_groups: exercise.muscle_groups,
+        sets: local_sets
+      });
 
-    // //fire off validation for the exercise and save to the exercise list
-    // let promise = new_exercise.validate().catch(err => { res.status(500).send({ "message": "newLog: validation error creating exercises" }); return console.log(err) });
-    // exercise_validate_promises.push(promise);
-    // all_exercises.push(new_exercise);
+    //fire off validation for the exercise and save to the exercise list
+    let promise = new_exercise.validate().catch(err => { res.status(500).send({ "message": "newLog: validation error creating exercises" }); return console.log(err) });
+    exercise_validate_promises.push(promise);
+    all_exercises.push(new_exercise);
   }
-/*  let ensure_exercises_validated = await Promise.all(exercise_validate_promises);
+  let ensure_exercises_validated = await Promise.all(exercise_validate_promises);
   
   //If null, make something up
   if (newActivity == null) {
@@ -355,7 +355,7 @@ let newLog = async function newLog(req, res) {
     .catch(err => { res.status(500).send({ "message": "newLog: error updating user max" }); return console.log(err); });
   await user.updateOne({ $push: { logs: new_log._id, activity: newActivity } })
     .catch(err => { res.status(500).send({ "message": "newLog: pushing id and error updating user activity" }); return console.log(err); });
-*/
+
   res.status(200).send({ "message": "newLog: Success!" });
   //console.log(new_log);
 } //end newLog
