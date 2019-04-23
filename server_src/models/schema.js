@@ -27,7 +27,7 @@ let Profile = new Schema({
   maxes : { type : Object, default : {}, required : true },
   dates : { type : Object, default : {}, required : true  },
   volumes : { type : Object, default : {}, required : true  },  
-  activity : { type : Object, default : {}, required : true },
+  activity : { type : [String], default : [], required : true },
   following: [{ type: Schema.Types.ObjectId, ref: "Profile"}],         //Workout plans the user has submitted to the master list
   workouts: [{ type: Schema.Types.ObjectId, ref: "WorkoutPlan"}],         //Workout plans the user has submitted to the master list
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise"}],         //Private exercises
