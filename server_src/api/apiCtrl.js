@@ -255,7 +255,7 @@ let newLog = async function newLog(req, res) {
     gitLog = req.body.date;
   }
 
-  let newActivity;
+  let newActivity = `${user.name} worked out on ${req.body.date}!`
   if (gitLog in user.dates) {
     user.dates[gitLog]++;
   }
@@ -288,13 +288,10 @@ let newLog = async function newLog(req, res) {
           newActivity = `${user.name} has achieved a new max of ${set.weight} on ${exercise.name}`;
           user.maxes[exercise.name] = set.weight;
         }
-        console.log(newActivity);
       }
       else {
-        console.log(user.maxes);
         user.maxes[exercise.name] = set.weight;
         newActivity = `${user.name} has done ${exercise.name} for the first time!`;
-        console.log(newActivity);
       }
       //end
 
@@ -319,11 +316,6 @@ let newLog = async function newLog(req, res) {
     all_exercises.push(new_exercise);
   }
   let ensure_exercises_validated = await Promise.all(exercise_validate_promises);
-  
-  //If null, make something up
-  if (newActivity == null) {
-    newActivity = `${user.name} worked out on ${req.body.date}!`
-  }
 
   //create new log and fire off validate promise
   let new_log = new schemaCtrl.WorkoutData
@@ -912,7 +904,7 @@ let editLog = async function editLog(req, res) {
   //validate setData json input
 
   let exerciseData_ids = [];
-  let newActivity;
+  let newActivity = `${user.name} worked out on ${req.body.date}!`
   if (req.body.date in user.dates) {
     user.dates[req.body.date]++;
   } else {
@@ -934,10 +926,6 @@ let editLog = async function editLog(req, res) {
         newActivity = `${user.name} has done ${exercise.name} for the first time!`;
       }
     });
-
-    if (newActivity == null) {
-      newActivity = `${user.name} worked out on ${req.body.date}!`
-    }
 
     //build setData objects for the current exercise
     let setData_ids = [];

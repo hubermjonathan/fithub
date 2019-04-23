@@ -4,7 +4,7 @@ const configAuth = require('./auth');
 const schemaCtrl = require('../models/schema');
 
 const mongoose = require('mongoose');
-const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/test?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
+const url = "mongodb://admin:team5307@fithub-database-shard-00-00-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-01-3xylr.gcp.mongodb.net:27017,fithub-database-shard-00-02-3xylr.gcp.mongodb.net:27017/prod?ssl=true&replicaSet=fithub-database-shard-0&authSource=admin&retryWrites=true";
 const crypto = require('crypto');
 
 mongoose.connect(url, {
