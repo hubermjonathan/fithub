@@ -134,8 +134,10 @@ class Cards extends React.Component {
               <Text style={styles.badgeText}>{this.props.exercises[i].muscle_group}</Text>
             </View>
           </View>
-
-          <Sets sets={this.props.exercises[i].sets} />
+          {this.props.exercises[i].sets
+            ?<Sets sets={this.props.exercises[i].sets} />
+            :<Text>No sets exists</Text>
+          }
         </View>
       );
     }
