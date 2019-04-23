@@ -255,7 +255,18 @@ let newLog = async function newLog(req, res) {
     gitLog = req.body.date;
   }
 
-  let newActivity = `${user.name} worked out on ${req.body.date}!`
+  let formatDate;
+  if (req.body.date instanceof Date) {
+    const day = req.body.date.getDate();
+    const month = req.body.date.getMonth() + 1;
+    const year = req.body.date.getFullYear();
+    formatDate = `${year}-${month}-${day}`;
+  }
+  else {
+    formatDate = req.body.date.substring(0,10);
+  }
+
+  let newActivity = `${user.name} worked out on ${formatDate}!`;
   if (gitLog in user.dates) {
     user.dates[gitLog]++;
   }
@@ -345,7 +356,7 @@ let newLog = async function newLog(req, res) {
   //user activity and max
   await user.updateOne({ $set: { maxes: user.maxes, dates: user.dates } })
     .catch(err => { res.status(500).send({ "message": "newLog: error updating user max" }); return console.log(err); });
-  await user.updateOne({ $push: { logs: new_log._id } })
+  await user.updateOne({ $push: { logs: new_log._id, activity : newActivity } })
     .catch(err => { res.status(500).send({ "message": "newLog: pushing id and error updating user activity" }); return console.log(err); });
 
   res.status(200).send({ "message": "newLog: Success!" });
