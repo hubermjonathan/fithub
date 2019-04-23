@@ -255,7 +255,18 @@ let newLog = async function newLog(req, res) {
     gitLog = req.body.date;
   }
 
-  let newActivity;
+  let formatDate;
+  if (req.body.date instanceof Date) {
+    const day = req.body.date.getDate();
+    const month = req.body.date.getMonth() + 1;
+    const year = req.body.date.getFullYear();
+    formatDate = `${year}-${month}-${day}`;
+  }
+  else {
+    formatDate = req.body.date.substring(0,10);
+  }
+
+  let newActivity = `${user.name} worked out on ${formatDate}!`;
   if (gitLog in user.dates) {
     user.dates[gitLog]++;
   }
@@ -345,7 +356,7 @@ let newLog = async function newLog(req, res) {
   //user activity and max
   await user.updateOne({ $set: { maxes: user.maxes, dates: user.dates } })
     .catch(err => { res.status(500).send({ "message": "newLog: error updating user max" }); return console.log(err); });
-  await user.updateOne({ $push: { logs: new_log._id, activity: newActivity } })
+  await user.updateOne({ $push: { logs: new_log._id, activity : newActivity } })
     .catch(err => { res.status(500).send({ "message": "newLog: pushing id and error updating user activity" }); return console.log(err); });
 
   res.status(200).send({ "message": "newLog: Success!" });
@@ -900,15 +911,23 @@ let editLog = async function editLog(req, res) {
     }
   }
 
-
-  //validate setData json input
+  let formatDate;
+  if (req.body.date instanceof Date) {
+    const day = req.body.date.getDate();
+    const month = req.body.date.getMonth() + 1;
+    const year = req.body.date.getFullYear();
+    formatDate = `${year}-${month}-${day}`;
+  }
+  else {
+    formatDate = req.body.date.substring(0,10);
+  }
 
   let exerciseData_ids = [];
-  let newActivity;
-  if (req.body.date in user.dates) {
-    user.dates[req.body.date]++;
+  let newActivity = `${user.name} worked out on ${formatDate}!`;
+  if (formatDate in user.dates) {
+    user.dates[formatDate]++;
   } else {
-    user.dates[req.body.date] = 1;
+    user.dates[formatDate] = 1;
   }
   //Construct the exerciseData objects
   for (let i = 0; i < req.body.exercises.length; i++) {
@@ -926,10 +945,6 @@ let editLog = async function editLog(req, res) {
         newActivity = `${user.name} has done ${exercise.name} for the first time!`;
       }
     });
-
-    if (newActivity == null) {
-      newActivity = `${user.name} worked out on ${req.body.date}!`
-    }
 
     //build setData objects for the current exercise
     let setData_ids = [];
@@ -980,6 +995,8 @@ let editLog = async function editLog(req, res) {
   } catch (validation_err) { console.log("Input Error: validation failed creating WorkoutData"); return res.status(500).send({ "message": "Input Error: Validation error while constructing workoutData" }) };
   newWorkoutData.save().catch(err => { return res.status(500).send({ "message": "editLog: Error saving log" }) });
   user.updateOne({ $set: { maxes: user.maxes, dates: user.dates } }, {}, (err, raw) => { });
+  await user.updateOne({ $push: { activity: newActivity } })
+  .catch(err => { res.status(500).send({ "message": "newLog: pushing id and error updating user activity" }); return console.log(err); });
   return res.status(200).send({ "message": "Successfully edited workout: " + old_log_id });
 } //end newLog
 
