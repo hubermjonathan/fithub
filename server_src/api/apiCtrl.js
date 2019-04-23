@@ -915,10 +915,10 @@ let editLog = async function editLog(req, res) {
 
   let exerciseData_ids = [];
   let newActivity = `${user.name} worked out on ${formatDate}!`;
-  if (req.body.date in user.dates) {
-    user.dates[req.body.date]++;
+  if (formatDate in user.dates) {
+    user.dates[formatDate]++;
   } else {
-    user.dates[req.body.date] = 1;
+    user.dates[formatDate] = 1;
   }
   //Construct the exerciseData objects
   for (let i = 0; i < req.body.exercises.length; i++) {
